@@ -30,6 +30,8 @@
 #include "fatfsWrapper.h"
 #include "screen.h"
 #include "callbacks.h"
+#include "time.h"
+#include "logger.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -176,10 +178,6 @@ kuroBoxInit()
 	// EEPROM
 	spiEepromStart(&spiEepromD1, &eeprom_cfg, &SPID1);
 	
-	// LTC's ICU stage
-	icuStart(&ICUD1, &ltc_icucfg);
-	icuEnable(&ICUD1);
-	
 	// SDIO 
 	sdcStart(&SDCD1, &sdio_cfg);
 	
@@ -199,6 +197,14 @@ kuroBoxInit()
 	
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();
+
+	// LTC's thread and ICU stage
+	kuroBoxTimeInit();
+	icuStart(&ICUD1, &ltc_icucfg);
+	icuEnable(&ICUD1);
+	
+	// the actual logging thread
+	kuroBoxLogger();
 	
 	return KB_OK; 
 }

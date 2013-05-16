@@ -20,13 +20,13 @@
 
 */
 
-#ifndef _naniBox_kuroBox_callbacks
-#define _naniBox_kuroBox_callbacks
+#ifndef _naniBox_kuroBox_time
+#define _naniBox_kuroBox_time
 
 #include <ch.h>
-#include <hal.h>
 
 //-----------------------------------------------------------------------------
-void adc_trigger_cb(void * p);
+void ltc_icu_period_cb(ICUDriver *icup);
+int kuroBoxTimeInit();
 
-#endif // _naniBox_kuroBox_callbacks
+#endif // _naniBox_kuroBox_time

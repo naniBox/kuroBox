@@ -20,13 +20,16 @@
 
 */
 
-#ifndef _naniBox_kuroBox_callbacks
-#define _naniBox_kuroBox_callbacks
+#ifndef _naniBox_kuroBox_logger
+#define _naniBox_kuroBox_logger
 
 #include <ch.h>
-#include <hal.h>
 
 //-----------------------------------------------------------------------------
-void adc_trigger_cb(void * p);
+#define KB_LOG_PACKET_SIZE	512
 
-#endif // _naniBox_kuroBox_callbacks
+
+int kuroBoxLogger();
+
+
+#endif // _naniBox_kuroBox_logger

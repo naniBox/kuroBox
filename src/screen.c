@@ -23,7 +23,6 @@
 #include "screen.h"
 #include "nanibox_util.h"
 #include "ST7565.h"
-#include "ltc.h"
 #include <memstreams.h>
 #include <chprintf.h>
 #include <string.h>
@@ -36,6 +35,7 @@ struct kuroBoxScreen
 	uint16_t voltage;
 	uint32_t sdc_free;
 	char sdc_fname[23]; // we can fit 128/26=21.3 chars per line, i think
+	uint32_t counter;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,8 +69,7 @@ thScreen(void *arg)
 	BaseSequentialStream * bss = (BaseSequentialStream *)&msb;
 	while( !chThdShouldTerminate() )
 	{
-	st7565_clear(&ST7565D1);
-
+		st7565_clear(&ST7565D1);
 		
 		// 1st line contains title, voltage, MB free...		
 		st7565_drawstring(&ST7565D1, 0, 0, "kuroBox");
@@ -85,6 +84,7 @@ thScreen(void *arg)
 		chprintf(bss,"%2dV", screen.voltage/10);
 		st7565_drawstring(&ST7565D1, -C2P(3), 0, charbuf);
 
+		// LTC
 		INIT_CBUF();
 		chprintf(bss,"T: %.2d:%.2d:%.2d.%.2d",
 				screen.ltc.hours,
@@ -92,11 +92,14 @@ thScreen(void *arg)
 				screen.ltc.secs,
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
-
-
+		
+		// Counter
+		INIT_CBUF();
+		chprintf(bss,"C: %d", screen.counter );
+		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
 
 		st7565_display(&ST7565D1);
-		chThdSleepMilliseconds(500);
+		chThdSleepMilliseconds(20);
 	}
 	#undef INIT_CBUF
 	return 0;
@@ -114,4 +117,16 @@ int kuroBoxScreenInit()
 void kbs_setVoltage(uint16_t volts)
 {
 	screen.voltage = volts;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setLTC(SMPTETimecode * ltc)
+{
+	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setCounter(uint32_t count)
+{
+	screen.counter = count;
 }

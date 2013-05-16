@@ -166,7 +166,7 @@
  * @brief Enable wrapped calls to f_mkfs.
  */
 #if !defined(FATFS_WRP_ENABLE_MKDS) || defined(__DOXYGEN__)
-#define FATFS_WRP_ENABLE_MKFS                 1
+#define FATFS_WRP_ENABLE_MKFS                 0
 #endif
 
 /**

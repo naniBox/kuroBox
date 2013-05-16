@@ -2360,6 +2360,12 @@
       <name>$PROJ_DIR$\..\src\integer.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\src\logger.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\logger.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\src\main.c</name>
     </file>
     <file>
@@ -2385,6 +2391,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\ST7565.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\time.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\time.h</name>
     </file>
   </group>
 </project>

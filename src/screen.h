@@ -24,10 +24,13 @@
 #define _naniBox_kuroBox_screen
 
 #include <ch.h>
+#include <ltc.h>
 
 //-----------------------------------------------------------------------------
 int kuroBoxScreenInit();
 
-void kbs_setVoltage(uint16_t volts); // in volts*10
+void kbs_setVoltage(uint16_t volts);	// in volts*10
+void kbs_setLTC(SMPTETimecode * ltc);
+void kbs_setCounter(uint32_t count);
 
 #endif // _naniBox_kuroBox_screen

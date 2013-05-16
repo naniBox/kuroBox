@@ -23,11 +23,6 @@
 #include "callbacks.h"
 #include "screen.h"
 
-//-----------------------------------------------------------------------------
-void ltc_icu_period_cb(ICUDriver *icup)
-{
-}
-
 /* Total number of channels to be sampled by a single ADC operation.*/
 #define ADC_NUM_CHANNELS   3
 
