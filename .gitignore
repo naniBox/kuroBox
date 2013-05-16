@@ -15,3 +15,12 @@
 *.exe
 *.out
 *.app
+
+# IAR droppings
+/iar/Debug
+/iar/Release
+/iar/settings
+/iar/kuroBoxCustomSfr.sfr
+/iar/kuroBox.dep
+/iar/kuroBox.ewd
+
