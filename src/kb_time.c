@@ -56,16 +56,22 @@ void ltc_icu_period_cb(ICUDriver *icup)
 		}
 		if ( ltc_buffer_pos == LTC_BUFFER_SIZE )
 		{
+			palSetPad(GPIOB, GPIOB_LED1);
 			ltc_decoder_write(ltc_decoder, ltc_buffer[which_ltc_buffer], ltc_buffer_pos, 0);
+			palClearPad(GPIOB, GPIOB_LED1);
 			ltc_buffer_pos = 0;
 			
+			palSetPad(GPIOB, GPIOB_LED2);
 			chSysLockFromIsr();
 			if (timeThread != NULL) 
 			{
 				timeThread->p_u.rdymsg = (msg_t)1;
 				chSchReadyI(timeThread);
+				timeThread = NULL;
 			}
 			chSysUnlockFromIsr();
+			palClearPad(GPIOB, GPIOB_LED2);
+
 		}
 	}
 }
@@ -80,6 +86,7 @@ thTime(void *arg)
 	while( !chThdShouldTerminate() )
 	{
 		chSysLock();
+		timeThread = chThdSelf();
 		msg_t msg = chSchGoSleepTimeoutS(THD_STATE_SUSPENDED, MS2ST(10));
 		chSysUnlock();		
 		if ( msg == RDY_TIMEOUT )
