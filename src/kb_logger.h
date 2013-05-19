@@ -20,17 +20,16 @@
 
 */
 
-#ifndef _naniBox_kuroBox_screen
-#define _naniBox_kuroBox_screen
+#ifndef _naniBox_kuroBox_logger
+#define _naniBox_kuroBox_logger
 
 #include <ch.h>
-#include <ltc.h>
 
 //-----------------------------------------------------------------------------
-int kuroBoxScreenInit();
+#define KB_LOG_PACKET_SIZE	512
 
-void kbs_setVoltage(uint16_t volts);	// in volts*10
-void kbs_setLTC(SMPTETimecode * ltc);
-void kbs_setCounter(uint32_t count);
 
-#endif // _naniBox_kuroBox_screen
+int kuroBoxLogger(void);
+
+
+#endif // _naniBox_kuroBox_logger

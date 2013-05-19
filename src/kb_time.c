@@ -24,8 +24,8 @@
 #include <hal.h>
 #include <ltc.h>
 #include <string.h>
-#include "time.h"
-#include "screen.h"
+#include "kb_time.h"
+#include "kb_screen.h"
 
 //-----------------------------------------------------------------------------
 static Thread * timeThread;
@@ -95,7 +95,7 @@ thTime(void *arg)
 }
 	
 //-----------------------------------------------------------------------------
-int kuroBoxTimeInit()
+int kuroBoxTimeInit(void)
 {
 	memset(ltc_buffer, 0, sizeof(ltc_buffer));
 	which_ltc_buffer = 0;

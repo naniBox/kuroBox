@@ -21,8 +21,8 @@
 */
 
 //-----------------------------------------------------------------------------
-#include "logger.h"
-#include "screen.h"
+#include "kb_logger.h"
+#include "kb_screen.h"
 
 //-----------------------------------------------------------------------------
 /*static Thread * loggerThread;*/
@@ -54,7 +54,7 @@ thLogger(void *arg)
 	
 
 //-----------------------------------------------------------------------------
-int kuroBoxLogger()
+int kuroBoxLogger(void)
 {
 	/*loggerThread = */chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
 	

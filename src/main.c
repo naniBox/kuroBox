@@ -28,10 +28,10 @@
 #include "spiEEPROM.h"
 #include "ST7565.h"
 #include "fatfsWrapper.h"
-#include "screen.h"
-#include "callbacks.h"
-#include "time.h"
-#include "logger.h"
+#include "kb_screen.h"
+#include "kb_callbacks.h"
+#include "kb_time.h"
+#include "kb_logger.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -127,7 +127,7 @@ thBlinker(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBox_panic(panic_msg_t msg)
+void kuroBox_panic(int msg)
 {
 	switch( msg )
 	{
@@ -153,7 +153,7 @@ int kuroBox_panic(panic_msg_t msg)
 
 //-----------------------------------------------------------------------------
 int
-kuroBoxInit()
+kuroBoxInit(void)
 {
 	chDbgAssert(GS_INIT == global_state, "kuroBoxInit, 1", "global_state is not GS_INIT");
 

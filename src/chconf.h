@@ -33,7 +33,6 @@
 #define _CHCONF_H_
 
 #define PORT_IDLE_THREAD_STACK_SIZE     32
-#define CORTEX_USE_FPU                  TRUE
 
 /*===========================================================================*/
 /**
@@ -521,6 +520,7 @@
  * @details This hook is invoked in case to a system halting error before
  *          the system is halted.
  */
+void kuroBox_panic(int);
 #if !defined(SYSTEM_HALT_HOOK) || defined(__DOXYGEN__)
 #define SYSTEM_HALT_HOOK() {                                                \
   kuroBox_panic(1 /*unknown_panic*/);                                       \

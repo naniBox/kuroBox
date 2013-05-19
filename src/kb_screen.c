@@ -20,7 +20,7 @@
 
 */
 
-#include "screen.h"
+#include "kb_screen.h"
 #include "nanibox_util.h"
 #include "ST7565.h"
 #include <memstreams.h>
@@ -95,7 +95,7 @@ thScreen(void *arg)
 		
 		// Counter
 		INIT_CBUF();
-		chprintf(bss,"C: %d", screen.counter );
+		chprintf(bss,"Count: %d", screen.counter );
 		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
 
 		st7565_display(&ST7565D1);
@@ -106,7 +106,7 @@ thScreen(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxScreenInit()
+int kuroBoxScreenInit(void)
 {
 	memset(&screen, 0, sizeof(screen));
 	/*screenThread = */chThdCreateStatic(waScreen, sizeof(waScreen), NORMALPRIO, thScreen, NULL);

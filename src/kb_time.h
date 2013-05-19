@@ -20,16 +20,14 @@
 
 */
 
-#ifndef _naniBox_kuroBox_logger
-#define _naniBox_kuroBox_logger
+#ifndef _naniBox_kuroBox_time
+#define _naniBox_kuroBox_time
 
 #include <ch.h>
+#include <hal.h>
 
 //-----------------------------------------------------------------------------
-#define KB_LOG_PACKET_SIZE	512
+void ltc_icu_period_cb(ICUDriver *icup);
+int kuroBoxTimeInit(void);
 
-
-int kuroBoxLogger();
-
-
-#endif // _naniBox_kuroBox_logger
+#endif // _naniBox_kuroBox_time

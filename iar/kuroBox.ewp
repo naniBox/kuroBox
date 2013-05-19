@@ -2318,12 +2318,6 @@
       </file>
     </group>
     <file>
-      <name>$PROJ_DIR$\..\src\callbacks.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\callbacks.h</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\src\chconf.h</name>
     </file>
     <file>
@@ -2360,10 +2354,28 @@
       <name>$PROJ_DIR$\..\src\integer.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\src\logger.c</name>
+      <name>$PROJ_DIR$\..\src\kb_callbacks.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\src\logger.h</name>
+      <name>$PROJ_DIR$\..\src\kb_callbacks.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_logger.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_logger.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_screen.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_screen.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_time.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\kb_time.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\main.c</name>
@@ -2373,12 +2385,6 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\nanibox_util.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\screen.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\screen.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\spiEEPROM.c</name>
@@ -2391,12 +2397,6 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\src\ST7565.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\time.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\src\time.h</name>
     </file>
   </group>
 </project>

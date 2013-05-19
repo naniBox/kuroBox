@@ -20,8 +20,8 @@
 
 */
 
-#include "callbacks.h"
-#include "screen.h"
+#include "kb_callbacks.h"
+#include "kb_screen.h"
 
 /* Total number of channels to be sampled by a single ADC operation.*/
 #define ADC_NUM_CHANNELS   3

@@ -20,13 +20,17 @@
 
 */
 
-#ifndef _naniBox_kuroBox_time
-#define _naniBox_kuroBox_time
+#ifndef _naniBox_kuroBox_screen
+#define _naniBox_kuroBox_screen
 
 #include <ch.h>
+#include <ltc.h>
 
 //-----------------------------------------------------------------------------
-void ltc_icu_period_cb(ICUDriver *icup);
-int kuroBoxTimeInit();
+int kuroBoxScreenInit(void);
 
-#endif // _naniBox_kuroBox_time
+void kbs_setVoltage(uint16_t volts);	// in volts*10
+void kbs_setLTC(SMPTETimecode * ltc);
+void kbs_setCounter(uint32_t count);
+
+#endif // _naniBox_kuroBox_screen
