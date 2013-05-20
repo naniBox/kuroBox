@@ -5,8 +5,8 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
-#  USE_OPT = -g -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+#  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+  USE_OPT = -g -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
 endif
 
 # C specific options here (added to USE_OPT).
@@ -79,12 +79,14 @@ CSRC = $(PORTSRC) \
         $(PLATFORMSRC) \
         $(BOARDSRC) \
         $(CHIBIOS)/os/various/chprintf.c \
+        $(CHIBIOS)/os/various/chrtclib.c \
         $(CHIBIOS)/os/various/memstreams.c \
         ./src/fatfsWrapper.c \
         ./src/fatfs_diskio.c \
         ./src/ff.c \
         ./src/glcdfont.c \
-        ./src/kb_callbacks.c \
+        ./src/kb_adc.c \
+        ./src/kb_buttons.c \
         ./src/kb_logger.c \
         ./src/kb_screen.c \
         ./src/kb_time.c \

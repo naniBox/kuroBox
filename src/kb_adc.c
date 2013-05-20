@@ -20,7 +20,7 @@
 
 */
 
-#include "kb_callbacks.h"
+#include "kb_adc.h"
 #include "kb_screen.h"
 
 /* Total number of channels to be sampled by a single ADC operation.*/
@@ -33,7 +33,7 @@ void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static adcsample_t adc_samples[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
 
 //-----------------------------------------------------------------------------
-static const ADCConversionGroup adc_grp_cfg = 
+static const ADCConversionGroup adc_grp_cfg =
 {
 	FALSE,						// circular
 	ADC_NUM_CHANNELS,		// num channels
@@ -42,14 +42,14 @@ static const ADCConversionGroup adc_grp_cfg =
 	/* HW dependent part.*/
 	0,
 	ADC_CR2_SWSTART,
-	ADC_SMPR1_SMP_AN10(ADC_SAMPLE_56) | 
-	ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_56) | 
+	ADC_SMPR1_SMP_AN10(ADC_SAMPLE_56) |
+	ADC_SMPR1_SMP_SENSOR(ADC_SAMPLE_56) |
 	ADC_SMPR1_SMP_VBAT(ADC_SAMPLE_56),
 	0,
 	ADC_SQR1_NUM_CH(ADC_NUM_CHANNELS),
 	0,
-	ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10) | 
-	ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR) | 
+	ADC_SQR3_SQ1_N(ADC_CHANNEL_IN10) |
+	ADC_SQR3_SQ2_N(ADC_CHANNEL_SENSOR) |
 	ADC_SQR3_SQ3_N(ADC_CHANNEL_VBAT)
 };
 
@@ -70,11 +70,11 @@ void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 	(void) buffer; (void) n;
 	/* Note, only in the ADC_COMPLETE state because the ADC driver fires an
 	 intermediate callback when the buffer is half full.*/
-	if (adcp->state == ADC_COMPLETE) 
+	if (adcp->state == ADC_COMPLETE)
 	{
 		adcsample_t voltage = adc_make_avg(0);
 		kbs_setVoltage((voltage-100)/10);
-		// don't care about these yet 
+		// don't care about these yet
 		// @TODO: remove them from actual ADC capture?
 		//adcsample_t temperature = adc_make_avg(1);
 		//adcsample_t vbat= adc_make_avg(2);

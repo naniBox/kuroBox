@@ -24,8 +24,10 @@
 #include "nanibox_util.h"
 #include "ST7565.h"
 #include <memstreams.h>
+#include <chrtclib.h>
 #include <chprintf.h>
 #include <string.h>
+#include <time.h>
 
 //-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
@@ -92,11 +94,19 @@ thScreen(void *arg)
 				screen.ltc.secs,
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
-		
+
+		// @OTODO: remove these, they are just for show!
 		// Counter
 		INIT_CBUF();
 		chprintf(bss,"Count: %d", screen.counter );
 		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
+
+		INIT_CBUF();
+		struct tm timp;
+		rtcGetTimeTm(&RTCD1, &timp);
+		chprintf(bss, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d",timp.tm_year+1900,timp.tm_mon+1,timp.tm_mday,
+		   timp.tm_hour,timp.tm_min,timp.tm_sec);
+		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
 
 		st7565_display(&ST7565D1);
 		chThdSleepMilliseconds(20);

@@ -20,13 +20,15 @@
 
 */
 
-#ifndef _naniBox_kuroBox_callbacks
-#define _naniBox_kuroBox_callbacks
+#ifndef _naniBox_kuroBox_buttons
+#define _naniBox_kuroBox_buttons
 
 #include <ch.h>
 #include <hal.h>
 
 //-----------------------------------------------------------------------------
-void adc_trigger_cb(void * p);
+void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel);
+void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel);
 
-#endif // _naniBox_kuroBox_callbacks
+
+#endif /* _naniBox_kuroBox_buttons */

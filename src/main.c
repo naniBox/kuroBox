@@ -28,10 +28,11 @@
 #include "spiEEPROM.h"
 #include "ST7565.h"
 #include "fatfsWrapper.h"
-#include "kb_screen.h"
-#include "kb_callbacks.h"
-#include "kb_time.h"
+#include "kb_adc.h"
+#include "kb_buttons.h"
 #include "kb_logger.h"
+#include "kb_screen.h"
+#include "kb_time.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -112,6 +113,38 @@ static const ST7565Config lcd_cfg =
 };
 
 //-----------------------------------------------------------------------------
+static const EXTConfig extcfg = {
+  {
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_0_exti_cb},	// 0
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_1_exti_cb},	// 1
+    //{EXT_CH_MODE_DISABLED, NULL},	// 1
+
+    {EXT_CH_MODE_DISABLED, NULL},	// 2
+    {EXT_CH_MODE_DISABLED, NULL},	// 3
+    {EXT_CH_MODE_DISABLED, NULL},	// 4
+    {EXT_CH_MODE_DISABLED, NULL},	// 5
+    {EXT_CH_MODE_DISABLED, NULL},	// 6
+    {EXT_CH_MODE_DISABLED, NULL},	// 7
+    {EXT_CH_MODE_DISABLED, NULL},	// 8
+    {EXT_CH_MODE_DISABLED, NULL},	// 9
+    {EXT_CH_MODE_DISABLED, NULL},	// 10
+    {EXT_CH_MODE_DISABLED, NULL},	// 11
+    {EXT_CH_MODE_DISABLED, NULL},	// 12
+    {EXT_CH_MODE_DISABLED, NULL},	// 13
+    {EXT_CH_MODE_DISABLED, NULL},	// 14
+    {EXT_CH_MODE_DISABLED, NULL},	// 15
+    {EXT_CH_MODE_DISABLED, NULL},	// 16
+    {EXT_CH_MODE_DISABLED, NULL},	// 17
+    {EXT_CH_MODE_DISABLED, NULL},	// 18
+    {EXT_CH_MODE_DISABLED, NULL},	// 19
+    {EXT_CH_MODE_DISABLED, NULL},	// 20
+    {EXT_CH_MODE_DISABLED, NULL},	// 21
+    {EXT_CH_MODE_DISABLED, NULL}	// 22
+  }
+};
+
+
+//-----------------------------------------------------------------------------
 static WORKING_AREA(waBlinker, 128);
 static msg_t 
 thBlinker(void *arg) 
@@ -156,6 +189,10 @@ int
 kuroBoxInit(void)
 {
 	chDbgAssert(GS_INIT == global_state, "kuroBoxInit, 1", "global_state is not GS_INIT");
+
+	palSetPad(GPIOB, GPIOB_LED1);
+	palSetPad(GPIOB, GPIOB_LED2);
+	palSetPad(GPIOA, GPIOA_LED3);
 
 	// Serial
 	sdStart(&SD1, &serial1_cfg);
@@ -206,6 +243,14 @@ kuroBoxInit(void)
 	// the actual logging thread
 	kuroBoxLogger();
 	
+	chThdSleepMilliseconds(100);
+	palClearPad(GPIOB, GPIOB_LED1);
+	palClearPad(GPIOB, GPIOB_LED2);
+	palClearPad(GPIOA, GPIOA_LED3);
+
+	// buttons and stuff
+	extStart(&EXTD1, &extcfg);
+
 	return KB_OK; 
 }
 
