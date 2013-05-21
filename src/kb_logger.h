@@ -28,8 +28,6 @@
 //-----------------------------------------------------------------------------
 #define KB_LOG_PACKET_SIZE	512
 
-
 int kuroBoxLogger(void);
-
 
 #endif // _naniBox_kuroBox_logger

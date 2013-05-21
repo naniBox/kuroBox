@@ -21,13 +21,14 @@
 */
 
 #include "kb_buttons.h"
+#include "kb_screen.h"
 
 //-----------------------------------------------------------------------------
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	palTogglePad(GPIOB, GPIOB_LED2);
+	kbs_setBtn0(palReadPad(GPIOA, GPIOA_BTN0));
 }
 
 //-----------------------------------------------------------------------------
@@ -35,6 +36,6 @@ void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	palTogglePad(GPIOA, GPIOA_LED3);
+	kbs_setBtn1(palReadPad(GPIOA, GPIOA_BTN1));
 }
 

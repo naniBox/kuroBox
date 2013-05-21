@@ -64,22 +64,24 @@ void __early_init(void) {
 /**
  * @brief   SDC card detection.
  */
+
 bool_t sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 
   (void)sdcp;
-  /* TODO: Fill the implementation.*/
-  return TRUE;
+  return palReadPad(GPIOD, GPIOD_SD_DET);
 }
+
 
 /**
  * @brief   SDC card write protection detection.
  */
+
 bool_t sdc_lld_is_write_protected(SDCDriver *sdcp) {
 
   (void)sdcp;
-  /* TODO: Fill the implementation.*/
-  return FALSE;
+  return palReadPad(GPIOD, GPIOD_SD_WP);
 }
+
 #endif /* HAL_USE_SDC */
 
 #if HAL_USE_MMC_SPI || defined(__DOXYGEN__)

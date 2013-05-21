@@ -38,6 +38,8 @@ struct kuroBoxScreen
 	uint32_t sdc_free;
 	char sdc_fname[23]; // we can fit 128/26=21.3 chars per line, i think
 	uint32_t counter;
+	uint8_t btn0;
+	uint8_t btn1;
 };
 
 //-----------------------------------------------------------------------------
@@ -95,6 +97,8 @@ thScreen(void *arg)
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
 
+		//-----------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------
 		// @OTODO: remove these, they are just for show!
 		// Counter
 		INIT_CBUF();
@@ -107,6 +111,10 @@ thScreen(void *arg)
 		chprintf(bss, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d",timp.tm_year+1900,timp.tm_mon+1,timp.tm_mday,
 		   timp.tm_hour,timp.tm_min,timp.tm_sec);
 		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
+
+		INIT_CBUF();
+		chprintf(bss,"%d%d", screen.btn0, screen.btn1);
+		st7565_drawstring(&ST7565D1, C2P(8), 0, charbuf);
 
 		st7565_display(&ST7565D1);
 		chThdSleepMilliseconds(20);
@@ -139,4 +147,16 @@ void kbs_setLTC(SMPTETimecode * ltc)
 void kbs_setCounter(uint32_t count)
 {
 	screen.counter = count;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setBtn0(uint8_t on)
+{
+	screen.btn0 = on;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setBtn1(uint8_t on)
+{
+	screen.btn1 = on;
 }

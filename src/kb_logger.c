@@ -23,10 +23,105 @@
 //-----------------------------------------------------------------------------
 #include "kb_logger.h"
 #include "kb_screen.h"
+#include "fatfsWrapper.h"
+#include <hal.h>
 
 //-----------------------------------------------------------------------------
-/*static Thread * loggerThread;*/
+#define POLLING_INTERVAL                10
+#define POLLING_DELAY                   10
+
+//-----------------------------------------------------------------------------
+static Thread * loggerThread;
 uint32_t counter;
+static VirtualTimer poll_timer;
+uint8_t sd_det_count;
+static EventSource inserted_event, removed_event;
+struct EventListener inserted_event_listener, removed_event_listener;
+//-----------------------------------------------------------------------------
+static bool_t fs_ready;
+static FATFS SDC_FS;
+
+//-----------------------------------------------------------------------------
+static void
+poll_sd_stat(void *p)
+{
+	palTogglePad(GPIOA, GPIOA_LED3);
+
+	BaseBlockDevice *bbdp = p;
+
+	/* The presence check is performed only while the driver is not in a
+		transfer state because it is often performed by changing the mode of
+		the pin connected to the CS/D3 contact of the card, this could disturb
+		the transfer.*/
+	blkstate_t state = blkGetDriverState(bbdp);
+	chSysLockFromIsr();
+	if ((state != BLK_READING) && (state != BLK_WRITING))
+	{
+		/* Safe to perform the check.*/
+		if (sd_det_count > 0)
+		{
+			if (blkIsInserted(bbdp))
+			{
+				if (--sd_det_count == 0)
+				{
+					chEvtBroadcastI(&inserted_event);
+				}
+			}
+			else
+				sd_det_count = POLLING_INTERVAL;
+		}
+		else
+		{
+			if (!blkIsInserted(bbdp))
+			{
+				sd_det_count = POLLING_INTERVAL;
+				chEvtBroadcastI(&removed_event);
+			}
+		}
+	}
+	chVTSetI(&poll_timer, MS2ST(POLLING_DELAY), poll_sd_stat, bbdp);
+	chSysUnlockFromIsr();
+}
+
+//-----------------------------------------------------------------------------
+static void InsertHandler(eventid_t id)
+{
+	FRESULT err;
+
+	(void)id;
+	if (sdcConnect(&SDCD1))
+	{
+		return;
+	}
+	err = f_mount(0, &SDC_FS);
+	if (err != FR_OK)
+	{
+		sdcDisconnect(&SDCD1);
+		return;
+	}
+	fs_ready = TRUE;
+}
+
+//-----------------------------------------------------------------------------
+static void RemoveHandler(eventid_t id)
+{
+	(void)id;
+	sdcDisconnect(&SDCD1);
+	fs_ready = FALSE;
+}
+
+//-----------------------------------------------------------------------------
+void
+waitForSD(void)
+{
+
+}
+
+//-----------------------------------------------------------------------------
+static const evhandler_t evhndl[] = {
+		InsertHandler,
+		RemoveHandler
+};
 
 //-----------------------------------------------------------------------------
 static WORKING_AREA(waLogger, 128);
@@ -40,6 +135,8 @@ thLogger(void *arg)
 	{
 		sleep_until += MS2ST(5);            // Next deadline
 		// LOG IT!
+
+	    chEvtDispatch(evhndl, ALL_EVENTS);
 		counter++;
 		kbs_setCounter(counter);
 		
@@ -48,6 +145,7 @@ thLogger(void *arg)
 		while ( sleep_until < chTimeNow() )
 			sleep_until += MS2ST(5);
 		chThdSleepUntil(sleep_until);
+
 	}
 	return 0;
 }
@@ -56,7 +154,16 @@ thLogger(void *arg)
 //-----------------------------------------------------------------------------
 int kuroBoxLogger(void)
 {
-	/*loggerThread = */chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
+	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
+	return 0;
+	chEvtRegister(&inserted_event, &inserted_event_listener, 0);
+	chEvtRegister(&removed_event, &removed_event_listener, 1);
+	chEvtInit(&inserted_event);
+	chEvtInit(&removed_event);
+	chSysLock();
+	sd_det_count = POLLING_INTERVAL;
+	chVTSetI(&poll_timer, MS2ST(POLLING_DELAY), poll_sd_stat, NULL);
+	chSysUnlock();
 	
 	return 0;
 }
