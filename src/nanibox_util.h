@@ -43,6 +43,7 @@ typedef enum
 
 //----------------------------------------------------------------------------
 #define KB_OK				0
-#define KB_UNKNOWN_ERR		1
+#define KB_NOT_OK			1
+#define KB_UNKNOWN_ERR		255
 
 #endif // _naniBox_kuroBox_nb_util

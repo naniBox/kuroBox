@@ -23,73 +23,36 @@
 //-----------------------------------------------------------------------------
 #include "kb_logger.h"
 #include "kb_screen.h"
+#include "nanibox_util.h"
 #include "fatfsWrapper.h"
 #include <hal.h>
 
 //-----------------------------------------------------------------------------
-#define POLLING_INTERVAL                10
-#define POLLING_DELAY                   10
+#define LS_INIT			0
+#define LS_WAIT_FOR_SD	1
+#define LS_RUNNING		2
+#define LS_EXITING		3
+
+//-----------------------------------------------------------------------------
+#define POLLING_COUNT			10
+#define POLLING_DELAY			10
 
 //-----------------------------------------------------------------------------
 static Thread * loggerThread;
 uint32_t counter;
-static VirtualTimer poll_timer;
 uint8_t sd_det_count;
-static EventSource inserted_event, removed_event;
-struct EventListener inserted_event_listener, removed_event_listener;
+uint8_t logger_state;
 //-----------------------------------------------------------------------------
 static bool_t fs_ready;
 static FATFS SDC_FS;
 
 //-----------------------------------------------------------------------------
 static void
-poll_sd_stat(void *p)
-{
-	palTogglePad(GPIOA, GPIOA_LED3);
-
-	BaseBlockDevice *bbdp = p;
-
-	/* The presence check is performed only while the driver is not in a
-		transfer state because it is often performed by changing the mode of
-		the pin connected to the CS/D3 contact of the card, this could disturb
-		the transfer.*/
-	blkstate_t state = blkGetDriverState(bbdp);
-	chSysLockFromIsr();
-	if ((state != BLK_READING) && (state != BLK_WRITING))
-	{
-		/* Safe to perform the check.*/
-		if (sd_det_count > 0)
-		{
-			if (blkIsInserted(bbdp))
-			{
-				if (--sd_det_count == 0)
-				{
-					chEvtBroadcastI(&inserted_event);
-				}
-			}
-			else
-				sd_det_count = POLLING_INTERVAL;
-		}
-		else
-		{
-			if (!blkIsInserted(bbdp))
-			{
-				sd_det_count = POLLING_INTERVAL;
-				chEvtBroadcastI(&removed_event);
-			}
-		}
-	}
-	chVTSetI(&poll_timer, MS2ST(POLLING_DELAY), poll_sd_stat, bbdp);
-	chSysUnlockFromIsr();
-}
-
-//-----------------------------------------------------------------------------
-static void InsertHandler(eventid_t id)
+on_insert(void)
 {
 	FRESULT err;
 
-	(void)id;
-	if (sdcConnect(&SDCD1))
+	if (sdcConnect(&SDCD1) != CH_SUCCESS)
 	{
 		return;
 	}
@@ -99,53 +62,140 @@ static void InsertHandler(eventid_t id)
 		sdcDisconnect(&SDCD1);
 		return;
 	}
+
+	chThdSleepMilliseconds(100);
+	uint32_t clusters;
+	FATFS *fsp;
+	err = f_getfree("/", &clusters, &fsp);
+	if (err != FR_OK)
+	{
+		sdcDisconnect(&SDCD1);
+		return;
+	}
+	uint64_t cardsize = clusters * (uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE;
+	uint32_t cardsize_MB = cardsize / (1024*1024);
+	kbs_setSDCFree(cardsize_MB);
+
 	fs_ready = TRUE;
+	logger_state = LS_RUNNING;
+	counter = 0;
 }
 
 //-----------------------------------------------------------------------------
-static void RemoveHandler(eventid_t id)
+static void
+on_remove(void)
 {
-	(void)id;
 	sdcDisconnect(&SDCD1);
 	fs_ready = FALSE;
+	counter = 10000000;
+	kbs_setSDCFree(0);
 }
 
 //-----------------------------------------------------------------------------
-void
-waitForSD(void)
+static uint8_t
+wait_for_sd(void)
 {
-
-}
-
-//-----------------------------------------------------------------------------
-static const evhandler_t evhndl[] = {
-		InsertHandler,
-		RemoveHandler
-};
-
-//-----------------------------------------------------------------------------
-static WORKING_AREA(waLogger, 128);
-static msg_t 
-thLogger(void *arg) 
-{
-	(void)arg;
-	chRegSetThreadName("Logger");
-	systime_t sleep_until = chTimeNow();
-	while( !chThdShouldTerminate() )
+	while(1)
 	{
-		sleep_until += MS2ST(5);            // Next deadline
-		// LOG IT!
+		if (sdc_lld_is_card_inserted(&SDCD1))
+		{
+			if (--sd_det_count == 0)
+			{
+				on_insert();
+				break;
+			}
+		}
+		else
+		{
+			sd_det_count = POLLING_COUNT;
+		}
+		chThdSleepMilliseconds(POLLING_DELAY);
+	}
+	return KB_OK;
+}
 
-	    chEvtDispatch(evhndl, ALL_EVENTS);
+//-----------------------------------------------------------------------------
+static uint8_t
+sd_card_status(void)
+{
+	uint8_t ret = KB_OK;
+	blkstate_t state = blkGetDriverState(&SDCD1);
+	if ((state != BLK_READING) && (state != BLK_WRITING))
+	{
+		if (!sdc_lld_is_card_inserted(&SDCD1))
+		{
+			on_remove();
+			logger_state = LS_WAIT_FOR_SD;
+			sd_det_count = POLLING_COUNT;
+		}
+	}
+	return ret;
+}
+
+//-----------------------------------------------------------------------------
+static uint8_t
+run(void)
+{
+	uint8_t ret = 1;
+	systime_t sleep_until = chTimeNow() + MS2ST(5);
+	while(LS_RUNNING == logger_state)
+	{
+		if (chThdShouldTerminate())
+		{
+			logger_state = LS_EXITING;
+			break;
+		}
+
+		//------------------------------------------------------
+		// LOG IT!
+		//------------------------------------------------------
+
+		//------------------------------------------------------
 		counter++;
 		kbs_setCounter(counter);
-		
-		// chTimeNow() will roll over every ~49 days 
+
+		sd_card_status();
+		if (LS_RUNNING != logger_state)
+			break;
+		//------------------------------------------------------
+
+		// chTimeNow() will roll over every ~49 days
 		// @TODO: make this code handle that
 		while ( sleep_until < chTimeNow() )
 			sleep_until += MS2ST(5);
 		chThdSleepUntil(sleep_until);
+		sleep_until += MS2ST(5);            // Next deadline
+	}
+	return ret;
+}
 
+//-----------------------------------------------------------------------------
+static WORKING_AREA(waLogger, 1024*1);
+static msg_t 
+thLogger(void *arg) 
+{
+	chDbgAssert(LS_INIT == logger_state, "thLogger, 1", "logger_state is not LS_INIT");
+	(void)arg;
+	chRegSetThreadName("Logger");
+
+	sd_det_count = POLLING_COUNT;
+	logger_state = LS_WAIT_FOR_SD;
+	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
+	{
+		switch ( logger_state )
+		{
+		case LS_INIT:
+			chDbgAssert(0, "thLogger, 2", "logger_state is should not be LS_INIT");
+			break;
+		case LS_WAIT_FOR_SD:
+			wait_for_sd();
+			break;
+		case LS_RUNNING:
+			run();
+			break;
+		case LS_EXITING:
+			break;
+		}
 	}
 	return 0;
 }
@@ -154,16 +204,8 @@ thLogger(void *arg)
 //-----------------------------------------------------------------------------
 int kuroBoxLogger(void)
 {
+	chDbgAssert(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
+
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
-	return 0;
-	chEvtRegister(&inserted_event, &inserted_event_listener, 0);
-	chEvtRegister(&removed_event, &removed_event_listener, 1);
-	chEvtInit(&inserted_event);
-	chEvtInit(&removed_event);
-	chSysLock();
-	sd_det_count = POLLING_INTERVAL;
-	chVTSetI(&poll_timer, MS2ST(POLLING_DELAY), poll_sd_stat, NULL);
-	chSysUnlock();
-	
 	return 0;
 }

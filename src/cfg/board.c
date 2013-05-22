@@ -68,7 +68,7 @@ void __early_init(void) {
 bool_t sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 
   (void)sdcp;
-  return palReadPad(GPIOD, GPIOD_SD_DET);
+  return palReadPad(GPIOD, GPIOD_SD_DET) == PAL_LOW;
 }
 
 
@@ -79,7 +79,7 @@ bool_t sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 bool_t sdc_lld_is_write_protected(SDCDriver *sdcp) {
 
   (void)sdcp;
-  return palReadPad(GPIOD, GPIOD_SD_WP);
+  return palReadPad(GPIOD, GPIOD_SD_WP) == PAL_HIGH;
 }
 
 #endif /* HAL_USE_SDC */

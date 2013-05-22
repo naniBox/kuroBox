@@ -21,20 +21,34 @@
 							<builder autoBuildTarget="all" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="org.eclipse.cdt.build.core.settings.default.builder.1309655024" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1248112929" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.175440426" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.405389427" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ChibiOS-RT (whole tree)}&quot;"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.405389427" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\kernel\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\hal\include&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.760914929" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.2040113618" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1446857874" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ChibiOS-RT (whole tree)}&quot;"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1446857874" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\kernel\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\hal\include&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.287406136" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1181033515" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1486853000" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ChibiOS-RT (whole tree)}&quot;"/>
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1486853000" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\kernel\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\kernel\src&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\ChibiStudio\chibios\os\hal\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\src\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32F4xx\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\GPIOv2\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\I2Cv1\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\OTGv1\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\RTCv2\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\SPIv1\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\hal\platforms\STM32\USARTv1\&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;c:\ChibiStudio\chibios\os\various\&quot;"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1945234128" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>

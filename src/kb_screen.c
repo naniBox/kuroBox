@@ -80,7 +80,7 @@ thScreen(void *arg)
 
 		// free bytes
 		INIT_CBUF();
-		chprintf(bss,"%4dMB", screen.sdc_free>1000?1000:screen.sdc_free);
+		chprintf(bss,"%4dMB", screen.sdc_free);
 		st7565_drawstring(&ST7565D1, C2P(10), 0, charbuf);
 
 		// input voltage
@@ -114,7 +114,7 @@ thScreen(void *arg)
 
 		INIT_CBUF();
 		chprintf(bss,"%d%d", screen.btn0, screen.btn1);
-		st7565_drawstring(&ST7565D1, C2P(8), 0, charbuf);
+		st7565_drawstring(&ST7565D1, C2P(7), 0, charbuf);
 
 		st7565_display(&ST7565D1);
 		chThdSleepMilliseconds(20);
@@ -147,6 +147,12 @@ void kbs_setLTC(SMPTETimecode * ltc)
 void kbs_setCounter(uint32_t count)
 {
 	screen.counter = count;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setSDCFree(uint32_t sdc_free)
+{
+	screen.sdc_free = sdc_free;
 }
 
 //-----------------------------------------------------------------------------
