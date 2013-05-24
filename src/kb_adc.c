@@ -76,7 +76,8 @@ void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 		kbs_setVoltage((voltage-100)/10);
 		// don't care about these yet
 		// @TODO: remove them from actual ADC capture?
-		//adcsample_t temperature = adc_make_avg(1);
+		adcsample_t temperature = adc_make_avg(1);
+		kbs_setTemperature((temperature*10-9000)/25+25);
 		//adcsample_t vbat= adc_make_avg(2);
 	}
 }

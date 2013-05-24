@@ -30,12 +30,16 @@
 #include <time.h>
 
 //-----------------------------------------------------------------------------
+#define SCREEN_REFRESH_SLEEP			40
+
+//-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
 struct kuroBoxScreen
 {
 	SMPTETimecode ltc;
 	uint16_t voltage;
-	uint32_t sdc_free;
+	int16_t temperature;
+	int32_t sdc_free;
 	char sdc_fname[23]; // we can fit 128/26=21.3 chars per line, i think
 	uint32_t counter;
 	uint8_t btn0;
@@ -56,6 +60,7 @@ thScreen(void *arg)
 	(void)arg;
 	chRegSetThreadName("Screen");
 	
+
 	// let the splash screen get some glory, but not 
 	// in debug, gotta get work DONE!
 #ifdef NDEBUG
@@ -80,13 +85,21 @@ thScreen(void *arg)
 
 		// free bytes
 		INIT_CBUF();
-		chprintf(bss,"%4dMB", screen.sdc_free);
+		int32_t sdc_free = screen.sdc_free<0?-screen.sdc_free:screen.sdc_free;
+		chprintf(bss,"%4dMB", sdc_free);
 		st7565_drawstring(&ST7565D1, C2P(10), 0, charbuf);
+		if ( screen.sdc_free<0 )
+			st7565_drawline(&ST7565D1, C2P(10), CHAR_HEIGHT, C2P(16), 0, COLOUR_BLACK);
 
 		// input voltage
 		INIT_CBUF();
 		chprintf(bss,"%2dV", screen.voltage/10);
 		st7565_drawstring(&ST7565D1, -C2P(3), 0, charbuf);
+
+		// core temperature
+		//INIT_CBUF();
+		//chprintf(bss,"%2d", screen.temperature);
+		//st7565_drawstring(&ST7565D1, -C2P(2), 0, charbuf);
 
 		// LTC
 		INIT_CBUF();
@@ -97,18 +110,21 @@ thScreen(void *arg)
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
 
+		// file name & count
+		INIT_CBUF();
+		chprintf(bss,"F: %s /%d",
+				screen.sdc_fname,
+				screen.counter);
+		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
+
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		// @OTODO: remove these, they are just for show!
-		// Counter
-		INIT_CBUF();
-		chprintf(bss,"Count: %d", screen.counter );
-		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
 
 		INIT_CBUF();
 		struct tm timp;
 		rtcGetTimeTm(&RTCD1, &timp);
-		chprintf(bss, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d",timp.tm_year+1900,timp.tm_mon+1,timp.tm_mday,
+		chprintf(bss, "%.4d%.2d%.2d %.2d%.2d%.2d",timp.tm_year+1900,timp.tm_mon+1,timp.tm_mday,
 		   timp.tm_hour,timp.tm_min,timp.tm_sec);
 		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
 
@@ -116,8 +132,14 @@ thScreen(void *arg)
 		chprintf(bss,"%d%d", screen.btn0, screen.btn1);
 		st7565_drawstring(&ST7565D1, C2P(7), 0, charbuf);
 
+		INIT_CBUF();
+		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
+		chprintf(bss,"%d", idle_time);
+		st7565_drawstring(&ST7565D1, C2P(-2), 3, charbuf);
+
+
 		st7565_display(&ST7565D1);
-		chThdSleepMilliseconds(20);
+		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
 	}
 	#undef INIT_CBUF
 	return 0;
@@ -138,6 +160,12 @@ void kbs_setVoltage(uint16_t volts)
 }
 
 //-----------------------------------------------------------------------------
+void kbs_setTemperature(int16_t temperature)
+{
+	screen.temperature = temperature;
+}
+
+//-----------------------------------------------------------------------------
 void kbs_setLTC(SMPTETimecode * ltc)
 {
 	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
@@ -150,9 +178,15 @@ void kbs_setCounter(uint32_t count)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setSDCFree(uint32_t sdc_free)
+void kbs_setSDCFree(int32_t sdc_free)
 {
 	screen.sdc_free = sdc_free;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setFName(const char * fname)
+{
+	strcpy(screen.sdc_fname, fname);
 }
 
 //-----------------------------------------------------------------------------

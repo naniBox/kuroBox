@@ -26,6 +26,11 @@
 #include "nanibox_util.h"
 #include "fatfsWrapper.h"
 #include <hal.h>
+#include <memstreams.h>
+#include <chprintf.h>
+#include <ltc.h>
+#include <time.h>
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 #define LS_INIT			0
@@ -38,13 +43,101 @@
 #define POLLING_DELAY			10
 
 //-----------------------------------------------------------------------------
-static Thread * loggerThread;
-uint32_t counter;
-uint8_t sd_det_count;
-uint8_t logger_state;
+#define LOG_BUFFER_SIZE			4
+#define LOG_MESSAGE_SIZE		512
+
 //-----------------------------------------------------------------------------
-static bool_t fs_ready;
+struct __PACKED__ ltc_msg_v01
+{
+	SMPTETimecode smpte_timecode;	// 13
+};
+STATIC_ASSERT(sizeof(struct ltc_msg_v01)==13, LTC_MESSAGE_SIZE);
+
+//-----------------------------------------------------------------------------
+struct __PACKED__ log_msg_v01
+{
+	uint32_t preamble;			// 4
+	uint8_t version;			// 1
+	uint8_t checksum;			// 1
+	uint16_t msg_size;			// 2
+	uint32_t msg_num;			// 4
+	uint32_t write_errors;		// 4
+								// =16
+
+	struct ltc_msg_v01 ltc;		// 13
+	struct tm rtc;				// 9*4=36
+
+	uint8_t __pad[512 - 16 - 13 - 36];
+};
+STATIC_ASSERT(sizeof(struct log_msg_v01)==LOG_MESSAGE_SIZE, LOG_MESSAGE_SIZE);
+
+
+//-----------------------------------------------------------------------------
+static Thread * loggerThread;
+static uint8_t sd_det_count;
+static uint8_t logger_state;
+
+//-----------------------------------------------------------------------------
+static uint8_t fs_ready;
+static uint8_t fs_write_protected;
 static FATFS SDC_FS;
+
+//-----------------------------------------------------------------------------
+static struct log_msg_v01 current_msg,writing_msg;
+
+#define NANIBOX_DNAME "/nanibox"
+#define KUROBOX_FNAME_STEM "kuro"
+#define KUROBOX_FNAME_EXT ".kbb"
+FIL kbfile;
+
+//-----------------------------------------------------------------------------
+static uint8_t
+make_dirs(void)
+{
+	FRESULT err;
+	DIR naniBox_dir;
+	err = f_opendir(&naniBox_dir, NANIBOX_DNAME);
+	if (FR_NO_PATH == err)
+	{
+		err = f_mkdir(NANIBOX_DNAME);
+	}
+	return err;
+}
+
+//-----------------------------------------------------------------------------
+static uint8_t
+new_file(void)
+{
+	char charbuf[64];
+	MemoryStream msb;
+	FRESULT err = FR_OK;
+	uint16_t fnum = 0;
+	for( ; fnum < 1000 ; fnum++ )
+	{
+		memset(charbuf,0,sizeof(charbuf));
+		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
+		chprintf((BaseSequentialStream *)&msb, "%s/%s%.4d%s", NANIBOX_DNAME, KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
+		err = f_open(&kbfile, charbuf, FA_WRITE|FA_CREATE_NEW);
+		f_sync(&kbfile);
+		if (err == FR_EXIST)
+			continue;
+		else if (err != FR_OK)
+			return err;
+		else
+			break;
+	}
+
+	// we can only get an OK if we opened the file
+	if (err == FR_OK)
+	{
+		memset(charbuf,0,sizeof(charbuf));
+		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
+		chprintf((BaseSequentialStream *)&msb, "%s%.4d%s", KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
+		kbs_setFName(charbuf);
+	}
+
+	return err;
+}
 
 //-----------------------------------------------------------------------------
 static void
@@ -74,11 +167,29 @@ on_insert(void)
 	}
 	uint64_t cardsize = clusters * (uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE;
 	uint32_t cardsize_MB = cardsize / (1024*1024);
+
+	fs_write_protected = sdc_lld_is_write_protected(&SDCD1);
+	if ( fs_write_protected )
+		cardsize_MB = -cardsize_MB;
 	kbs_setSDCFree(cardsize_MB);
+
+	err = make_dirs();
+	if (err != FR_OK)
+	{
+		sdcDisconnect(&SDCD1);
+		return;
+	}
+
+	err = new_file();
+	if (err != FR_OK)
+	{
+		sdcDisconnect(&SDCD1);
+		return;
+	}
 
 	fs_ready = TRUE;
 	logger_state = LS_RUNNING;
-	counter = 0;
+	current_msg.msg_num = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -86,9 +197,9 @@ static void
 on_remove(void)
 {
 	sdcDisconnect(&SDCD1);
-	fs_ready = FALSE;
-	counter = 10000000;
 	kbs_setSDCFree(0);
+	kbs_setFName("");
+	fs_ready = FALSE;
 }
 
 //-----------------------------------------------------------------------------
@@ -148,11 +259,18 @@ run(void)
 
 		//------------------------------------------------------
 		// LOG IT!
+		memcpy(&writing_msg, &current_msg, sizeof(writing_msg));
+		UINT bytes_written = 0;
+		FRESULT err = f_write(&kbfile, &current_msg, sizeof(writing_msg), &bytes_written);
+		if (bytes_written != sizeof(writing_msg) || err != FR_OK)
+			current_msg.write_errors++;
+		if (current_msg.msg_num%128==0)
+			f_sync(&kbfile);
+
 		//------------------------------------------------------
 
 		//------------------------------------------------------
-		counter++;
-		kbs_setCounter(counter);
+		kbs_setCounter(current_msg.msg_num);
 
 		sd_card_status();
 		if (LS_RUNNING != logger_state)
@@ -162,9 +280,14 @@ run(void)
 		// chTimeNow() will roll over every ~49 days
 		// @TODO: make this code handle that
 		while ( sleep_until < chTimeNow() )
+		{
+			// this code handles for when we skipped a writing-slot
+			current_msg.msg_num++;
 			sleep_until += MS2ST(5);
+		}
 		chThdSleepUntil(sleep_until);
 		sleep_until += MS2ST(5);            // Next deadline
+		current_msg.msg_num++;
 	}
 	return ret;
 }
@@ -206,6 +329,6 @@ int kuroBoxLogger(void)
 {
 	chDbgAssert(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
 
-	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
+	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
 	return 0;
 }

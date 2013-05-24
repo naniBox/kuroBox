@@ -25,6 +25,7 @@
 #include <hal.h>
 #include <chprintf.h>
 #include <memstreams.h>
+#include <time.h>
 #include "spiEEPROM.h"
 #include "ST7565.h"
 #include "fatfsWrapper.h"
@@ -221,9 +222,6 @@ kuroBoxInit(void)
 	// just blink to indicate we haven't crashed
 	/*blinkerThread = */chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
 
-	// start the FatFS wrapper
-	wf_init (HIGHPRIO);	
-	
 	// read config goes here
 	// @TODO: add config reading from eeprom
 	
@@ -260,6 +258,18 @@ int main(void)
 	global_state = GS_INIT;
 	halInit();
 	chSysInit();
+
+	/*
+		struct tm timp;
+		timp.tm_sec = 0;
+		timp.tm_min = 18;
+		timp.tm_hour = 0;
+		timp.tm_mday = 25; // -1
+		timp.tm_mon = 5;
+		timp.tm_year = 113;
+		rtcSetTimeTm(&RTCD1, &timp);
+	 */
+
 	if ( KB_OK != kuroBoxInit() )
 		global_state = GS_ERROR;
 	else

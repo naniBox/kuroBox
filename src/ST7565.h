@@ -31,8 +31,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "hal.h"
 #include "nanibox_util.h"
 
-#define BLACK 1
-#define WHITE 0
+#define COLOUR_BLACK 1
+#define COLOUR_WHITE 0
 
 #define LCDWIDTH					128
 #define LCDHEIGHT					32
@@ -40,8 +40,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define ST7565_BUFFER_SIZE			(LCDWIDTH*LCDHEIGHT>>3)  // 512 bytes
 
 
-// chars 2 pixels
-#define C2P(c) (c*6)
+// chars to pixels
+#define CHAR_WIDTH 		6
+#define CHAR_HEIGHT 	7
+#define C2P(c) 			(c*CHAR_WIDTH)
 
 typedef struct ST7565Config ST7565Config;
 struct ST7565Config
@@ -68,6 +70,7 @@ void st7565_clear(ST7565Driver * stdp);
 void st7565_drawchar(ST7565Driver * stdp, int8_t x, uint8_t line, char c);
 void st7565_drawstring(ST7565Driver * stdp, int8_t x, uint8_t line, const char *str);
 void st7565_setpixel(ST7565Driver * stdp, uint8_t x, uint8_t y, uint8_t colour);
+void st7565_drawline(ST7565Driver * stdp, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
 
 /*
 class ST7565 {

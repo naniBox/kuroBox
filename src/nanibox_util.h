@@ -42,6 +42,22 @@ typedef enum
 } panic_msg_t;
 
 //----------------------------------------------------------------------------
+#define swap_u8(a,b) {uint8_t x=a;a=b;b=x;}
+#define __PACKED__ __attribute__ ((packed))
+
+// http://stackoverflow.com/questions/174356/ways-to-assert-expressions-at-build-time-in-c
+#ifdef __GNUC__
+#define STATIC_ASSERT_HELPER(expr, msg) \
+    (!!sizeof(struct { unsigned int STATIC_ASSERTION__##msg: (expr) ? 1 : -1; }))
+#define STATIC_ASSERT(expr, msg) \
+    extern int (*assert_function__(void)) [STATIC_ASSERT_HELPER(expr, msg)]
+#else
+    #define STATIC_ASSERT(expr, msg)   						\
+		extern char STATIC_ASSERTION__##msg[1]; 			\
+		extern char STATIC_ASSERTION__##msg[(expr)?1:2]
+#endif /* #ifdef __GNUC__ */
+
+//----------------------------------------------------------------------------
 #define KB_OK				0
 #define KB_NOT_OK			1
 #define KB_UNKNOWN_ERR		255

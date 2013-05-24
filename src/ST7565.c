@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "hal.h"
 #include "string.h"
 #include "ST7565.h"
+#include <stdlib.h>
 
 ST7565Driver ST7565D1;
 
@@ -308,7 +309,53 @@ st7565_setpixel(ST7565Driver * stdp, uint8_t x, uint8_t y, uint8_t colour)
 	updateBoundingBox(x, y, x, y);
 }
 
+//----------------------------------------------------------------------------
+// bresenham's algorithm - thx wikpedia
+void
+st7565_drawline(ST7565Driver * stdp, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color)
+{
+	uint8_t steep = abs( y1 - y0 ) > abs( x1 - x0 );
+	if ( steep )
+	{
+		swap_u8( x0, y0 );
+		swap_u8( x1, y1 );
+	}
 
+	if ( x0 > x1 )
+	{
+		swap_u8( x0, x1 );
+		swap_u8( y0, y1 );
+	}
+
+	// much faster to put the test here, since we've already sorted the points
+	updateBoundingBox( x0, y0, x1, y1 );
+
+	uint8_t dx, dy;
+	dx = x1 - x0;
+	dy = abs( y1 - y0 );
+
+	int8_t err = dx / 2;
+	int8_t ystep;
+
+	if ( y0 < y1 )
+		ystep = 1;
+	else
+		ystep = -1;
+
+	for ( ; x0<=x1; x0++ )
+	{
+		if ( steep )
+			st7565_setpixel( stdp, y0, x0, color );
+		else
+			st7565_setpixel( stdp, x0, y0, color );
+		err -= dy;
+		if ( err < 0 )
+		{
+			y0 += ystep;
+			err += dx;
+		}
+	}
+}
 /*
 //----------------------------------------------------------------------------
 #define ST7565_STARTBYTES 0

@@ -30,9 +30,11 @@
 int kuroBoxScreenInit(void);
 
 void kbs_setVoltage(uint16_t volts);	// in volts*10
+void kbs_setTemperature(int16_t temperature);	// in C
 void kbs_setLTC(SMPTETimecode * ltc);
 void kbs_setCounter(uint32_t count);
-void kbs_setSDCFree(uint32_t sdc_free);
+void kbs_setSDCFree(int32_t sdc_free);	// if negative, then write protected
+void kbs_setFName(const char * fname);
 void kbs_setBtn0(uint8_t on);
 void kbs_setBtn1(uint8_t on);
 
