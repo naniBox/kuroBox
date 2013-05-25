@@ -5,8 +5,8 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-#  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
-  USE_OPT = -g -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+#  USE_OPT = -g -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
 endif
 
 # C specific options here (added to USE_OPT).
@@ -81,6 +81,7 @@ CSRC = $(PORTSRC) \
         $(CHIBIOS)/os/various/chprintf.c \
         $(CHIBIOS)/os/various/chrtclib.c \
         $(CHIBIOS)/os/various/memstreams.c \
+        ./src/kb_debug.c \
         ./src/fatfs_diskio.c \
         ./src/ff.c \
         ./src/glcdfont.c \
@@ -124,7 +125,8 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM)
+ASMSRC = $(PORTASM) \
+		./src/kb_debug_asm.s
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) \

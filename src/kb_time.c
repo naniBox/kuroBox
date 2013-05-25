@@ -77,7 +77,7 @@ void ltc_icu_period_cb(ICUDriver *icup)
 }
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waTime, 1024);
+static WORKING_AREA(waTime, 1024*4);
 static msg_t 
 thTime(void *arg) 
 {

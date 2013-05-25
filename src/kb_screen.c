@@ -53,7 +53,7 @@ static char charbuf[128];
 static MemoryStream msb;
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waScreen, 128);
+static WORKING_AREA(waScreen, 1024*4);
 static msg_t 
 thScreen(void *arg) 
 {

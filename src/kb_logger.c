@@ -261,7 +261,8 @@ run(void)
 		// LOG IT!
 		memcpy(&writing_msg, &current_msg, sizeof(writing_msg));
 		UINT bytes_written = 0;
-		FRESULT err = f_write(&kbfile, &current_msg, sizeof(writing_msg), &bytes_written);
+		FRESULT err = FR_OK;
+		err = f_write(&kbfile, &current_msg, sizeof(writing_msg), &bytes_written);
 		if (bytes_written != sizeof(writing_msg) || err != FR_OK)
 			current_msg.write_errors++;
 		if (current_msg.msg_num%128==0)
@@ -293,7 +294,7 @@ run(void)
 }
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waLogger, 1024*1);
+static WORKING_AREA(waLogger, 1024*8);
 static msg_t 
 thLogger(void *arg) 
 {
