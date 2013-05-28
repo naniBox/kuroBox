@@ -155,7 +155,7 @@
 #define STM32_PWM_USE_TIM3                  FALSE
 #define STM32_PWM_USE_TIM4                  FALSE
 #define STM32_PWM_USE_TIM5                  FALSE
-#define STM32_PWM_USE_TIM8                  FLASE
+#define STM32_PWM_USE_TIM8                  FALSE
 #define STM32_PWM_TIM1_IRQ_PRIORITY         7
 #define STM32_PWM_TIM2_IRQ_PRIORITY         7
 #define STM32_PWM_TIM3_IRQ_PRIORITY         7
@@ -183,8 +183,8 @@
  * SPI driver system settings.
  */
 #define STM32_SPI_USE_SPI1                  TRUE
-#define STM32_SPI_USE_SPI2                  FLASE
-#define STM32_SPI_USE_SPI3                  FLASE
+#define STM32_SPI_USE_SPI2                  FALSE
+#define STM32_SPI_USE_SPI3                  FALSE
 #define STM32_SPI_SPI1_RX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 0)
 #define STM32_SPI_SPI1_TX_DMA_STREAM        STM32_DMA_STREAM_ID(2, 5)
 #define STM32_SPI_SPI2_RX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 3)

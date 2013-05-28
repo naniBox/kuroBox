@@ -47,6 +47,12 @@ ifeq ($(USE_FWLIB),)
   USE_FWLIB = no
 endif
 
+# If relocating to 0x08020000 : 128kb in
+ifeq ($(USE_RELOCATED_FLASH),)
+	USE_RELOCATED_FLASH = yes
+	#USE_RELOCATED_FLASH = no
+endif
+
 #
 # Architecture or project specific options
 ##############################################################################
@@ -56,7 +62,11 @@ endif
 #
 
 # Define project name here
-PROJECT = kuroBox
+ifeq ($(USE_RELOCATED_FLASH),yes)
+	PROJECT = kuroBox_relocated
+else
+	PROJECT = kuroBox
+endif
 
 # Imported source files and paths
 CHIBIOS = ../../chibios
@@ -67,7 +77,11 @@ include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 
 # Define linker script file here
-LDSCRIPT= $(PORTLD)/STM32F407xG.ld
+ifeq ($(USE_RELOCATED_FLASH),yes)
+	LDSCRIPT= ./STM32F407xG_OFFSET.ld
+else
+	LDSCRIPT= $(PORTLD)/STM32F407xG.ld
+endif
 #LDSCRIPT= $(PORTLD)/STM32F407xG_CCM.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
@@ -128,7 +142,7 @@ TCPPSRC =
 ASMSRC = $(PORTASM) \
 		./src/kb_debug_asm.s
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
+INCDIR = $(PORTINC) $(KERNINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) \
          $(CHIBIOS)/os/various \
          src \
@@ -221,12 +235,16 @@ ULIBS =
 # End of user defines
 ##############################################################################
 
-#ifeq ($(USE_FPU),yes)
+ifeq ($(USE_FPU),yes)
   USE_OPT += -mfloat-abi=softfp -mfpu=fpv4-sp-d16 -fsingle-precision-constant
   DDEFS += -DCORTEX_USE_FPU=TRUE
-#else
-#  DDEFS += -DCORTEX_USE_FPU=FALSE
-#endif
+else
+  DDEFS += -DCORTEX_USE_FPU=FALSE
+endif
+
+ifeq ($(USE_RELOCATED_FLASH),yes)
+	DDEFS += -DRELOCATED_FLASH=TRUE
+endif
 
 ifeq ($(USE_FWLIB),yes)
   include $(CHIBIOS)/ext/stm32lib/stm32lib.mk

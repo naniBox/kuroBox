@@ -32,6 +32,10 @@
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
 
+#ifdef RELOCATED_FLASH
+#define CORTEX_VTOR_INIT 0x00020000
+#endif
+
 #define PORT_IDLE_THREAD_STACK_SIZE     32
 
 /*===========================================================================*/

@@ -130,7 +130,7 @@ thScreen(void *arg)
 
 		INIT_CBUF();
 		chprintf(bss,"%d%d", screen.btn0, screen.btn1);
-		st7565_drawstring(&ST7565D1, C2P(7), 0, charbuf);
+		st7565_drawstring(&ST7565D1, C2P(8), 0, charbuf);
 
 		INIT_CBUF();
 		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
