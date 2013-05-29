@@ -111,8 +111,6 @@ CSRC = $(PORTSRC) \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
 
-#        ./src/fatfsWrapper.c \
-
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
