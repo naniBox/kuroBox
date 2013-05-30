@@ -24,10 +24,10 @@
 #define _naniBox_kuroBox_logger
 
 #include <ch.h>
+#include <ltc.h>
 
 //-----------------------------------------------------------------------------
-#define KB_LOG_PACKET_SIZE	512
-
 int kuroBoxLogger(void);
+void kbl_setLTC(SMPTETimecode * ltc);
 
 #endif // _naniBox_kuroBox_logger

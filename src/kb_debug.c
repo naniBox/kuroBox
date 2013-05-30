@@ -19,6 +19,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+#include <ch.h>
+#include <hal.h>
+#include <chprintf.h>
+
 /*
 void **HARDFAULT_PSP;
 register void *stack_pointer asm("sp");
@@ -57,22 +62,21 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
 	stacked_pc = ((unsigned long) hardfault_args[6]);
 	stacked_psr = ((unsigned long) hardfault_args[7]);
 
-	/*
-	printf ("\n\n[Hard fault handler - all numbers in hex]\n");
-	printf ("R0 = %x\n", stacked_r0);
-	printf ("R1 = %x\n", stacked_r1);
-	printf ("R2 = %x\n", stacked_r2);
-	printf ("R3 = %x\n", stacked_r3);
-	printf ("R12 = %x\n", stacked_r12);
-	printf ("LR [R14] = %x  subroutine call return address\n", stacked_lr);
-	printf ("PC [R15] = %x  program counter\n", stacked_pc);
-	printf ("PSR = %x\n", stacked_psr);
-	printf ("BFAR = %x\n", (*((volatile unsigned long *)(0xE000ED38))));
-	printf ("CFSR = %x\n", (*((volatile unsigned long *)(0xE000ED28))));
-	printf ("HFSR = %x\n", (*((volatile unsigned long *)(0xE000ED2C))));
-	printf ("DFSR = %x\n", (*((volatile unsigned long *)(0xE000ED30))));
-	printf ("AFSR = %x\n", (*((volatile unsigned long *)(0xE000ED3C))));
-	printf ("SCB_SHCSR = %x\n", SCB->SHCSR);
-	*/
+	BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
+	chprintf(prnt, "\n\n[Hard fault handler - all numbers in hex]\n");
+	chprintf(prnt, "R0 = %x\n", stacked_r0);
+	chprintf(prnt, "R1 = %x\n", stacked_r1);
+	chprintf(prnt, "R2 = %x\n", stacked_r2);
+	chprintf(prnt, "R3 = %x\n", stacked_r3);
+	chprintf(prnt, "R12 = %x\n", stacked_r12);
+	chprintf(prnt, "LR [R14] = %x  subroutine call return address\n", stacked_lr);
+	chprintf(prnt, "PC [R15] = %x  program counter\n", stacked_pc);
+	chprintf(prnt, "PSR = %x\n", stacked_psr);
+	chprintf(prnt, "BFAR = %x\n", (*((volatile unsigned long *)(0xE000ED38))));
+	chprintf(prnt, "CFSR = %x\n", (*((volatile unsigned long *)(0xE000ED28))));
+	chprintf(prnt, "HFSR = %x\n", (*((volatile unsigned long *)(0xE000ED2C))));
+	chprintf(prnt, "DFSR = %x\n", (*((volatile unsigned long *)(0xE000ED30))));
+	chprintf(prnt, "AFSR = %x\n", (*((volatile unsigned long *)(0xE000ED3C))));
+	chprintf(prnt, "SCB_SHCSR = %x\n", SCB->SHCSR);
 	while (1);
 }

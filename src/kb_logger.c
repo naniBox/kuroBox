@@ -28,6 +28,7 @@
 #include <hal.h>
 #include <memstreams.h>
 #include <chprintf.h>
+#include <chrtclib.h>
 #include <ltc.h>
 #include <time.h>
 #include <string.h>
@@ -47,7 +48,9 @@
 #define LOGGER_MESSAGE_SIZE		512
 #define LOGGER_FSYNC_INTERVAL	128
 
-#define LOGGER_PREAMBLE			0x6e426b42
+// nBkB  backwards, since this architecture is little-endian, we have to
+// swizzle the bytes
+#define LOGGER_PREAMBLE			0x426b426e
 #define LOGGER_VERSION			11
 
 //-----------------------------------------------------------------------------
@@ -120,7 +123,8 @@ new_file(void)
 	{
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
-		chprintf((BaseSequentialStream *)&msb, "%s/%s%.4d%s", NANIBOX_DNAME, KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
+		chprintf((BaseSequentialStream *)&msb, "%s/%s%.4d%s", NANIBOX_DNAME,
+				KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
 		err = f_open(&kbfile, charbuf, FA_WRITE|FA_CREATE_NEW);
 		f_sync(&kbfile);
 		if (err == FR_EXIST)
@@ -136,7 +140,8 @@ new_file(void)
 	{
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
-		chprintf((BaseSequentialStream *)&msb, "%s%.4d%s", KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
+		chprintf((BaseSequentialStream *)&msb, "%s%.4d%s", KUROBOX_FNAME_STEM,
+				fnum, KUROBOX_FNAME_EXT);
 		kbs_setFName(charbuf);
 	}
 
@@ -252,7 +257,7 @@ static uint8_t
 calc_checksum( uint8_t * buf, uint16_t buf_size )
 {
 	uint8_t xor = 0;
-	uint8_t idx = 0;
+	uint16_t idx = 0;
 
 	for ( ; idx < buf_size ; ++idx )
 		xor ^= (uint8_t) buf[ idx ];
@@ -276,13 +281,19 @@ run(void)
 
 		//------------------------------------------------------
 		// LOG IT!
+		rtcGetTimeTm(&RTCD1, &current_msg.rtc);
+
+		// the only really critical thing here:
+		chSysLock();
 		memcpy(&writing_msg, &current_msg, sizeof(writing_msg));
+		chSysUnlock();
+
 		uint8_t * buf = (uint8_t*) &writing_msg;
 		writing_msg.checksum = calc_checksum(buf+16, LOGGER_MESSAGE_SIZE-16);
 
 		UINT bytes_written = 0;
 		FRESULT err = FR_OK;
-		err = f_write(&kbfile, &current_msg, sizeof(writing_msg), &bytes_written);
+		err = f_write(&kbfile, &writing_msg, sizeof(writing_msg), &bytes_written);
 		if (bytes_written != sizeof(writing_msg) || err != FR_OK)
 			current_msg.write_errors++;
 		if (current_msg.msg_num%LOGGER_FSYNC_INTERVAL==0)
@@ -291,7 +302,6 @@ run(void)
 			if (err != FR_OK)
 				current_msg.write_errors++;
 		}
-
 		//------------------------------------------------------
 
 		//------------------------------------------------------
@@ -307,6 +317,8 @@ run(void)
 		while ( sleep_until < chTimeNow() )
 		{
 			// this code handles for when we skipped a writing-slot
+			// i'm counting a skipped msg as a write error
+			current_msg.write_errors++;
 			current_msg.msg_num++;
 			sleep_until += MS2ST(5);
 		}
@@ -360,4 +372,10 @@ int kuroBoxLogger(void)
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void kbl_setLTC(SMPTETimecode * ltc)
+{
+	memcpy(&current_msg.ltc.smpte_timecode, ltc, sizeof(current_msg.ltc.smpte_timecode));
 }

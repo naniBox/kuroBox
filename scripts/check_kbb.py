@@ -24,39 +24,17 @@
 import sys
 import os
 import struct
-
-def parse_header(msg):
-	preamble,version,checksum,msg_size,msg_num,write_errors = struct.unpack("<IBBHII",msg)
-	return preamble,version,checksum,msg_size,msg_num,write_errors
-
-def check_kbb(fname):
-	print fname
-	fin = file(fname,"rb")
-	msg_count = 0
-	msg_num_prev = None
-	msg_skipped = 0
-	while True:
-		msg = fin.read(512)
-		if len(msg)==0:
-			print msg
-			break
-		preamble,version,checksum,msg_size,msg_num,write_errors = parse_header(msg[0:16])
-		if msg_num_prev is None:
-			msg_num_prev = msg_num
-		else:
-			if msg_num_prev + 1 != msg_num:
-				print "Skipped a beat:", msg_num_prev, "->", msg_num, "@", msg_count
-				msg_skipped += msg_num-msg_num_prev
-			msg_num_prev = msg_num
-		#print msg_num
-		msg_count+=1
-
-	print "Total msgs:", msg_count, "skipped:", msg_skipped
+import KBB
 
 	
 def main():
 	for fname in sys.argv[1:]:
-		check_kbb(fname)
+		kbb = KBB.KBB_factory(fname)
+		if kbb is None:
+			print "Can't parse '%s'"%fname
+		while kbb.read_next():
+			kbb.check_header()
+		kbb.print_errors()
 
 if __name__ == '__main__':
 	main()
