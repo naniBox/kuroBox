@@ -28,7 +28,6 @@
 #include <time.h>
 #include "spiEEPROM.h"
 #include "ST7565.h"
-#include "fatfsWrapper.h"
 #include "kb_adc.h"
 #include "kb_buttons.h"
 #include "kb_logger.h"

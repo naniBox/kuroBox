@@ -24,7 +24,7 @@
 #include "kb_logger.h"
 #include "kb_screen.h"
 #include "nanibox_util.h"
-#include "fatfsWrapper.h"
+#include "ff.h"
 #include <hal.h>
 #include <memstreams.h>
 #include <chprintf.h>
@@ -33,18 +33,22 @@
 #include <string.h>
 
 //-----------------------------------------------------------------------------
-#define LS_INIT			0
-#define LS_WAIT_FOR_SD	1
-#define LS_RUNNING		2
-#define LS_EXITING		3
+#define LS_INIT					0
+#define LS_WAIT_FOR_SD			1
+#define LS_RUNNING				2
+#define LS_EXITING				3
 
 //-----------------------------------------------------------------------------
 #define POLLING_COUNT			10
 #define POLLING_DELAY			10
 
 //-----------------------------------------------------------------------------
-#define LOG_BUFFER_SIZE			4
-#define LOG_MESSAGE_SIZE		512
+#define LOGGER_BUFFER_SIZE		4
+#define LOGGER_MESSAGE_SIZE		512
+#define LOGGER_FSYNC_INTERVAL	128
+
+#define LOGGER_PREAMBLE			0x6e426b42
+#define LOGGER_VERSION			11
 
 //-----------------------------------------------------------------------------
 struct __PACKED__ ltc_msg_v01
@@ -69,7 +73,7 @@ struct __PACKED__ log_msg_v01
 
 	uint8_t __pad[512 - 16 - 13 - 36];
 };
-STATIC_ASSERT(sizeof(struct log_msg_v01)==LOG_MESSAGE_SIZE, LOG_MESSAGE_SIZE);
+STATIC_ASSERT(sizeof(struct log_msg_v01)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
 
 //-----------------------------------------------------------------------------
@@ -245,6 +249,19 @@ sd_card_status(void)
 
 //-----------------------------------------------------------------------------
 static uint8_t
+calc_checksum( uint8_t * buf, uint16_t buf_size )
+{
+	uint8_t xor = 0;
+	uint8_t idx = 0;
+
+	for ( ; idx < buf_size ; ++idx )
+		xor ^= (uint8_t) buf[ idx ];
+
+	return xor;
+}
+
+//-----------------------------------------------------------------------------
+static uint8_t
 run(void)
 {
 	uint8_t ret = 1;
@@ -260,13 +277,20 @@ run(void)
 		//------------------------------------------------------
 		// LOG IT!
 		memcpy(&writing_msg, &current_msg, sizeof(writing_msg));
+		uint8_t * buf = (uint8_t*) &writing_msg;
+		writing_msg.checksum = calc_checksum(buf+16, LOGGER_MESSAGE_SIZE-16);
+
 		UINT bytes_written = 0;
 		FRESULT err = FR_OK;
 		err = f_write(&kbfile, &current_msg, sizeof(writing_msg), &bytes_written);
 		if (bytes_written != sizeof(writing_msg) || err != FR_OK)
 			current_msg.write_errors++;
-		if (current_msg.msg_num%128==0)
-			f_sync(&kbfile);
+		if (current_msg.msg_num%LOGGER_FSYNC_INTERVAL==0)
+		{
+			err = f_sync(&kbfile);
+			if (err != FR_OK)
+				current_msg.write_errors++;
+		}
 
 		//------------------------------------------------------
 
@@ -301,6 +325,10 @@ thLogger(void *arg)
 	chDbgAssert(LS_INIT == logger_state, "thLogger, 1", "logger_state is not LS_INIT");
 	(void)arg;
 	chRegSetThreadName("Logger");
+
+	current_msg.preamble = LOGGER_PREAMBLE;
+	current_msg.version = LOGGER_VERSION;
+	current_msg.msg_size = LOGGER_MESSAGE_SIZE;
 
 	sd_det_count = POLLING_COUNT;
 	logger_state = LS_WAIT_FOR_SD;

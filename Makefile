@@ -5,8 +5,8 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
-#  USE_OPT = -g -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+#  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99
+  USE_OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
 endif
 
 # C specific options here (added to USE_OPT).
@@ -49,8 +49,13 @@ endif
 
 # If relocating to 0x08020000 : 128kb in
 ifeq ($(USE_RELOCATED_FLASH),)
-	USE_RELOCATED_FLASH = yes
-	#USE_RELOCATED_FLASH = no
+	#USE_RELOCATED_FLASH = yes
+	USE_RELOCATED_FLASH = no
+endif
+
+# we want FPU, please
+ifeq ($(USE_FPU),)
+  USE_FPU = yes
 endif
 
 #
@@ -70,11 +75,15 @@ endif
 
 # Imported source files and paths
 CHIBIOS = ../../chibios
-include src/cfg/board.mk
+KUROBOX = .
+LIBLTC = ../libltc
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
+include $(LIBLTC)/libltc.mk
+include $(KUROBOX)/src/fatfs/fatfs.mk
+include $(KUROBOX)/src/cfg/board.mk
 
 # Define linker script file here
 ifeq ($(USE_RELOCATED_FLASH),yes)
@@ -95,22 +104,25 @@ CSRC = $(PORTSRC) \
         $(CHIBIOS)/os/various/chprintf.c \
         $(CHIBIOS)/os/various/chrtclib.c \
         $(CHIBIOS)/os/various/memstreams.c \
+        $(FATFSSRC) \
+        $(LIBLTCSRC) \
         ./src/kb_debug.c \
-        ./src/fatfs_diskio.c \
-        ./src/ff.c \
         ./src/glcdfont.c \
         ./src/kb_adc.c \
         ./src/kb_buttons.c \
         ./src/kb_logger.c \
         ./src/kb_screen.c \
         ./src/kb_time.c \
-        ./src/ltc/decoder.c \
-        ./src/ltc/ltc.c \
-        ./src/ltc/timecode.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
 
+#        ./src/fatfs_diskio.c \
+#        ./src/ff.c \
+#        ./src/ltc/decoder.c \
+#        ./src/ltc/ltc.c \
+#        ./src/ltc/timecode.c \
+#
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -140,11 +152,15 @@ TCPPSRC =
 ASMSRC = $(PORTASM) \
 		./src/kb_debug_asm.s
 
-INCDIR = $(PORTINC) $(KERNINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) \
-         $(CHIBIOS)/os/various \
-         src \
-         src/ltc
+INCDIR = $(PORTINC) \
+		$(KERNINC) \
+		$(HALINC) \
+		$(PLATFORMINC) \
+		$(BOARDINC) \
+		$(CHIBIOS)/os/various \
+		$(FATFSINC) \
+		$(LIBLTCINC) \
+		src
 
 #
 # Project, sources and paths

@@ -1,12 +1,8 @@
 device stm32f407vg
 halt
 r
-Sleep 1000
 loadbin build/kuroBox_relocated.bin 0x08020000
-Sleep 1000
 verifybin build/kuroBox_relocated.bin 0x08020000
-Sleep 1000
 r
-Sleep 1000
 go
 exit

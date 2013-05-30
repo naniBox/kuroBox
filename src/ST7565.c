@@ -3,7 +3,10 @@ $Id:$
 
 ST7565 LCD library!
 
-Copyright ( C ) 2010 Limor Fried, Adafruit Industries
+// some of this code was written by <cstone@pobox.com> originally; it is in the public domain.
+// parts modified to work with the NHD_C12832A by talsit@talsit.org
+// 20121012 // dmo@nanibox.com // modified for ARM and plain C!
+// Copyright ( C ) 2010 Limor Fried, Adafruit Industries
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -18,10 +21,6 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-// some of this code was written by <cstone@pobox.com> originally; it is in the public domain.
-// parts modified to work with the NHD_C12832A by talsit@talsit.org
-// 20121012 // dmo@nanibox.com // modified for ARM and plain C!
 
 */
 
