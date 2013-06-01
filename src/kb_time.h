@@ -27,6 +27,7 @@
 #include <hal.h>
 
 //-----------------------------------------------------------------------------
+void ltc_exti_cb(EXTDriver *extp, expchannel_t channel);
 void ltc_icu_period_cb(ICUDriver *icup);
 int kuroBoxTimeInit(void);
 

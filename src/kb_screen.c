@@ -30,7 +30,8 @@
 #include <time.h>
 
 //-----------------------------------------------------------------------------
-#define SCREEN_REFRESH_SLEEP			40
+// I usually keep this at 1000/24 ~= 40
+#define SCREEN_REFRESH_SLEEP			250
 
 //-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
@@ -44,6 +45,7 @@ struct kuroBoxScreen
 	uint32_t counter;
 	uint8_t btn0;
 	uint8_t btn1;
+	uint32_t a,b,c,d;
 };
 
 //-----------------------------------------------------------------------------
@@ -102,6 +104,7 @@ thScreen(void *arg)
 		//st7565_drawstring(&ST7565D1, -C2P(2), 0, charbuf);
 
 		// LTC
+		/*
 		INIT_CBUF();
 		chprintf(bss,"T: %.2d:%.2d:%.2d.%.2d",
 				screen.ltc.hours,
@@ -109,18 +112,30 @@ thScreen(void *arg)
 				screen.ltc.secs,
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
+		*/
+		INIT_CBUF();
+		chprintf(bss,"T: %3d %3d",
+				screen.a,
+				screen.b);
+		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
+		INIT_CBUF();
+		chprintf(bss,"T: %3d %3d",
+				screen.c,
+				screen.d);
+		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
 
 		// file name & count
 		INIT_CBUF();
 		chprintf(bss,"F: %s /%d",
 				screen.sdc_fname,
 				screen.counter);
-		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
+		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
 
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		// @OTODO: remove these, they are just for show!
 
+		/*
 		INIT_CBUF();
 		struct tm timp;
 		rtcGetTimeTm(&RTCD1, &timp);
@@ -136,7 +151,7 @@ thScreen(void *arg)
 		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
 		chprintf(bss,"%d", idle_time);
 		st7565_drawstring(&ST7565D1, C2P(-2), 3, charbuf);
-
+		*/
 
 		st7565_display(&ST7565D1);
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
@@ -199,4 +214,13 @@ void kbs_setBtn0(uint8_t on)
 void kbs_setBtn1(uint8_t on)
 {
 	screen.btn1 = on;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setLTCS(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
+{
+	screen.a = a;
+	screen.b = b;
+	screen.c = c;
+	screen.d = d;
 }

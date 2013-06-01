@@ -53,14 +53,16 @@ static kuroBoxState_t global_state;
 static VirtualTimer adc_trigger;
 
 //-----------------------------------------------------------------------------
+/*
 static ICUConfig ltc_icucfg = {
 	ICU_INPUT_ACTIVE_HIGH,
-	150000,
+	1000000,
 	NULL,						// width
 	ltc_icu_period_cb,			// period
 	NULL,						// overflow
 	ICU_CHANNEL_2
 };
+*/
 
 //-----------------------------------------------------------------------------
 static SerialConfig serial1_cfg = {
@@ -117,7 +119,6 @@ static const EXTConfig extcfg = {
   {
 	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_0_exti_cb},	// 0
 	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_1_exti_cb},	// 1
-    //{EXT_CH_MODE_DISABLED, NULL},	// 1
 
     {EXT_CH_MODE_DISABLED, NULL},	// 2
     {EXT_CH_MODE_DISABLED, NULL},	// 3
@@ -126,7 +127,7 @@ static const EXTConfig extcfg = {
     {EXT_CH_MODE_DISABLED, NULL},	// 6
     {EXT_CH_MODE_DISABLED, NULL},	// 7
     {EXT_CH_MODE_DISABLED, NULL},	// 8
-    {EXT_CH_MODE_DISABLED, NULL},	// 9
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, ltc_exti_cb},	// 9
     {EXT_CH_MODE_DISABLED, NULL},	// 10
     {EXT_CH_MODE_DISABLED, NULL},	// 11
     {EXT_CH_MODE_DISABLED, NULL},	// 12
@@ -234,8 +235,8 @@ kuroBoxInit(void)
 
 	// LTC's thread and ICU stage
 	kuroBoxTimeInit();
-	icuStart(&ICUD1, &ltc_icucfg);
-	icuEnable(&ICUD1);
+	//icuStart(&ICUD1, &ltc_icucfg);
+	//icuEnable(&ICUD1);
 	
 	// the actual logging thread
 	kuroBoxLogger();

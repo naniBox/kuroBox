@@ -38,4 +38,6 @@ void kbs_setFName(const char * fname);
 void kbs_setBtn0(uint8_t on);
 void kbs_setBtn1(uint8_t on);
 
+void kbs_setLTCS(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+
 #endif // _naniBox_kuroBox_screen

@@ -30,5 +30,8 @@
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel);
 void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel);
 
+bool_t is_btn_0_pressed(void);
+bool_t is_btn_1_pressed(void);
+
 
 #endif /* _naniBox_kuroBox_buttons */

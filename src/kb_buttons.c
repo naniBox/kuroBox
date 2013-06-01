@@ -23,12 +23,15 @@
 #include "kb_buttons.h"
 #include "kb_screen.h"
 
+static bool_t btn_0_state;
+static bool_t btn_1_state;
+
 //-----------------------------------------------------------------------------
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	kbs_setBtn0(palReadPad(GPIOA, GPIOA_BTN0));
+	kbs_setBtn0(btn_0_state=palReadPad(GPIOA, GPIOA_BTN0));
 }
 
 //-----------------------------------------------------------------------------
@@ -36,6 +39,17 @@ void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	kbs_setBtn1(palReadPad(GPIOA, GPIOA_BTN1));
+	kbs_setBtn1(btn_1_state=palReadPad(GPIOA, GPIOA_BTN1));
 }
 
+//-----------------------------------------------------------------------------
+bool_t is_btn_0_pressed(void)
+{
+	return btn_0_state == 0;
+}
+
+//-----------------------------------------------------------------------------
+bool_t is_btn_1_pressed(void)
+{
+	return btn_1_state == 0;
+}
