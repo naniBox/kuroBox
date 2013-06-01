@@ -29,7 +29,6 @@
 #include <memstreams.h>
 #include <chprintf.h>
 #include <chrtclib.h>
-#include <ltc.h>
 #include <time.h>
 #include <string.h>
 
@@ -56,7 +55,7 @@
 //-----------------------------------------------------------------------------
 struct __PACKED__ ltc_msg_v01
 {
-	SMPTETimecode smpte_timecode;	// 13
+	uint8_t placeholder[13];
 };
 STATIC_ASSERT(sizeof(struct ltc_msg_v01)==13, LTC_MESSAGE_SIZE);
 
@@ -372,10 +371,4 @@ int kuroBoxLogger(void)
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
 	return 0;
-}
-
-//-----------------------------------------------------------------------------
-void kbl_setLTC(SMPTETimecode * ltc)
-{
-	memcpy(&current_msg.ltc.smpte_timecode, ltc, sizeof(current_msg.ltc.smpte_timecode));
 }

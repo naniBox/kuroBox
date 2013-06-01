@@ -31,13 +31,13 @@
 
 //-----------------------------------------------------------------------------
 // I usually keep this at 1000/24 ~= 40
-#define SCREEN_REFRESH_SLEEP			250
+#define SCREEN_REFRESH_SLEEP			40
 
 //-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
 struct kuroBoxScreen
 {
-	SMPTETimecode ltc;
+	struct SMPTETimecode ltc;
 	uint16_t voltage;
 	int16_t temperature;
 	int32_t sdc_free;
@@ -104,7 +104,6 @@ thScreen(void *arg)
 		//st7565_drawstring(&ST7565D1, -C2P(2), 0, charbuf);
 
 		// LTC
-		/*
 		INIT_CBUF();
 		chprintf(bss,"T: %.2d:%.2d:%.2d.%.2d",
 				screen.ltc.hours,
@@ -112,7 +111,7 @@ thScreen(void *arg)
 				screen.ltc.secs,
 				screen.ltc.frame);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
-		*/
+		/*
 		INIT_CBUF();
 		chprintf(bss,"T: %3d %3d",
 				screen.a,
@@ -123,7 +122,7 @@ thScreen(void *arg)
 				screen.c,
 				screen.d);
 		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
-
+		*/
 		// file name & count
 		INIT_CBUF();
 		chprintf(bss,"F: %s /%d",
@@ -181,7 +180,7 @@ void kbs_setTemperature(int16_t temperature)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setLTC(SMPTETimecode * ltc)
+void kbs_setLTC(struct SMPTETimecode * ltc)
 {
 	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
 }

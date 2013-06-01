@@ -24,10 +24,8 @@
 #define _naniBox_kuroBox_logger
 
 #include <ch.h>
-#include <ltc.h>
 
 //-----------------------------------------------------------------------------
 int kuroBoxLogger(void);
-void kbl_setLTC(SMPTETimecode * ltc);
 
 #endif // _naniBox_kuroBox_logger

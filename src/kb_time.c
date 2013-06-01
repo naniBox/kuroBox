@@ -22,39 +22,15 @@
 
 #include <ch.h>
 #include <hal.h>
-#include <ltc.h>
 #include <string.h>
 #include <chprintf.h>
 #include "kb_time.h"
 #include "kb_screen.h"
 #include "kb_buttons.h"
+#include "nanibox_util.h"
 
 //-----------------------------------------------------------------------------
 static Thread * timeThread;
-#define LTC_BUFFER_SIZE 	1024
-#define LTC_BUFFER_COUNT	2
-Semaphore ltc_buffer_semaphore;
-
-ltcsnd_sample_t ltc_buffer[LTC_BUFFER_COUNT][LTC_BUFFER_SIZE];
-volatile int which_ltc_buffer;
-int ltc_buffer_pos;
-
-LTCDecoder *ltc_decoder;
-LTCFrameExt ltc_frame;
-SMPTETimecode ltc_smpte_time;
-
-//-----------------------------------------------------------------------------
-/*
-static icucnt_t long_period;
-static icucnt_t short_period;
-static icucnt_t long_width;
-static icucnt_t short_width;
-*/
-uint8_t close_by(icucnt_t target, icucnt_t subject, uint8_t percentage)
-{
-	uint32_t margin = target * 100 / percentage;
-	return ( subject < (target + margin) && subject > (target - margin) );
-}
 
 //-----------------------------------------------------------------------------
 /*
@@ -80,6 +56,10 @@ uint8_t close_by(icucnt_t target, icucnt_t subject, uint8_t percentage)
 #define IS_LTC_LONG(x)	((x<LTC_LONG_MAX_US) && (x>LTC_LONG_MIN_US))
 #define IS_LTC_SHORT(x)	((x<LTC_SHORT_MAX_US) && (x>LTC_SHORT_MIN_US))
 
+#define LTC_SYNC_WORD 					(0xBFFC)
+
+STATIC_ASSERT(sizeof(struct LTCFrame)==10, LTC_FRAME_SIZE); // 80bits
+
 uint32_t last_edge_time;
 bool_t was_last_edge_short;
 uint32_t long_count,short_count,other_count;
@@ -92,9 +72,43 @@ uint16_t pw_idx;
 uint8_t ltc_data[80];
 uint8_t ltc_data_print[80];
 uint8_t ltc_data_idx;
-void ltc_store(uint8_t which)
+
+uint16_t current_word;
+uint8_t * ltc_raw;
+struct LTCFrame ltc_frame;
+struct SMPTETimecode ltc_timecode;
+void ltc_frame_to_time2(struct SMPTETimecode *stime, struct LTCFrame *frame) {
+	stime->years  = 0;
+	stime->months = 0;
+	stime->days   = 0;
+	stime->hours = frame->hours_units + frame->hours_tens*10;
+	stime->mins  = frame->mins_units  + frame->mins_tens*10;
+	stime->secs  = frame->secs_units  + frame->secs_tens*10;
+	stime->frame = frame->frame_units + frame->frame_tens*10;
+}
+
+void ltc_store(uint8_t bit_set)
 {
-	ltc_data[ltc_data_idx++] = which;
+	for ( uint8_t idx = 0 ; idx < 9 ; idx++ )
+	{
+		ltc_raw[idx] >>= 1;
+		if ( ltc_raw[idx+1] & 0x01 )
+			ltc_raw[idx] |= 0x80;
+	}
+	ltc_raw[9] >>= 1;
+	if ( bit_set )
+		ltc_raw[9] |= 0x80;
+
+	// debug comes here:
+	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
+	{
+		ltc_frame_to_time2(&ltc_timecode, &ltc_frame);
+		kbs_setLTC(&ltc_timecode);
+		palTogglePad(GPIOB, GPIOB_LED2);
+	}
+
+	return;
+	ltc_data[ltc_data_idx++] = bit_set;
 	if ( ltc_data_idx == sizeof(ltc_data) )
 	{
 		memcpy(ltc_data_print,ltc_data,sizeof(ltc_data_print));
@@ -158,60 +172,6 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 }
 
 //-----------------------------------------------------------------------------
-void ltc_icu_period_cb(ICUDriver *icup)
-{
-	icucnt_t period = icuGetPeriod(icup);
-	icucnt_t width = icuGetWidth(icup);
-
-	kbs_setLTCS(period, width, 0,0);
-	/*
-	if ( long_period == 0 )
-	{
-		// first!
-		long_period = short_period = period;
-		long_width = long_width = width;
-	}
-
-	if ( )
-	*/
-}
-
-//-----------------------------------------------------------------------------
-void ltc_icu_period_cb_old(ICUDriver *icup)
-{
-	icucnt_t period = icuGetPeriod(icup);
-	icucnt_t width = icuGetWidth(icup);
-	while( period )
-	{
-		period--;
-		ltc_buffer[which_ltc_buffer][ltc_buffer_pos++] = width?255:0;
-		if ( width )
-		{
-			width--;
-		}
-		if ( ltc_buffer_pos == LTC_BUFFER_SIZE )
-		{
-			palSetPad(GPIOB, GPIOB_LED1);
-			ltc_decoder_write(ltc_decoder, ltc_buffer[which_ltc_buffer], ltc_buffer_pos, 0);
-			palClearPad(GPIOB, GPIOB_LED1);
-			ltc_buffer_pos = 0;
-			
-			palSetPad(GPIOB, GPIOB_LED2);
-			chSysLockFromIsr();
-			if (timeThread != NULL) 
-			{
-				timeThread->p_u.rdymsg = (msg_t)1;
-				chSchReadyI(timeThread);
-				timeThread = NULL;
-			}
-			chSysUnlockFromIsr();
-			palClearPad(GPIOB, GPIOB_LED2);
-
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
 static WORKING_AREA(waTime, 1024*4);
 static msg_t 
 thTime(void *arg) 
@@ -228,6 +188,8 @@ thTime(void *arg)
 		{
 			continue;
 		}
+
+		/*
 		BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
 		for ( uint32_t i = 0 ; i < 80; i++ )
 			chprintf(prnt, "%d ", ltc_data_print[i]);
@@ -243,13 +205,7 @@ thTime(void *arg)
 			chprintf(prnt, "\n\r");
 		}
 		chprintf(prnt, "\n\r\n\r");
-
-/*		while (ltc_decoder_read(ltc_decoder, &ltc_frame))
-		{
-			ltc_frame_to_time(&ltc_smpte_time, &ltc_frame.ltc, 1);
-		}
-		kbs_setLTC(&ltc_smpte_time);
-*/
+		*/
 	}
 	return 0;
 }
@@ -257,16 +213,14 @@ thTime(void *arg)
 //-----------------------------------------------------------------------------
 int kuroBoxTimeInit(void)
 {
-	memset(ltc_buffer, 0, sizeof(ltc_buffer));
-	which_ltc_buffer = 0;
-	
+	memset(&ltc_frame,0,sizeof(ltc_frame));
+	ltc_raw = (uint8_t*)&ltc_frame;
+
+	/**///debug
 	memset(ltc_data,0,sizeof(ltc_data));
 	memset(ltc_data_print,0,sizeof(ltc_data_print));
 	memset(pw,0,sizeof(pw));
 	memset(pw_p,0,sizeof(pw_p));
-
-	int apv = 1920; // audio frames per video frame, ballpark only
-	ltc_decoder = ltc_decoder_create(apv, 0);
 	
 	timeThread = chThdCreateStatic(waTime, sizeof(waTime), NORMALPRIO, thTime, NULL);
 	
