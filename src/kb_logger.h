@@ -24,8 +24,10 @@
 #define _naniBox_kuroBox_logger
 
 #include <ch.h>
+#include "kb_time.h"
 
 //-----------------------------------------------------------------------------
 int kuroBoxLogger(void);
+void kbl_setLTC(struct LTCFrame * ltc_frame);
 
 #endif // _naniBox_kuroBox_logger

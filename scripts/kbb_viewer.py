@@ -1,11 +1,18 @@
 import sys
 import os
+import struct
 from PyQt4 import QtCore, QtGui, uic
 import KBB
+
+KBB.DBG = 0
+
 
 def fmt_h32(x):		return "0x%08X"%x
 def fmt_i(x):		return "%i"%x
 def fmt_h8(x):		return "0x%02x"%x
+
+def fmt_preamble(kbb):return "%s / %s"%(fmt_h32(kbb.header.preamble),struct.pack("<I",kbb.header.preamble))
+def fmt_checksum(kbb):return "%s / %s"%(fmt_h8(kbb.header.checksum),"valid"if kbb.valid_packet else"invalid")
 
 class KBB_Viewer(QtGui.QMainWindow):
 	def __init__(self):
@@ -16,6 +23,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.connect(self.ui.actionPrev, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('prev()'))
 		self.connect(self.ui.rangeSlider, QtCore.SIGNAL('valueChanged(int)'), self.setPos)
 
+		self.ui.rangeSlider.setFocus(7)
 		if len(sys.argv)==2:
 			QtCore.QTimer.singleShot(10, self.loadFileArgv)
 
@@ -35,6 +43,8 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.rangeSlider.setMaximum(self.packet_count)
 		self.rangeSpinBox.setMaximum(self.packet_count)
 		self.setWindowTitle("KBB_Viewer: %s"%self.fname)
+		self.packetCountEdit.setText("%d"%self.packet_count)
+		self.setPos(0)
 
 	@QtCore.pyqtSlot()
 	def next(self):
@@ -49,18 +59,19 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.kbb.set_index(pos)
 		if not self.kbb.read_next():
 			return
+		self.kbb.check_all()
 
 		# header
-		self.header_preamble.setText(fmt_h32(self.kbb.header.preamble))
+		self.header_preamble.setText(fmt_preamble(self.kbb))
 		self.header_version.setText(fmt_i(self.kbb.header.version))
-		self.header_checksum.setText(fmt_h8(self.kbb.header.checksum))
+		self.header_checksum.setText(fmt_checksum(self.kbb))
 
 		self.header_msg_size.setText(fmt_i(self.kbb.header.msg_size))
 		self.header_msg_num.setText(fmt_i(self.kbb.header.msg_num))
 		self.header_write_errors.setText(fmt_i(self.kbb.header.write_errors))
 
 		# LTC
-		ltc = "%02d:%02d:%02d.%02d"%(self.kbb.ltc.hours,self.kbb.ltc.mins,self.kbb.ltc.secs,self.kbb.ltc.frame)
+		ltc = "%02d:%02d:%02d.%02d"%(self.kbb.ltc.hours,self.kbb.ltc.minutes,self.kbb.ltc.seconds,self.kbb.ltc.frames)
 		self.ltc_ltc.setText(ltc)
 
 		# RTC
@@ -70,7 +81,8 @@ class KBB_Viewer(QtGui.QMainWindow):
 
 		# text area
 		self.formatHex()
-		print pos
+		
+		print "Setting position of KBB file to", pos
 
 	def formatHex(self):
 		s = ""

@@ -53,13 +53,6 @@
 #define LOGGER_VERSION			11
 
 //-----------------------------------------------------------------------------
-struct __PACKED__ ltc_msg_v01
-{
-	uint8_t placeholder[13];
-};
-STATIC_ASSERT(sizeof(struct ltc_msg_v01)==13, LTC_MESSAGE_SIZE);
-
-//-----------------------------------------------------------------------------
 struct __PACKED__ log_msg_v01
 {
 	uint32_t preamble;			// 4
@@ -70,13 +63,12 @@ struct __PACKED__ log_msg_v01
 	uint32_t write_errors;		// 4
 								// =16
 
-	struct ltc_msg_v01 ltc;		// 13
+	struct LTCFrame ltc_frame;	// 10
 	struct tm rtc;				// 9*4=36
 
-	uint8_t __pad[512 - 16 - 13 - 36];
+	uint8_t __pad[512 - 16 - 10 - 36];
 };
 STATIC_ASSERT(sizeof(struct log_msg_v01)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
-
 
 //-----------------------------------------------------------------------------
 static Thread * loggerThread;
@@ -371,4 +363,10 @@ int kuroBoxLogger(void)
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
 	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void kbl_setLTC(struct LTCFrame * ltc_frame)
+{
+	memcpy(&current_msg.ltc_frame, ltc_frame, sizeof(current_msg.ltc_frame));
 }

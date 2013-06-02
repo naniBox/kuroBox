@@ -76,12 +76,10 @@ endif
 # Imported source files and paths
 CHIBIOS = ../../chibios
 KUROBOX = .
-LIBLTC = ../libltc
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
-include $(LIBLTC)/libltc.mk
 include $(KUROBOX)/src/fatfs/fatfs.mk
 include $(KUROBOX)/src/cfg/board.mk
 
@@ -105,7 +103,6 @@ CSRC = $(PORTSRC) \
         $(CHIBIOS)/os/various/chrtclib.c \
         $(CHIBIOS)/os/various/memstreams.c \
         $(FATFSSRC) \
-        $(LIBLTCSRC) \
         ./src/kb_debug.c \
         ./src/glcdfont.c \
         ./src/kb_adc.c \
@@ -113,6 +110,7 @@ CSRC = $(PORTSRC) \
         ./src/kb_logger.c \
         ./src/kb_screen.c \
         ./src/kb_time.c \
+        ./src/kb_gps.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c

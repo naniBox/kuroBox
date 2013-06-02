@@ -26,11 +26,8 @@
 #include <chprintf.h>
 #include "kb_time.h"
 #include "kb_screen.h"
-#include "kb_buttons.h"
+#include "kb_logger.h"
 #include "nanibox_util.h"
-
-//-----------------------------------------------------------------------------
-static Thread * timeThread;
 
 //-----------------------------------------------------------------------------
 /*
@@ -53,81 +50,61 @@ static Thread * timeThread;
 #define LTC_LONG_MAX_US					580
 #define LTC_LONG_MIN_US					350
 
-#define IS_LTC_LONG(x)	((x<LTC_LONG_MAX_US) && (x>LTC_LONG_MIN_US))
-#define IS_LTC_SHORT(x)	((x<LTC_SHORT_MAX_US) && (x>LTC_SHORT_MIN_US))
+#define IS_LTC_LONG(x)	(((x)<LTC_LONG_MAX_US)  && ((x)>LTC_LONG_MIN_US))
+#define IS_LTC_SHORT(x)	(((x)<LTC_SHORT_MAX_US) && ((x)>LTC_SHORT_MIN_US))
 
 #define LTC_SYNC_WORD 					(0xBFFC)
 
-STATIC_ASSERT(sizeof(struct LTCFrame)==10, LTC_FRAME_SIZE); // 80bits
+//-----------------------------------------------------------------------------
+static uint32_t last_edge_time;
+static bool_t was_last_edge_short;
+static struct LTCFrame ltc_frame;
+static struct SMPTETimecode ltc_timecode;
 
-uint32_t last_edge_time;
-bool_t was_last_edge_short;
-uint32_t long_count,short_count,other_count;
-
-struct PW{ uint32_t width;uint8_t pulse; };
-struct PW pw[256];
-struct PW pw_p[256];
-uint16_t pw_idx;
-
-uint8_t ltc_data[80];
-uint8_t ltc_data_print[80];
-uint8_t ltc_data_idx;
-
-uint16_t current_word;
-uint8_t * ltc_raw;
-struct LTCFrame ltc_frame;
-struct SMPTETimecode ltc_timecode;
-void ltc_frame_to_time2(struct SMPTETimecode *stime, struct LTCFrame *frame) {
-	stime->years  = 0;
-	stime->months = 0;
-	stime->days   = 0;
-	stime->hours = frame->hours_units + frame->hours_tens*10;
-	stime->mins  = frame->mins_units  + frame->mins_tens*10;
-	stime->secs  = frame->secs_units  + frame->secs_tens*10;
-	stime->frame = frame->frame_units + frame->frame_tens*10;
+//-----------------------------------------------------------------------------
+static void frame_to_time(struct SMPTETimecode * smpte_timecode, struct LTCFrame * ltc_frame)
+{
+	smpte_timecode->hours = ltc_frame->hours_units + ltc_frame->hours_tens*10;
+	smpte_timecode->minutes  = ltc_frame->minutes_units  + ltc_frame->minutes_tens*10;
+	smpte_timecode->seconds  = ltc_frame->seconds_units  + ltc_frame->seconds_tens*10;
+	smpte_timecode->frames = ltc_frame->frame_units + ltc_frame->frame_tens*10;
 }
 
+//-----------------------------------------------------------------------------
 void ltc_store(uint8_t bit_set)
 {
+	// cast it into an array so it's easier to deal with for bitshifting
+	uint8_t * ltc_raw = (uint8_t*)&ltc_frame;
+
+	// we are pushing a new bit at the end of the struct - bit 7 of byte 9
+	// so we need to push everything down a bit. First, bit 0 of byte 0
+	// gets lost by shifting it out, then we push in bit 0 of byte 1 into
+	// bit 7 of byte 0, this is repeat for all but the last byte
 	for ( uint8_t idx = 0 ; idx < 9 ; idx++ )
 	{
 		ltc_raw[idx] >>= 1;
-		if ( ltc_raw[idx+1] & 0x01 )
-			ltc_raw[idx] |= 0x80;
+		ltc_raw[idx] |= (ltc_raw[idx+1] & 0x01) << 7;
 	}
-	ltc_raw[9] >>= 1;
-	if ( bit_set )
-		ltc_raw[9] |= 0x80;
 
-	// debug comes here:
+	// here, we've already pushed bit 0 of byte 9 into bit 7 of byte 8 in
+	// the above loop, we now shift things down and push in the new bit
+	ltc_raw[9] >>= 1;
+	ltc_raw[9] |= (bit_set & 0x01) << 7; // this will either be 0x80 or 0x00;
+
+	// if we *just* got the sync_word, then this bit is the end of the frame,
+	// but remember, right now is the time JUST past, since the sync word
+	// happens at the end of the frame.
 	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
 	{
-		ltc_frame_to_time2(&ltc_timecode, &ltc_frame);
-		kbs_setLTC(&ltc_timecode);
-		palTogglePad(GPIOB, GPIOB_LED2);
-	}
-
-	return;
-	ltc_data[ltc_data_idx++] = bit_set;
-	if ( ltc_data_idx == sizeof(ltc_data) )
-	{
-		memcpy(ltc_data_print,ltc_data,sizeof(ltc_data_print));
-		memcpy(pw_p,pw,sizeof(pw_p));
-		memset(pw,0,sizeof(pw));
-
 		chSysLockFromIsr();
-		if (timeThread != NULL)
-		{
-			timeThread->p_u.rdymsg = (msg_t)1;
-			chSchReadyI(timeThread);
-			timeThread = NULL;
-		}
+		frame_to_time(&ltc_timecode, &ltc_frame);
+		kbs_setLTC(&ltc_timecode);
+		kbl_setLTC(&ltc_frame);
 		chSysUnlockFromIsr();
-		ltc_data_idx = 0;
-		pw_idx = 0;
 	}
 }
 
+//-----------------------------------------------------------------------------
 void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
@@ -135,17 +112,13 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 	uint32_t this_edge_time = halGetCounterValue();
 	uint32_t tdiff = RTT2US(this_edge_time - last_edge_time);
 
-	pw[pw_idx].width = tdiff;
 	if ( IS_LTC_LONG(tdiff) )
 	{
-		pw[pw_idx].pulse = 0;
 		ltc_store(0);
 		was_last_edge_short = FALSE;
-		long_count++;
 	}
 	else if ( IS_LTC_SHORT(tdiff) )
 	{
-		pw[pw_idx].pulse = 1;
 		if ( was_last_edge_short )
 		{
 			ltc_store(1);
@@ -155,74 +128,17 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 		{
 			was_last_edge_short = TRUE;
 		}
-		short_count++;
 	}
 	else
 	{
-		pw[pw_idx].pulse = 2;
-		other_count++;
+		//other_count++;
 	}
-
-	if ( pw_idx < 2556 )
-		pw_idx++;
-
-	kbs_setLTCS(tdiff, long_count, short_count, other_count);
-
 	last_edge_time = this_edge_time;
 }
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waTime, 1024*4);
-static msg_t 
-thTime(void *arg) 
-{
-	(void)arg;
-	chRegSetThreadName("Time");
-	while( !chThdShouldTerminate() )
-	{
-		chSysLock();
-		timeThread = chThdSelf();
-		msg_t msg = chSchGoSleepTimeoutS(THD_STATE_SUSPENDED, MS2ST(10));
-		chSysUnlock();		
-		if ( msg == RDY_TIMEOUT )
-		{
-			continue;
-		}
-
-		/*
-		BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
-		for ( uint32_t i = 0 ; i < 80; i++ )
-			chprintf(prnt, "%d ", ltc_data_print[i]);
-		chprintf(prnt, "\n\r");
-		if ( is_btn_0_pressed() )
-		{
-			for ( uint32_t i = 0 ; i < 256; i++ )
-				chprintf(prnt, "%d ", pw_p[i].pulse);
-			chprintf(prnt, "\n\r");
-
-			for ( uint32_t i = 0 ; i < 256; i++ )
-				chprintf(prnt, "%d ", pw_p[i].width);
-			chprintf(prnt, "\n\r");
-		}
-		chprintf(prnt, "\n\r\n\r");
-		*/
-	}
-	return 0;
-}
-	
-//-----------------------------------------------------------------------------
 int kuroBoxTimeInit(void)
 {
 	memset(&ltc_frame,0,sizeof(ltc_frame));
-	ltc_raw = (uint8_t*)&ltc_frame;
-
-	/**///debug
-	memset(ltc_data,0,sizeof(ltc_data));
-	memset(ltc_data_print,0,sizeof(ltc_data_print));
-	memset(pw,0,sizeof(pw));
-	memset(pw_p,0,sizeof(pw_p));
-	
-	timeThread = chThdCreateStatic(waTime, sizeof(waTime), NORMALPRIO, thTime, NULL);
-	
 	return 0;
 }

@@ -46,6 +46,8 @@ struct kuroBoxScreen
 	uint8_t btn0;
 	uint8_t btn1;
 	uint32_t a,b,c,d;
+
+	int gpsCount;
 };
 
 //-----------------------------------------------------------------------------
@@ -107,34 +109,21 @@ thScreen(void *arg)
 		INIT_CBUF();
 		chprintf(bss,"T: %.2d:%.2d:%.2d.%.2d",
 				screen.ltc.hours,
-				screen.ltc.mins,
-				screen.ltc.secs,
-				screen.ltc.frame);
+				screen.ltc.minutes,
+				screen.ltc.seconds,
+				screen.ltc.frames);
 		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
-		/*
-		INIT_CBUF();
-		chprintf(bss,"T: %3d %3d",
-				screen.a,
-				screen.b);
-		st7565_drawstring(&ST7565D1, 0, 1, charbuf);
-		INIT_CBUF();
-		chprintf(bss,"T: %3d %3d",
-				screen.c,
-				screen.d);
-		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
-		*/
-		// file name & count
+
 		INIT_CBUF();
 		chprintf(bss,"F: %s /%d",
 				screen.sdc_fname,
 				screen.counter);
-		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
+		st7565_drawstring(&ST7565D1, 0, 2, charbuf);
 
 		//-----------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------
 		// @OTODO: remove these, they are just for show!
 
-		/*
 		INIT_CBUF();
 		struct tm timp;
 		rtcGetTimeTm(&RTCD1, &timp);
@@ -142,15 +131,19 @@ thScreen(void *arg)
 		   timp.tm_hour,timp.tm_min,timp.tm_sec);
 		st7565_drawstring(&ST7565D1, 0, 3, charbuf);
 
-		INIT_CBUF();
-		chprintf(bss,"%d%d", screen.btn0, screen.btn1);
-		st7565_drawstring(&ST7565D1, C2P(8), 0, charbuf);
+		if ( screen.btn0 )
+			st7565_drawline(&ST7565D1, C2P(8), 0, C2P(8), CHAR_HEIGHT, COLOUR_BLACK);
+		if ( screen.btn1 )
+			st7565_drawline(&ST7565D1, C2P(8)+1, 0, C2P(8)+1, CHAR_HEIGHT, COLOUR_BLACK);
 
 		INIT_CBUF();
 		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
 		chprintf(bss,"%d", idle_time);
 		st7565_drawstring(&ST7565D1, C2P(-2), 3, charbuf);
-		*/
+
+		INIT_CBUF();
+		chprintf(bss,"%d", screen.gpsCount);
+		st7565_drawstring(&ST7565D1, C2P(-5), 1, charbuf);
 
 		st7565_display(&ST7565D1);
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
@@ -222,4 +215,9 @@ void kbs_setLTCS(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
 	screen.b = b;
 	screen.c = c;
 	screen.d = d;
+}
+
+void kbs_gpsCount(int count)
+{
+	screen.gpsCount += count;
 }

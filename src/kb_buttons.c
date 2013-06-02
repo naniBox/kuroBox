@@ -27,6 +27,14 @@ static bool_t btn_0_state;
 static bool_t btn_1_state;
 
 //-----------------------------------------------------------------------------
+int kuroBoxButtons(void)
+{
+	kbs_setBtn0(btn_0_state=palReadPad(GPIOA, GPIOA_BTN0));
+	kbs_setBtn1(btn_1_state=palReadPad(GPIOA, GPIOA_BTN1));
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;

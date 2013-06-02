@@ -43,22 +43,56 @@ class KBB_V11(object):
 
 	class KBB_V11_ltc():
 		"""
-		struct SMPTETimecode {
-			char timezone[6];   ///< the timezone 6bytes: "+HHMM" textual representation
-			unsigned char years; ///< LTC-date uses 2-digit year 00.99
-			unsigned char months; ///< valid months are 1..12
-			unsigned char days; ///< day of month 1..31
+			struct __PACKED__ LTCFrame
+			{
+				uint8_t frame_units:4;
+				uint8_t user_bits_1:4;
+				uint8_t frame_tens:2;
+				uint8_t drop_frame_flag:1;
+				uint8_t color_frame_flag:1;
+				uint8_t user_bits_2:4;
 
-			unsigned char hours; ///< hour 0..23
-			unsigned char mins; ///< minute 0..60
-			unsigned char secs; ///< second 0..60
-			unsigned char frame; ///< sub-second frame 0..(FPS - 1)
-		};
+				uint8_t seconds_units:4;
+				uint8_t user_bits_3:4;
+				uint8_t seconds_tens:3;
+				uint8_t even_parity_bit:1;
+				uint8_t user_bits_4:4;
+
+				uint8_t minutes_units:4;
+				uint8_t user_bits_5:4;
+				uint8_t minutes_tens:3;
+				uint8_t binary_group_flag_1:1;
+				uint8_t user_bits_6:4;
+
+				uint8_t hours_units:4;
+				uint8_t user_bits_7:4;
+				uint8_t hours_tens:2;
+				uint8_t reserved:1;
+				uint8_t binary_group_flag_2:1;
+				uint8_t user_bits_8:4;
+
+				uint16_t sync_word:16;
+			};
 		"""
 		def __init__(self,msg):
-			self.timezone = msg[16:22]
-			self.years,self.months,self.days,self.hours,self.mins,self.secs,self.frame = \
-				struct.unpack("<BBBBBBB",msg[22:29])
+			bytes = struct.unpack("<BBBBBBBBBB",msg[16:26])
+			
+			frame_units = bytes[0]&0x0f
+			frame_tens = bytes[1]&0x03
+			
+			second_units = bytes[2]&0xf
+			second_tens = bytes[3]&0x07
+
+			minute_units = bytes[4]&0xf
+			minute_tens = bytes[5]&0x07
+
+			hour_units = bytes[6]&0xf
+			hour_tens = bytes[7]&0x03
+
+			self.frames = frame_units+frame_tens*10
+			self.seconds = second_units+second_tens*10
+			self.minutes = minute_units+minute_tens*10
+			self.hours = hour_units+hour_tens*10
 
 	class KBB_V11_rtc():
 		"""
@@ -77,7 +111,7 @@ class KBB_V11(object):
 		"""
 		def __init__(self,msg):
 			self.sec,self.min,self.hour,self.mday,self.mon,self.year,self.wday,self.yday,self.isdst = \
-				struct.unpack("<IIIIIIIII",msg[29:29+4*9])
+				struct.unpack("<IIIIIIIII",msg[26:62])
 
 
 	def __init__(self, arg):
@@ -124,9 +158,12 @@ class KBB_V11(object):
 		self.msg_count+=1
 
 		# check the checksum
-		cs = calc_checksum(self.msg[16:])
-		if cs != self.header.checksum:
+		self.header.calculated_checksum = calc_checksum(self.msg[16:])
+		if self.header.calculated_checksum != self.header.checksum:
+			self.valid_packet = False
 			self.inc_err("checksum mismatch",1)
+		else:
+			self.valid_packet = True
 		
 	def parse_ltc(self):
 		self.ltc = self.KBB_V11_ltc(self.msg)
@@ -140,6 +177,9 @@ class KBB_V11(object):
 		self.parse_header()
 		self.parse_ltc()
 		self.parse_rtc()
+
+	def check_all(self):
+		self.check_header()
 
 	def read_next(self):
 		self.msg = self.fin.read(512)

@@ -33,7 +33,7 @@ def main():
 		if kbb is None:
 			print "Can't parse '%s'"%fname
 		while kbb.read_next():
-			kbb.check_header()
+			kbb.check_all()
 		kbb.print_errors()
 
 if __name__ == '__main__':

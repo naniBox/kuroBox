@@ -33,6 +33,7 @@
 #include "kb_logger.h"
 #include "kb_screen.h"
 #include "kb_time.h"
+#include "kb_gps.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -121,7 +122,7 @@ static const EXTConfig extcfg = {
 	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_1_exti_cb},	// 1
 
     {EXT_CH_MODE_DISABLED, NULL},	// 2
-    {EXT_CH_MODE_DISABLED, NULL},	// 3
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, gps_timepulse_exti_cb},	// 3
     {EXT_CH_MODE_DISABLED, NULL},	// 4
     {EXT_CH_MODE_DISABLED, NULL},	// 5
     {EXT_CH_MODE_DISABLED, NULL},	// 6
@@ -163,6 +164,7 @@ thBlinker(void *arg)
 //-----------------------------------------------------------------------------
 void kuroBox_panic(int msg)
 {
+	return;// this function is doing more harm than good...
 	switch( msg )
 	{
 	case unknown_panic:
@@ -222,6 +224,9 @@ kuroBoxInit(void)
 	// just blink to indicate we haven't crashed
 	/*blinkerThread = */chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
 
+	// set initial button state.
+	kuroBoxButtons();
+
 	// read config goes here
 	// @TODO: add config reading from eeprom
 	
@@ -232,6 +237,9 @@ kuroBoxInit(void)
 	
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();
+
+	// gps uart
+	kuroBoxGPSInit();
 
 	// LTC's thread and ICU stage
 	kuroBoxTimeInit();

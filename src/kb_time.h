@@ -30,51 +30,44 @@
 //-----------------------------------------------------------------------------
 struct __PACKED__ LTCFrame
 {
-	unsigned int frame_units:4; ///< SMPTE framenumber BCD unit 0..9
-	unsigned int user1:4;
+	uint8_t frame_units:4;
+	uint8_t user_bits_1:4;
+	uint8_t frame_tens:2;
+	uint8_t drop_frame_flag:1;
+	uint8_t color_frame_flag:1;
+	uint8_t user_bits_2:4;
 
-	unsigned int frame_tens:2; ///< SMPTE framenumber BCD tens 0..3
-	unsigned int dfbit:1; ///< indicated drop-frame timecode
-	unsigned int col_frame:1; ///< colour-frame: timecode intentionally synchronized to a colour TV field sequence
-	unsigned int user2:4;
+	uint8_t seconds_units:4;
+	uint8_t user_bits_3:4;
+	uint8_t seconds_tens:3;
+	uint8_t even_parity_bit:1;
+	uint8_t user_bits_4:4;
 
-	unsigned int secs_units:4; ///< SMPTE seconds BCD unit 0..9
-	unsigned int user3:4;
+	uint8_t minutes_units:4;
+	uint8_t user_bits_5:4;
+	uint8_t minutes_tens:3;
+	uint8_t binary_group_flag_1:1;
+	uint8_t user_bits_6:4;
 
-	unsigned int secs_tens:3; ///< SMPTE seconds BCD tens 0..6
-	unsigned int biphase_mark_phase_correction:1; ///< see note on Bit 27 in description and \ref ltc_frame_set_parity .
-	unsigned int user4:4;
+	uint8_t hours_units:4;
+	uint8_t user_bits_7:4;
+	uint8_t hours_tens:2;
+	uint8_t reserved:1;
+	uint8_t binary_group_flag_2:1;
+	uint8_t user_bits_8:4;
 
-	unsigned int mins_units:4; ///< SMPTE minutes BCD unit 0..9
-	unsigned int user5:4;
-
-	unsigned int mins_tens:3; ///< SMPTE minutes BCD tens 0..6
-	unsigned int binary_group_flag_bit0:1; ///< indicate user-data char encoding, see table above - bit 43
-	unsigned int user6:4;
-
-	unsigned int hours_units:4; ///< SMPTE hours BCD unit 0..9
-	unsigned int user7:4;
-
-	unsigned int hours_tens:2; ///< SMPTE hours BCD tens 0..2
-	unsigned int binary_group_flag_bit1:1; ///< indicate timecode is local time wall-clock, see table above - bit 58
-	unsigned int binary_group_flag_bit2:1; ///< indicate user-data char encoding (or parity with 25fps), see table above - bit 59
-	unsigned int user8:4;
-
-	unsigned int sync_word:16;
+	uint16_t sync_word:16;
 };
+STATIC_ASSERT(sizeof(struct LTCFrame)==10, LTC_FRAME_SIZE); // 80bits
 
-struct __PACKED__ SMPTETimecode {
-	char timezone[6];   ///< the timezone 6bytes: "+HHMM" textual representation
-	unsigned char years; ///< LTC-date uses 2-digit year 00.99
-	unsigned char months; ///< valid months are 1..12
-	unsigned char days; ///< day of month 1..31
-
-	unsigned char hours; ///< hour 0..23
-	unsigned char mins; ///< minute 0..60
-	unsigned char secs; ///< second 0..60
-	unsigned char frame; ///< sub-second frame 0..(FPS - 1)
+//-----------------------------------------------------------------------------
+struct __PACKED__ SMPTETimecode
+{
+	uint8_t hours;
+	uint8_t minutes;
+	uint8_t seconds;
+	uint8_t frames;
 };
-
 
 //-----------------------------------------------------------------------------
 void ltc_exti_cb(EXTDriver *extp, expchannel_t channel);
