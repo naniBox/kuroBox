@@ -27,92 +27,137 @@ import struct
 
 DBG = 3
 
-def calc_checksum(buf):
+def calc_checksum_8(buf):
 	xor = 0
 	for c in buf:
 		xor ^= ord(c)
 		xor = xor % 256
 	return xor
 
-class KBB_V11(object):
-	
-	class KBB_V11_header():
-		def __init__(self,msg):
-			self.preamble,self.version,self.checksum,self.msg_size,self.msg_num,self.write_errors = \
-				struct.unpack("<IBBHII",msg[0:16])
+def calc_checksum_16(buf):
+	a,b = 0,0
+	for c in buf:
+		a += ord(c)
+		a = a%256
+		b += a
+		b = b%256
+	return b*256+a
 
-	class KBB_V11_ltc():
-		"""
-			struct __PACKED__ LTCFrame
-			{
-				uint8_t frame_units:4;
-				uint8_t user_bits_1:4;
-				uint8_t frame_tens:2;
-				uint8_t drop_frame_flag:1;
-				uint8_t color_frame_flag:1;
-				uint8_t user_bits_2:4;
+class KBB_V11_header():
+	def __init__(self,msg):
+		self.preamble,self.version,self.checksum,self.msg_size,self.msg_num,self.write_errors = \
+			struct.unpack("<IBBHII",msg[0:16])
 
-				uint8_t seconds_units:4;
-				uint8_t user_bits_3:4;
-				uint8_t seconds_tens:3;
-				uint8_t even_parity_bit:1;
-				uint8_t user_bits_4:4;
-
-				uint8_t minutes_units:4;
-				uint8_t user_bits_5:4;
-				uint8_t minutes_tens:3;
-				uint8_t binary_group_flag_1:1;
-				uint8_t user_bits_6:4;
-
-				uint8_t hours_units:4;
-				uint8_t user_bits_7:4;
-				uint8_t hours_tens:2;
-				uint8_t reserved:1;
-				uint8_t binary_group_flag_2:1;
-				uint8_t user_bits_8:4;
-
-				uint16_t sync_word:16;
-			};
-		"""
-		def __init__(self,msg):
-			bytes = struct.unpack("<BBBBBBBBBB",msg[16:26])
-			
-			frame_units = bytes[0]&0x0f
-			frame_tens = bytes[1]&0x03
-			
-			second_units = bytes[2]&0xf
-			second_tens = bytes[3]&0x07
-
-			minute_units = bytes[4]&0xf
-			minute_tens = bytes[5]&0x07
-
-			hour_units = bytes[6]&0xf
-			hour_tens = bytes[7]&0x03
-
-			self.frames = frame_units+frame_tens*10
-			self.seconds = second_units+second_tens*10
-			self.minutes = minute_units+minute_tens*10
-			self.hours = hour_units+hour_tens*10
-
-	class KBB_V11_rtc():
-		"""
-		struct tm
+class KBB_V11_ltc():
+	"""
+		struct __PACKED__ ltc_frame_t
 		{
-		  int	tm_sec;
-		  int	tm_min;
-		  int	tm_hour;
-		  int	tm_mday;
-		  int	tm_mon;
-		  int	tm_year;
-		  int	tm_wday;
-		  int	tm_yday;
-		  int	tm_isdst;
-		};
-		"""
-		def __init__(self,msg):
-			self.sec,self.min,self.hour,self.mday,self.mon,self.year,self.wday,self.yday,self.isdst = \
-				struct.unpack("<IIIIIIIII",msg[26:62])
+			uint8_t frame_units:4;
+			uint8_t user_bits_1:4;
+			uint8_t frame_tens:2;
+			uint8_t drop_frame_flag:1;
+			uint8_t color_frame_flag:1;
+			uint8_t user_bits_2:4;
 
+			uint8_t seconds_units:4;
+			uint8_t user_bits_3:4;
+			uint8_t seconds_tens:3;
+			uint8_t even_parity_bit:1;
+			uint8_t user_bits_4:4;
+
+			uint8_t minutes_units:4;
+			uint8_t user_bits_5:4;
+			uint8_t minutes_tens:3;
+			uint8_t binary_group_flag_1:1;
+			uint8_t user_bits_6:4;
+
+			uint8_t hours_units:4;
+			uint8_t user_bits_7:4;
+			uint8_t hours_tens:2;
+			uint8_t reserved:1;
+			uint8_t binary_group_flag_2:1;
+			uint8_t user_bits_8:4;
+
+			uint16_t sync_word:16;
+		};
+	"""
+	def __init__(self,msg):
+		bytes = struct.unpack("<BBBBBBBBBB",msg[16:26])
+		
+		frame_units = bytes[0]&0x0f
+		frame_tens = bytes[1]&0x03
+		
+		second_units = bytes[2]&0xf
+		second_tens = bytes[3]&0x07
+
+		minute_units = bytes[4]&0xf
+		minute_tens = bytes[5]&0x07
+
+		hour_units = bytes[6]&0xf
+		hour_tens = bytes[7]&0x03
+
+		self.frames = frame_units+frame_tens*10
+		self.seconds = second_units+second_tens*10
+		self.minutes = minute_units+minute_tens*10
+		self.hours = hour_units+hour_tens*10
+
+class KBB_V11_rtc():
+	"""
+	struct tm
+	{
+	  int	tm_sec;
+	  int	tm_min;
+	  int	tm_hour;
+	  int	tm_mday;
+	  int	tm_mon;
+	  int	tm_year;
+	  int	tm_wday;
+	  int	tm_yday;
+	  int	tm_isdst;
+	};
+	"""
+	def __init__(self,msg):
+		self.sec,self.min,self.hour,self.mday,self.mon,self.year,self.wday,self.yday,self.isdst = \
+			struct.unpack("<IIIIIIIII",msg[26:62])
+
+class KBB_V11_nav_sol():
+	"""
+	struct ubx_nav_sol_t
+	{
+		uint16_t header;
+		uint16_t id;
+		uint16_t len;
+		uint32_t itow;
+		int32_t ftow;
+		int16_t week;
+		uint8_t gpsfix;
+		uint8_t flags;
+		int32_t ecefX;
+		int32_t ecefY;
+		int32_t ecefZ;
+		uint32_t pAcc;
+
+		int32_t ecefVX;
+		int32_t ecefVY;
+		int32_t ecefVZ;
+		uint32_t sAcc;
+		uint16_t pdop;
+		uint8_t reserved1;
+		uint8_t numSV;
+		uint32_t reserved2;
+
+		uint16_t cs;
+	};
+
+	"""
+	def __init__(self,msg):
+		self.pps,self.header,self.msg_id,self.msg_len,self.itow,self.ftow,self.week,self.gpsfix,self.flags, \
+			self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
+			self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
+			struct.unpack("<IHHHIihBBiiiIiiiIHBBIH", msg[62:126])
+		self.calc_cs = calc_checksum_16(msg[68:124])
+
+class KBB_V11(object):	
 
 	def __init__(self, arg):
 		super(KBB_V11, self).__init__()
@@ -141,8 +186,9 @@ class KBB_V11(object):
 			return 0
 		return self.errors[which]
 
+#---------------------------------------------------------------
 	def parse_header(self):
-		self.header = self.KBB_V11_header(self.msg)
+		self.header = KBB_V11_header(self.msg)
 		return self.header
 		
 	def check_header(self):
@@ -158,28 +204,42 @@ class KBB_V11(object):
 		self.msg_count+=1
 
 		# check the checksum
-		self.header.calculated_checksum = calc_checksum(self.msg[16:])
+		self.header.calculated_checksum = calc_checksum_8(self.msg[16:])
 		if self.header.calculated_checksum != self.header.checksum:
 			self.valid_packet = False
 			self.inc_err("checksum mismatch",1)
 		else:
 			self.valid_packet = True
 		
+#---------------------------------------------------------------
 	def parse_ltc(self):
-		self.ltc = self.KBB_V11_ltc(self.msg)
+		self.ltc = KBB_V11_ltc(self.msg)
 		return self.ltc
 
 	def parse_rtc(self):
-		self.rtc = self.KBB_V11_rtc(self.msg)
+		self.rtc = KBB_V11_rtc(self.msg)
 		return self.rtc
 
+#---------------------------------------------------------------
+	def parse_nav_sol(self):
+		self.nav_sol = KBB_V11_nav_sol(self.msg)
+		return self.nav_sol
+
+	def check_nav_sol(self):
+		if self.nav_sol.cs != self.nav_sol.calc_cs:
+			self.inc_err("nav_sol_cs",1)
+			if DBG>2:print "NAV_SOL cs mismatch:",self.nav_sol.cs,self.nav_sol.calc_cs
+
+#---------------------------------------------------------------
 	def parse_all(self):
 		self.parse_header()
 		self.parse_ltc()
 		self.parse_rtc()
+		self.parse_nav_sol()
 
 	def check_all(self):
 		self.check_header()
+		self.check_nav_sol()
 
 	def read_next(self):
 		self.msg = self.fin.read(512)

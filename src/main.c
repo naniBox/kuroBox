@@ -122,7 +122,7 @@ static const EXTConfig extcfg = {
 	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_1_exti_cb},	// 1
 
     {EXT_CH_MODE_DISABLED, NULL},	// 2
-	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, gps_timepulse_exti_cb},	// 3
+	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, gps_timepulse_exti_cb},	// 3
     {EXT_CH_MODE_DISABLED, NULL},	// 4
     {EXT_CH_MODE_DISABLED, NULL},	// 5
     {EXT_CH_MODE_DISABLED, NULL},	// 6

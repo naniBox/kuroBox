@@ -20,6 +20,12 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QPlainTextEdit" name="hex_view">
+         <property name="minimumSize">
+          <size>
+           <width>450</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <family>Courier New</family>
@@ -36,12 +42,6 @@
           <size>
            <width>220</width>
            <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>220</width>
-           <height>16777215</height>
           </size>
          </property>
          <property name="frameShape">
@@ -192,6 +192,142 @@
              <item>
               <widget class="QLineEdit" name="rtc_rtc"/>
              </item>
+             <item>
+              <widget class="QGroupBox" name="groupBox_4">
+               <property name="title">
+                <string>NAV_SOL</string>
+               </property>
+               <property name="flat">
+                <bool>true</bool>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="margin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QWidget" name="widget_3" native="true">
+                  <layout class="QFormLayout" name="formLayout_2">
+                   <property name="horizontalSpacing">
+                    <number>0</number>
+                   </property>
+                   <property name="verticalSpacing">
+                    <number>0</number>
+                   </property>
+                   <property name="margin">
+                    <number>0</number>
+                   </property>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_7">
+                     <property name="text">
+                      <string>ITOW</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="nav_sol_itow"/>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_8">
+                     <property name="text">
+                      <string>FTOW</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="nav_sol_ftow"/>
+                   </item>
+                   <item row="3" column="0">
+                    <widget class="QLabel" name="label_9">
+                     <property name="text">
+                      <string>week</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0">
+                    <widget class="QLabel" name="label_10">
+                     <property name="text">
+                      <string>gpsFix</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="5" column="0">
+                    <widget class="QLabel" name="label_11">
+                     <property name="text">
+                      <string>Flags</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="6" column="0">
+                    <widget class="QLabel" name="label_12">
+                     <property name="text">
+                      <string>ECEF</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="7" column="0">
+                    <widget class="QLabel" name="label_13">
+                     <property name="text">
+                      <string>ECEFV</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="8" column="0">
+                    <widget class="QLabel" name="label_14">
+                     <property name="text">
+                      <string>pAcc/sAcc</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="9" column="0">
+                    <widget class="QLabel" name="label_15">
+                     <property name="text">
+                      <string>pdop/numSv</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="nav_sol_week"/>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLineEdit" name="nav_sol_gpsfix"/>
+                   </item>
+                   <item row="5" column="1">
+                    <widget class="QLineEdit" name="nav_sol_flags"/>
+                   </item>
+                   <item row="6" column="1">
+                    <widget class="QLineEdit" name="nav_sol_ecef"/>
+                   </item>
+                   <item row="7" column="1">
+                    <widget class="QLineEdit" name="nav_sol_ecefv"/>
+                   </item>
+                   <item row="8" column="1">
+                    <widget class="QLineEdit" name="nav_sol_pacc_sacc"/>
+                   </item>
+                   <item row="9" column="1">
+                    <widget class="QLineEdit" name="nav_sol_pdop_numsv"/>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="nav_sol_pps"/>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QLabel" name="label_16">
+                     <property name="text">
+                      <string>PPS</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -322,8 +458,8 @@
      <y>548</y>
     </hint>
     <hint type="destinationlabel">
-     <x>756</x>
-     <y>547</y>
+     <x>724</x>
+     <y>560</y>
     </hint>
    </hints>
   </connection>
@@ -334,11 +470,11 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>753</x>
-     <y>558</y>
+     <x>724</x>
+     <y>560</y>
     </hint>
     <hint type="destinationlabel">
-     <x>699</x>
+     <x>643</x>
      <y>559</y>
     </hint>
    </hints>
@@ -366,12 +502,12 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>606</x>
-     <y>228</y>
+     <x>780</x>
+     <y>223</y>
     </hint>
     <hint type="destinationlabel">
-     <x>636</x>
-     <y>249</y>
+     <x>780</x>
+     <y>223</y>
     </hint>
    </hints>
   </connection>
@@ -382,12 +518,28 @@
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>590</x>
-     <y>292</y>
+     <x>780</x>
+     <y>279</y>
     </hint>
     <hint type="destinationlabel">
-     <x>613</x>
-     <y>304</y>
+     <x>780</x>
+     <y>256</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>groupBox_4</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>widget_3</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>593</x>
+     <y>263</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>630</x>
+     <y>270</y>
     </hint>
    </hints>
   </connection>

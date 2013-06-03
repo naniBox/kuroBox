@@ -27,7 +27,7 @@
 #include "kb_time.h"
 #include "kb_screen.h"
 #include "kb_logger.h"
-#include "nanibox_util.h"
+#include "kb_util.h"
 
 //-----------------------------------------------------------------------------
 /*
@@ -58,11 +58,11 @@
 //-----------------------------------------------------------------------------
 static uint32_t last_edge_time;
 static bool_t was_last_edge_short;
-static struct LTCFrame ltc_frame;
-static struct SMPTETimecode ltc_timecode;
+static struct ltc_frame_t ltc_frame;
+static struct smpte_timecode_t ltc_timecode;
 
 //-----------------------------------------------------------------------------
-static void frame_to_time(struct SMPTETimecode * smpte_timecode, struct LTCFrame * ltc_frame)
+static void frame_to_time(struct smpte_timecode_t * smpte_timecode, struct ltc_frame_t * ltc_frame)
 {
 	smpte_timecode->hours = ltc_frame->hours_units + ltc_frame->hours_tens*10;
 	smpte_timecode->minutes  = ltc_frame->minutes_units  + ltc_frame->minutes_tens*10;
@@ -111,7 +111,16 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)channel;
 	uint32_t this_edge_time = halGetCounterValue();
 	uint32_t tdiff = RTT2US(this_edge_time - last_edge_time);
+	last_edge_time = this_edge_time;
 
+	/*
+		the LTC comes in at differential manchester code, or biphase mark code
+		it doesn't matter whether a signal is high or low, but rather the
+		interval between transitions. DiffManch is self-clocking, and the
+		output code is modulated with the clock.
+
+		two short transitions indicate a logic 1, a long transition a logic 0.
+	*/
 	if ( IS_LTC_LONG(tdiff) )
 	{
 		ltc_store(0);
@@ -122,6 +131,8 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 		if ( was_last_edge_short )
 		{
 			ltc_store(1);
+			// the last edge *was* short, but since we just processed this one
+			// we need to reset it so that it happens again.
 			was_last_edge_short = FALSE;
 		}
 		else
@@ -131,9 +142,10 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 	}
 	else
 	{
+		// @TODO: if too many errors are happening, maybe we need to start
+		// 	implementing a clock-tracking algorithm
 		//other_count++;
 	}
-	last_edge_time = this_edge_time;
 }
 
 //-----------------------------------------------------------------------------

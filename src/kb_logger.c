@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 #include "kb_logger.h"
 #include "kb_screen.h"
-#include "nanibox_util.h"
+#include "kb_util.h"
 #include "ff.h"
 #include <hal.h>
 #include <memstreams.h>
@@ -55,18 +55,23 @@
 //-----------------------------------------------------------------------------
 struct __PACKED__ log_msg_v01
 {
-	uint32_t preamble;			// 4
-	uint8_t version;			// 1
-	uint8_t checksum;			// 1
-	uint16_t msg_size;			// 2
-	uint32_t msg_num;			// 4
-	uint32_t write_errors;		// 4
-								// =16
+	uint32_t preamble;					// 4
+	uint8_t version;					// 1
+	uint8_t checksum;					// 1
+	uint16_t msg_size;					// 2
+	uint32_t msg_num;					// 4
+	uint32_t write_errors;				// 4
+										// = 16 for HEADER block
 
-	struct LTCFrame ltc_frame;	// 10
-	struct tm rtc;				// 9*4=36
+	struct ltc_frame_t ltc_frame;		// 10
+	struct tm rtc;						// 9*4=36
+										// = 46 for TIME block
 
-	uint8_t __pad[512 - 16 - 10 - 36];
+	uint32_t pps;						// 4
+	struct ubx_nav_sol_t nav_sol;		// 60
+										// = 64 for GPS block
+
+	uint8_t __pad[512 - (16 + 46 + 64)];
 };
 STATIC_ASSERT(sizeof(struct log_msg_v01)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
@@ -245,19 +250,6 @@ sd_card_status(void)
 
 //-----------------------------------------------------------------------------
 static uint8_t
-calc_checksum( uint8_t * buf, uint16_t buf_size )
-{
-	uint8_t xor = 0;
-	uint16_t idx = 0;
-
-	for ( ; idx < buf_size ; ++idx )
-		xor ^= (uint8_t) buf[ idx ];
-
-	return xor;
-}
-
-//-----------------------------------------------------------------------------
-static uint8_t
 run(void)
 {
 	uint8_t ret = 1;
@@ -280,7 +272,7 @@ run(void)
 		chSysUnlock();
 
 		uint8_t * buf = (uint8_t*) &writing_msg;
-		writing_msg.checksum = calc_checksum(buf+16, LOGGER_MESSAGE_SIZE-16);
+		writing_msg.checksum = calc_checksum_8(buf+16, LOGGER_MESSAGE_SIZE-16);
 
 		UINT bytes_written = 0;
 		FRESULT err = FR_OK;
@@ -366,7 +358,19 @@ int kuroBoxLogger(void)
 }
 
 //-----------------------------------------------------------------------------
-void kbl_setLTC(struct LTCFrame * ltc_frame)
+void kbl_setLTC(struct ltc_frame_t * ltc_frame)
 {
 	memcpy(&current_msg.ltc_frame, ltc_frame, sizeof(current_msg.ltc_frame));
+}
+
+//-----------------------------------------------------------------------------
+void kbl_incPPS(void)
+{
+	current_msg.pps++;
+}
+
+//-----------------------------------------------------------------------------
+void kbl_setGpsNavSol(struct ubx_nav_sol_t * nav_sol)
+{
+	memcpy(&current_msg.nav_sol, nav_sol, sizeof(current_msg.nav_sol));
 }

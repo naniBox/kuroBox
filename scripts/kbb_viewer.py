@@ -12,7 +12,10 @@ def fmt_i(x):		return "%i"%x
 def fmt_h8(x):		return "0x%02x"%x
 
 def fmt_preamble(kbb):return "%s / %s"%(fmt_h32(kbb.header.preamble),struct.pack("<I",kbb.header.preamble))
-def fmt_checksum(kbb):return "%s / %s"%(fmt_h8(kbb.header.checksum),"valid"if kbb.valid_packet else"invalid")
+def fmt_checksum(kbb):return "%s / %s"%(fmt_h8(kbb.header.checksum),"valid"if kbb.valid_packet else"INVALID")
+
+def fmt_3xi(a,b,c): return "%s, %s, %s"%(fmt_i(a),fmt_i(b),fmt_i(c))
+def fmt_2xi(a,b): return "%s, %s"%(fmt_i(a),fmt_i(b))
 
 class KBB_Viewer(QtGui.QMainWindow):
 	def __init__(self):
@@ -78,6 +81,22 @@ class KBB_Viewer(QtGui.QMainWindow):
 		rtc = "%04d-%02d-%02d %02d:%02d:%02d"%(self.kbb.rtc.year+1900,self.kbb.rtc.mon+1,self.kbb.rtc.mday,\
 			self.kbb.rtc.hour,self.kbb.rtc.min,self.kbb.rtc.sec)
 		self.rtc_rtc.setText(rtc)
+
+		# NAV_SOL
+		self.nav_sol_pps.setText(fmt_i(self.kbb.nav_sol.pps))
+		self.nav_sol_itow.setText(fmt_i(self.kbb.nav_sol.itow))
+		self.nav_sol_ftow.setText(fmt_i(self.kbb.nav_sol.ftow))
+		self.nav_sol_week.setText(fmt_i(self.kbb.nav_sol.week))
+		self.nav_sol_gpsfix.setText(fmt_i(self.kbb.nav_sol.gpsfix))
+		self.nav_sol_flags.setText(fmt_i(self.kbb.nav_sol.flags))
+		self.nav_sol_ecef.setText(fmt_3xi(self.kbb.nav_sol.ecefX,self.kbb.nav_sol.ecefY,self.kbb.nav_sol.ecefZ))
+		self.nav_sol_ecefv.setText(fmt_3xi(self.kbb.nav_sol.ecefVX,self.kbb.nav_sol.ecefVY,self.kbb.nav_sol.ecefVZ))
+		self.nav_sol_pacc_sacc.setText(fmt_2xi(self.kbb.nav_sol.pAcc, self.kbb.nav_sol.sAcc))
+		self.nav_sol_pdop_numsv.setText(fmt_2xi(self.kbb.nav_sol.pdop, self.kbb.nav_sol.numSV))
+
+		#self.pps,self.header,self.msg_id,self.msg_len,self.itow,self.ftow,self.week,self.gpsfix,self.flags, \
+		#	self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
+		#	self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
 
 		# text area
 		self.formatHex()

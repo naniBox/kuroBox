@@ -23,58 +23,46 @@
 //-----------------------------------------------------------------------------
 #include "kb_gps.h"
 #include "kb_screen.h"
-#include "nanibox_util.h"
+#include "kb_util.h"
+#include "kb_logger.h"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
-#define UBX_NAV_SOL_SIZE						60
-#define UBX_NAV_SOL_COUNT_PER_PULSE				5
-uint8_t gps_ubx_nav_sol[UBX_NAV_SOL_SIZE];
-uint8_t gps_ubx_nav_sol_count;
-
-
-//-----------------------------------------------------------------------------
-static void gps_rx_end_cb(UARTDriver * uartp)
-{
-	(void)uartp;
-	palTogglePad(GPIOB, GPIOB_LED2);
-
-	const uint16_t UBX_HEADER_PREAMBLE = 0x62b5;
-	uint16_t * ubx_header = (uint16_t *)&gps_ubx_nav_sol[0];
-	if( *ubx_header == UBX_HEADER_PREAMBLE )
-		kbs_gpsCount(1);
-	else
-		kbs_gpsCount(-1);
-
-	gps_ubx_nav_sol_count--;
-	if ( gps_ubx_nav_sol_count )
-	{
-		chSysLockFromIsr();
-		uartStopReceiveI(&UARTD6);
-		uartStartReceiveI(&UARTD6, UBX_NAV_SOL_SIZE, gps_ubx_nav_sol);
-		chSysUnlockFromIsr();
-	}
-}
+#define UBX_HEADER								0x62b5 //  little endian
+#define UBX_NAV_SOL_ID 							0x0601 //  little endian
+uint8_t ubx_nav_sol_buffer[UBX_NAV_SOL_SIZE];
+uint8_t ubx_nav_sol_idx;
 
 //-----------------------------------------------------------------------------
-static void gps_rx_char_cb(UARTDriver *uartp, uint16_t c)
-{
-	(void)uartp;
-	(void)c;
-}
-
-//-----------------------------------------------------------------------------
-static const UARTConfig gps_cfg = {
-	NULL, 				// txend1_cb;
-	NULL, 				// txend2_cb;
-	gps_rx_end_cb, 		// rxend_cb;
-	gps_rx_char_cb,		// rxchar_cb;
-	NULL, 				// rxerr_cb;
-	9600, 				// speed;
-	0, 					// cr1;
-	0, 					// cr2;
-	0 					// cr3;
+static SerialConfig gps_cfg = {
+	9600,
+	0, 						// cr1;
+	USART_CR2_STOP1_BITS,	// cr2;
+	0 						// cr3;
 };
+
+//-----------------------------------------------------------------------------
+void parse_and_store_nav_sol(void)
+{
+	struct ubx_nav_sol_t * nav_sol = (struct ubx_nav_sol_t*) ubx_nav_sol_buffer;
+
+	if ( nav_sol->header == UBX_HEADER )
+	{
+		if ( nav_sol->id == UBX_NAV_SOL_ID )
+		{
+			uint16_t cs = calc_checksum_16( ubx_nav_sol_buffer+2, UBX_NAV_SOL_SIZE-4 );
+			if ( nav_sol->cs == cs )
+			{
+				// valid packet!
+				chSysLock();
+					kbl_setGpsNavSol(nav_sol);
+				chSysUnlock();
+			}
+		}
+	}
+	memset(ubx_nav_sol_buffer, 0, sizeof(ubx_nav_sol_buffer));
+	ubx_nav_sol_idx = 0;
+}
 
 //-----------------------------------------------------------------------------
 /*static Thread * gpsThread;*/
@@ -85,10 +73,24 @@ thGps(void *arg)
 {
 	(void)arg;
 	chRegSetThreadName("Gps");
+
+	memset(ubx_nav_sol_buffer, 0, sizeof(ubx_nav_sol_buffer));
 	while( !chThdShouldTerminate() )
 	{
-		palTogglePad(GPIOA, GPIOA_LED3);
-		chThdSleepMilliseconds(1000);
+		uint8_t c = 0;
+		if ( sdRead(&SD6, &c, 1) != 1 )
+			continue;
+
+		if ( ( ubx_nav_sol_idx == 0 && c == (UBX_HEADER&0xff) ) ||
+			 ( ubx_nav_sol_idx == 1 && c == ((UBX_HEADER>>8)&0xff) ) ||
+			 ( ( ubx_nav_sol_idx > 1 ) &&
+			   ( ubx_nav_sol_idx < UBX_NAV_SOL_SIZE ) ) )
+			ubx_nav_sol_buffer[ubx_nav_sol_idx++] = c;
+		else
+			ubx_nav_sol_idx = 0;
+
+		if ( ubx_nav_sol_idx == UBX_NAV_SOL_SIZE )
+			parse_and_store_nav_sol();
 	}
 	return 0;
 }
@@ -100,26 +102,15 @@ void gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 
-	gps_ubx_nav_sol_count = UBX_NAV_SOL_COUNT_PER_PULSE;
 	chSysLockFromIsr();
-	uartStopReceiveI(&UARTD6);
-	uartStartReceiveI(&UARTD6, UBX_NAV_SOL_SIZE, gps_ubx_nav_sol);
+		kbl_incPPS();
 	chSysUnlockFromIsr();
-
-	/*
-	if (palReadPad(GPIOC, GPIOC_L1_TIMEPULSE))
-		palSetPad(GPIOB, GPIOB_LED2);
-	else
-		palClearPad(GPIOB, GPIOB_LED2);
-	*/
 }
 
 //-----------------------------------------------------------------------------
 int kuroBoxGPSInit(void)
 {
-	memset(gps_ubx_nav_sol, 0, sizeof(gps_ubx_nav_sol));
-
-	uartStart(&UARTD6, &gps_cfg);
+	sdStart(&SD6, &gps_cfg);
 	/*gpsThread = */chThdCreateStatic(waGps, sizeof(waGps), NORMALPRIO, thGps, NULL);
 	return KB_OK;
 }

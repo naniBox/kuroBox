@@ -24,6 +24,37 @@
 #define _naniBox_kuroBox_gps
 
 #include <hal.h>
+#include "kb_util.h"
+
+//-----------------------------------------------------------------------------
+#define UBX_NAV_SOL_SIZE						60
+struct __PACKED__ ubx_nav_sol_t
+{
+	uint16_t header;
+	uint16_t id;
+	uint16_t len;
+	uint32_t itow;
+	int32_t ftow;
+	int16_t week;
+	uint8_t gpsfix;
+	uint8_t flags;
+	int32_t ecefX;
+	int32_t ecefY;
+	int32_t ecefZ;
+	uint32_t pAcc;
+
+	int32_t ecefVX;
+	int32_t ecefVY;
+	int32_t ecefVZ;
+	uint32_t sAcc;
+	uint16_t pdop;
+	uint8_t reserved1;
+	uint8_t numSV;
+	uint32_t reserved2;
+
+	uint16_t cs;
+};
+STATIC_ASSERT(sizeof(struct ubx_nav_sol_t)==UBX_NAV_SOL_SIZE, UBX_NAV_SOL_SIZE);
 
 //-----------------------------------------------------------------------------
 void gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel);

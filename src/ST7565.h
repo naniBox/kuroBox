@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "ch.h"
 #include "hal.h"
-#include "nanibox_util.h"
+#include "kb_util.h"
 
 #define COLOUR_BLACK 1
 #define COLOUR_WHITE 0

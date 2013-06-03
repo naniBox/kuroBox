@@ -25,9 +25,12 @@
 
 #include <ch.h>
 #include "kb_time.h"
+#include "kb_gps.h"
 
 //-----------------------------------------------------------------------------
 int kuroBoxLogger(void);
-void kbl_setLTC(struct LTCFrame * ltc_frame);
+void kbl_setLTC(struct ltc_frame_t * ltc_frame);
+void kbl_incPPS(void);
+void kbl_setGpsNavSol(struct ubx_nav_sol_t * nav_sol);
 
 #endif // _naniBox_kuroBox_logger

@@ -25,10 +25,10 @@
 
 #include <ch.h>
 #include <hal.h>
-#include "nanibox_util.h"
+#include "kb_util.h"
 
 //-----------------------------------------------------------------------------
-struct __PACKED__ LTCFrame
+struct __PACKED__ ltc_frame_t
 {
 	uint8_t frame_units:4;
 	uint8_t user_bits_1:4;
@@ -58,10 +58,10 @@ struct __PACKED__ LTCFrame
 
 	uint16_t sync_word:16;
 };
-STATIC_ASSERT(sizeof(struct LTCFrame)==10, LTC_FRAME_SIZE); // 80bits
+STATIC_ASSERT(sizeof(struct ltc_frame_t)==10, LTC_FRAME_SIZE); // 80bits
 
 //-----------------------------------------------------------------------------
-struct __PACKED__ SMPTETimecode
+struct __PACKED__ smpte_timecode_t
 {
 	uint8_t hours;
 	uint8_t minutes;

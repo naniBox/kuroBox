@@ -21,7 +21,7 @@
 */
 
 #include "kb_screen.h"
-#include "nanibox_util.h"
+#include "kb_util.h"
 #include "ST7565.h"
 #include <memstreams.h>
 #include <chrtclib.h>
@@ -37,7 +37,7 @@
 typedef struct kuroBoxScreen kuroBoxScreen;
 struct kuroBoxScreen
 {
-	struct SMPTETimecode ltc;
+	struct smpte_timecode_t ltc;
 	uint16_t voltage;
 	int16_t temperature;
 	int32_t sdc_free;
@@ -173,7 +173,7 @@ void kbs_setTemperature(int16_t temperature)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setLTC(struct SMPTETimecode * ltc)
+void kbs_setLTC(struct smpte_timecode_t * ltc)
 {
 	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
 }
