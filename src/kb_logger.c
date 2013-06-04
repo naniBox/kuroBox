@@ -84,6 +84,7 @@ static uint8_t logger_state;
 static uint8_t fs_ready;
 static uint8_t fs_write_protected;
 static FATFS SDC_FS;
+uint32_t cardsize_MB;
 
 //-----------------------------------------------------------------------------
 static struct log_msg_v01 current_msg,writing_msg;
@@ -91,6 +92,7 @@ static struct log_msg_v01 current_msg,writing_msg;
 #define NANIBOX_DNAME "/nanibox"
 #define KUROBOX_FNAME_STEM "kuro"
 #define KUROBOX_FNAME_EXT ".kbb"
+#define KUROBOX_BLANK_FNAME "--"
 FIL kbfile;
 
 //-----------------------------------------------------------------------------
@@ -171,7 +173,7 @@ on_insert(void)
 		return;
 	}
 	uint64_t cardsize = clusters * (uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE;
-	uint32_t cardsize_MB = cardsize / (1024*1024);
+	cardsize_MB = cardsize / (1024*1024);
 
 	fs_write_protected = sdc_lld_is_write_protected(&SDCD1);
 	if ( fs_write_protected )
@@ -203,7 +205,7 @@ on_remove(void)
 {
 	sdcDisconnect(&SDCD1);
 	kbs_setSDCFree(0);
-	kbs_setFName("");
+	kbs_setFName(KUROBOX_BLANK_FNAME);
 	fs_ready = FALSE;
 }
 
@@ -308,6 +310,10 @@ run(void)
 		chThdSleepUntil(sleep_until);
 		sleep_until += MS2ST(5);            // Next deadline
 		current_msg.msg_num++;
+		if ( current_msg.msg_num%2048 == 0 ) // we write 1MB every 2048 msgs
+		{
+			kbs_setSDCFree(--cardsize_MB);
+		}
 	}
 	return ret;
 }
@@ -349,11 +355,12 @@ thLogger(void *arg)
 	
 
 //-----------------------------------------------------------------------------
-int kuroBoxLogger(void)
+int kuroBoxLoggerInit(void)
 {
 	chDbgAssert(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
+	kbs_setFName(KUROBOX_BLANK_FNAME);
 	return 0;
 }
 

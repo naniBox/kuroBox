@@ -157,6 +157,26 @@ class KBB_V11_nav_sol():
 			struct.unpack("<IHHHIihBBiiiIiiiIHBBIH", msg[62:126])
 		self.calc_cs = calc_checksum_16(msg[68:124])
 
+	def calculateLLA(self):
+		import math
+		# Constants (WGS ellipsoid)
+		a = 6378137
+		e = 8.1819190842622e-2
+		b = 6356752.3142451793 # math.sqrt(pow(a,2) * (1-pow(e,2)))
+		ep = 0.082094437949695676 #math.sqrt((pow(a,2)-pow(b,2))/pow(b,2))
+		# Calculation
+		ecefX = float(self.ecefX)
+		ecefY = float(self.ecefY)
+		ecefZ = float(self.ecefZ)
+		p = math.sqrt(pow(ecefX,2)+pow(ecefY,2))
+		th = math.atan2(a*ecefZ, b*p)
+		self.lon = math.atan2(ecefY, ecefX)
+		self.lat = math.atan2((ecefZ+ep*ep*b*pow(math.sin(th),3)), (p-e*e*a*pow(math.cos(th),3)))
+		n = a/math.sqrt(1-e*e*pow(math.sin(self.lat),2))
+		self.alt = p/math.cos(self.lat)-n
+		self.lat = (self.lat*180.0)/math.pi
+		self.lon = (self.lon*180.0)/math.pi
+
 class KBB_V11(object):	
 
 	def __init__(self, arg):

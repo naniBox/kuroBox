@@ -112,6 +112,7 @@ CSRC = $(PORTSRC) \
         ./src/kb_time.c \
         ./src/kb_gps.c \
         ./src/kb_util.c \
+        ./src/kb_vectornav.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c

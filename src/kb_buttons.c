@@ -27,7 +27,7 @@ static bool_t btn_0_state;
 static bool_t btn_1_state;
 
 //-----------------------------------------------------------------------------
-int kuroBoxButtons(void)
+int kuroBoxButtonsInit(void)
 {
 	kbs_setBtn0(btn_0_state=palReadPad(GPIOA, GPIOA_BTN0));
 	kbs_setBtn1(btn_1_state=palReadPad(GPIOA, GPIOA_BTN1));

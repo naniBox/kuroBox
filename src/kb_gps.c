@@ -26,10 +26,11 @@
 #include "kb_util.h"
 #include "kb_logger.h"
 #include <string.h>
+#include <math.h>
 
 //-----------------------------------------------------------------------------
-#define UBX_HEADER								0x62b5 //  little endian
-#define UBX_NAV_SOL_ID 							0x0601 //  little endian
+#define UBX_HEADER				0x62b5 //  little endian, so byte swapped
+#define UBX_NAV_SOL_ID 			0x0601 //  little endian
 uint8_t ubx_nav_sol_buffer[UBX_NAV_SOL_SIZE];
 uint8_t ubx_nav_sol_idx;
 
@@ -42,7 +43,26 @@ static SerialConfig gps_cfg = {
 };
 
 //-----------------------------------------------------------------------------
-void parse_and_store_nav_sol(void)
+void
+ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt)
+{
+    float a = 6378137.0f;
+    float e = 8.1819190842622e-2f;
+    float b = 6356752.3142451793f; // sqrtf(powf(a,2) * (1-powf(e,2)));
+    float ep = 0.082094437949695676f; // sqrtf((powf(a,2)-powf(b,2))/powf(b,2));
+    float p = sqrt(pow(x,2)+pow(y,2));
+    float th = atan2(a*z, b*p);
+    *lon = atan2(y, x);
+    *lat = atan2((z+ep*ep*b*pow(sin(th),3)), (p-e*e*a*pow(cos(th),3)));
+    float n = a/sqrt(1-e*e*pow(sin(*lat),2));
+    *alt = p/cos(*lat)-n;
+    *lat = (*lat*180)/M_PI;
+    *lon = (*lon*180)/M_PI;
+}
+
+//-----------------------------------------------------------------------------
+static void
+parse_and_store_nav_sol(void)
 {
 	struct ubx_nav_sol_t * nav_sol = (struct ubx_nav_sol_t*) ubx_nav_sol_buffer;
 
@@ -55,6 +75,7 @@ void parse_and_store_nav_sol(void)
 			{
 				// valid packet!
 				chSysLock();
+					kbs_setGpsEcef(nav_sol->ecefX, nav_sol->ecefY, nav_sol->ecefZ);
 					kbl_setGpsNavSol(nav_sol);
 				chSysUnlock();
 			}
@@ -95,15 +116,16 @@ thGps(void *arg)
 	return 0;
 }
 
-
 //-----------------------------------------------------------------------------
-void gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
+void
+gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
 
 	chSysLockFromIsr();
 		kbl_incPPS();
+		kbs_PPS();
 	chSysUnlockFromIsr();
 }
 

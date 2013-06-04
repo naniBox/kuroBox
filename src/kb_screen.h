@@ -32,14 +32,17 @@ int kuroBoxScreenInit(void);
 void kbs_setVoltage(uint16_t volts);	// in volts*10
 void kbs_setTemperature(int16_t temperature);	// in C
 void kbs_setLTC(struct smpte_timecode_t * ltc);
+
 void kbs_setCounter(uint32_t count);
 void kbs_setSDCFree(int32_t sdc_free);	// if negative, then write protected
 void kbs_setFName(const char * fname);
+
 void kbs_setBtn0(uint8_t on);
 void kbs_setBtn1(uint8_t on);
 
-void kbs_setLTCS(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+void kbs_PPS(void);
+void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z);
 
-void kbs_gpsCount(int count);
+void kbs_setYPR(float yaw, float pitch, float roll);
 
 #endif // _naniBox_kuroBox_screen

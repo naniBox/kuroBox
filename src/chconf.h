@@ -37,6 +37,7 @@
 #endif
 
 #define PORT_IDLE_THREAD_STACK_SIZE     32
+#define CHPRINTF_USE_FLOAT				TRUE
 
 /*===========================================================================*/
 /**

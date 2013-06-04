@@ -605,7 +605,7 @@
  * PD15 - _D15                      (input pullup).
  */
 #define VAL_GPIOD_MODER             (PIN_MODE_INPUT(GPIOD_L1_VN_SYNC_IN) |  \
-                                     PIN_MODE_INPUT(GPIOD_L1_VN_NSS) |      \
+                                     PIN_MODE_OUTPUT(GPIOD_L1_VN_NSS) |     \
                                      PIN_MODE_ALTERNATE(GPIOD_SDIO_CMD) |   \
                                      PIN_MODE_INPUT(GPIOD_L1_VN_NRST) |     \
                                      PIN_MODE_INPUT(GPIOD_SD_DET) |         \
@@ -637,7 +637,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOD__D14) |       \
                                      PIN_OTYPE_PUSHPULL(GPIOD__D15))
 #define VAL_GPIOD_OSPEEDR           (PIN_OSPEED_2M(GPIOD_L1_VN_SYNC_IN) |   \
-                                     PIN_OSPEED_2M(GPIOD_L1_VN_NSS) |       \
+                                     PIN_OSPEED_100M(GPIOD_L1_VN_NSS) |       \
                                      PIN_OSPEED_100M(GPIOD_SDIO_CMD) |      \
                                      PIN_OSPEED_2M(GPIOD_L1_VN_NRST) |      \
                                      PIN_OSPEED_2M(GPIOD_SD_DET) |          \

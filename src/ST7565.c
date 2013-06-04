@@ -294,9 +294,11 @@ st7565_drawstring(ST7565Driver * stdp, int8_t x, uint8_t line, const char *str)
 
 //----------------------------------------------------------------------------
 void 
-st7565_setpixel(ST7565Driver * stdp, uint8_t x, uint8_t y, uint8_t colour) 
+st7565_setpixel(ST7565Driver * stdp, int8_t x, uint8_t y, uint8_t colour)
 {
-	if ( ( x >= LCDWIDTH ) || ( y >= LCDHEIGHT ) )
+	if ( x < 0 )
+		x = (LCDWIDTH-1) + x;
+	if ( ( x < 0 ) || ( y >= LCDHEIGHT ) )
 		return;
 
 	// x is which column
@@ -311,8 +313,12 @@ st7565_setpixel(ST7565Driver * stdp, uint8_t x, uint8_t y, uint8_t colour)
 //----------------------------------------------------------------------------
 // bresenham's algorithm - thx wikpedia
 void
-st7565_drawline(ST7565Driver * stdp, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color)
+st7565_drawline(ST7565Driver * stdp, int8_t x0, uint8_t y0, int8_t x1, uint8_t y1, uint8_t color)
 {
+	if ( x0 < 0 )
+		x0 = (LCDWIDTH-1) + x0;
+	if ( x1 < 0 )
+		x1 = (LCDWIDTH-1) + x1;
 	uint8_t steep = abs( y1 - y0 ) > abs( x1 - x0 );
 	if ( steep )
 	{
@@ -355,6 +361,43 @@ st7565_drawline(ST7565Driver * stdp, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t
 		}
 	}
 }
+
+//----------------------------------------------------------------------------
+void
+st7565_drawrect(ST7565Driver * stdp, int8_t x, uint8_t y, int8_t w, uint8_t h, uint8_t color)
+{
+	if ( x < 0 )
+		x = (LCDWIDTH-1) + x;
+	// stupidest version - just pixels - but fast with internal buffer!
+	for ( uint8_t i=x; i<x+w; i++ )
+	{
+		st7565_setpixel( stdp, i, y, color );
+		st7565_setpixel( stdp, i, y+h-1, color );
+	}
+	for ( uint8_t i=y; i<y+h; i++ )
+	{
+		st7565_setpixel( stdp, x, i, color );
+		st7565_setpixel( stdp, x+w-1, i, color );
+	}
+
+	updateBoundingBox( x, y, x+w, y+h );
+}
+
+//----------------------------------------------------------------------------
+void
+st7565_fillrect(ST7565Driver * stdp, int8_t x, uint8_t y, int8_t w, uint8_t h, uint8_t color)
+{
+	if ( x < 0 )
+		x = (LCDWIDTH-1) + x;
+	// stupidest version - just pixels - but fast with internal buffer!
+	for ( uint8_t i=x; i<x+w; i++ )
+		for ( uint8_t j=y; j<y+h; j++ )
+			st7565_setpixel( stdp, i, j, color );
+
+	updateBoundingBox( x, y, x+w, y+h );
+
+}
+
 /*
 //----------------------------------------------------------------------------
 #define ST7565_STARTBYTES 0

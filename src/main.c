@@ -34,6 +34,7 @@
 #include "kb_screen.h"
 #include "kb_time.h"
 #include "kb_gps.h"
+#include "kb_vectornav.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -52,18 +53,6 @@ static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
 /*static Thread * blinkerThread;*/
 static kuroBoxState_t global_state;
 static VirtualTimer adc_trigger;
-
-//-----------------------------------------------------------------------------
-/*
-static ICUConfig ltc_icucfg = {
-	ICU_INPUT_ACTIVE_HIGH,
-	1000000,
-	NULL,						// width
-	ltc_icu_period_cb,			// period
-	NULL,						// overflow
-	ICU_CHANNEL_2
-};
-*/
 
 //-----------------------------------------------------------------------------
 static SerialConfig serial1_cfg = {
@@ -130,7 +119,7 @@ static const EXTConfig extcfg = {
     {EXT_CH_MODE_DISABLED, NULL},	// 8
 	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, ltc_exti_cb},	// 9
     {EXT_CH_MODE_DISABLED, NULL},	// 10
-    {EXT_CH_MODE_DISABLED, NULL},	// 11
+	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, vn_dr_int_exti_cb},	// 11
     {EXT_CH_MODE_DISABLED, NULL},	// 12
     {EXT_CH_MODE_DISABLED, NULL},	// 13
     {EXT_CH_MODE_DISABLED, NULL},	// 14
@@ -224,9 +213,6 @@ kuroBoxInit(void)
 	// just blink to indicate we haven't crashed
 	/*blinkerThread = */chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
 
-	// set initial button state.
-	kuroBoxButtons();
-
 	// read config goes here
 	// @TODO: add config reading from eeprom
 	
@@ -238,23 +224,30 @@ kuroBoxInit(void)
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();
 
+	// set initial button state.
+	kuroBoxButtonsInit();
+
 	// gps uart
 	kuroBoxGPSInit();
 
-	// LTC's thread and ICU stage
+	// LTC's, though this is now driven purely through interrupts, and it's
+	// VERY quick
 	kuroBoxTimeInit();
-	//icuStart(&ICUD1, &ltc_icucfg);
-	//icuEnable(&ICUD1);
 	
+	VND1.spip = &SPID2;
+	VND1.gpdp = &GPTD14;
+	kuroBoxVectorNavInit(&VND1, NULL); // use the defaults
+
 	// the actual logging thread
-	kuroBoxLogger();
-	
+	kuroBoxLoggerInit();
+
+	// indicate we're ready
 	chThdSleepMilliseconds(100);
 	palClearPad(GPIOB, GPIOB_LED1);
 	palClearPad(GPIOB, GPIOB_LED2);
 	palClearPad(GPIOA, GPIOA_LED3);
 
-	// buttons and stuff
+	// all external interrupts, all the system should now be ready for it
 	extStart(&EXTD1, &extcfg);
 
 	return KB_OK; 

@@ -69,8 +69,10 @@ void st7565_clear_display(ST7565Driver * stdp);
 void st7565_clear(ST7565Driver * stdp);
 void st7565_drawchar(ST7565Driver * stdp, int8_t x, uint8_t line, char c);
 void st7565_drawstring(ST7565Driver * stdp, int8_t x, uint8_t line, const char *str);
-void st7565_setpixel(ST7565Driver * stdp, uint8_t x, uint8_t y, uint8_t colour);
-void st7565_drawline(ST7565Driver * stdp, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1, uint8_t color);
+void st7565_setpixel(ST7565Driver * stdp, int8_t x, uint8_t y, uint8_t colour);
+void st7565_drawline(ST7565Driver * stdp, int8_t x0, uint8_t y0, int8_t x1, uint8_t y1, uint8_t color);
+void st7565_drawrect(ST7565Driver * stdp, int8_t x, uint8_t y, int8_t w, uint8_t h, uint8_t color);
+void st7565_fillrect(ST7565Driver * stdp, int8_t x, uint8_t y, int8_t w, uint8_t h, uint8_t color);
 
 /*
 class ST7565 {

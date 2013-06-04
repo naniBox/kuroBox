@@ -94,6 +94,9 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.nav_sol_pacc_sacc.setText(fmt_2xi(self.kbb.nav_sol.pAcc, self.kbb.nav_sol.sAcc))
 		self.nav_sol_pdop_numsv.setText(fmt_2xi(self.kbb.nav_sol.pdop, self.kbb.nav_sol.numSV))
 
+		self.kbb.nav_sol.calculateLLA()
+		self.nav_sol_lla.setText(fmt_3xi(self.kbb.nav_sol.lat,self.kbb.nav_sol.lon,self.kbb.nav_sol.alt))
+
 		#self.pps,self.header,self.msg_id,self.msg_len,self.itow,self.ftow,self.week,self.gpsfix,self.flags, \
 		#	self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
 		#	self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
