@@ -26,44 +26,129 @@
 #include "kb_screen.h"
 #include <string.h>
 
+
+//-----------------------------------------------------------------------------
+void vectornav_spi_end_cb(SPIDriver * spip);
+void vectornav_gpt_end_cb(GPTDriver * spip);
+
+//-----------------------------------------------------------------------------
 static const VectorNavConfig default_vectornav_config =
 {
 	{	// SPIConfig struct
-		NULL, //  we are going to need a callback, mkay?
+		vectornav_spi_end_cb,
 		GPIOD,
 		GPIOD_L1_VN_NSS,
 		SPI_CR1_CPOL | SPI_CR1_CPHA
 	},
 	{
 		1000000, // 1MHz should be fine enough to get a 50us timeout
-		NULL
+		vectornav_gpt_end_cb
 	}
+};
+
+#define VN_ASYNC_INACTIVE				0
+#define VN_ASYNC_1ST_SPI_CB				1
+#define VN_ASYNC_1ST_SLEEP				2
+#define VN_ASYNC_2ND_SPI_CB				3
+#define VN_ASYNC_2ND_SLEEP				4
+#define VN_SLEEPTIME					50
+
+//-----------------------------------------------------------------------------
+struct async_vn_msg_t
+{
+	uint8_t state;
+	uint8_t reg;
+	uint16_t wait;
+	uint8_t buf[VN100_MAX_MSG_SIZE];
+	uint16_t buf_size;
 };
 
 //-----------------------------------------------------------------------------
 VectorNavDriver VND1;
+static struct async_vn_msg_t async_vn_msg;
 
 //-----------------------------------------------------------------------------
-static Thread * vnThread;
-static WORKING_AREA(waVN, 128);
-static msg_t
-thVN(void *arg)
+void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 {
-	(void)arg;
-	chRegSetThreadName("VN");
-
-	float ypr[4]; // the 4th is a uint32_t, deal with it
-	memset(&ypr, 0, sizeof(ypr));
-	while( !chThdShouldTerminate() )
+	switch( reg )
 	{
-		chSysLock();
-		vnThread = chThdSelf();
-		chSchGoSleepS(THD_STATE_SUSPENDED);
-		chSysUnlock();
-		kbv_readRegister(&VND1, VN100_REG_YPR, VN100_REG_YPR_SIZE+4, (uint8_t*)ypr);
-		kbs_setYPR(ypr[0],ypr[1],ypr[2]);
+	case VN100_REG_YPR:
+		if ( buf[0] == 0x00 && buf[1] == 0x01 &&
+			 buf[2] == reg && buf[3] == 0x00 && buf_size == VN100_REG_YPR_SIZE + VN100_HEADER_SIZE)
+		{
+			// data return is good, proceed
+			float * fbuf = (float*)(&buf[4]); //  header
+			// uint32_t * tmsg = (uint32_t*)(&buf[4+4*3]);
+			kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
+		}
+		break;
+	default:
+		break;
 	}
-	return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vectornav_spi_end_cb(SPIDriver * spip)
+{
+	(void)spip;
+
+	switch( async_vn_msg.state )
+	{
+	case VN_ASYNC_1ST_SPI_CB:
+		chSysLockFromIsr();
+		spiUnselectI(VND1.spip);
+		async_vn_msg.state = VN_ASYNC_1ST_SLEEP;
+		gptStartOneShotI(VND1.gpdp, VN_SLEEPTIME);
+		chSysUnlockFromIsr();
+		break;
+
+	case VN_ASYNC_2ND_SPI_CB:
+		chSysLockFromIsr();
+		spiUnselectI(VND1.spip);
+		// here we have the register
+		vectornav_dispatch_register(async_vn_msg.reg, async_vn_msg.buf_size, async_vn_msg.buf);
+		async_vn_msg.state = VN_ASYNC_2ND_SLEEP;
+		gptStartOneShotI(VND1.gpdp, VN_SLEEPTIME);
+		chSysUnlockFromIsr();
+		break;
+
+	case VN_ASYNC_INACTIVE:
+	case VN_ASYNC_1ST_SLEEP:
+	case VN_ASYNC_2ND_SLEEP:
+	default:
+		// @TODO: assert?
+		break;
+	}
+}
+
+//-----------------------------------------------------------------------------
+void vectornav_gpt_end_cb(GPTDriver * gptp)
+{
+	(void)gptp;
+
+	switch( async_vn_msg.state )
+	{
+	case VN_ASYNC_1ST_SLEEP:
+		chSysLockFromIsr();
+		async_vn_msg.state = VN_ASYNC_2ND_SPI_CB;
+		memset(&async_vn_msg.buf, 0, sizeof(async_vn_msg.buf));
+		spiSelectI(VND1.spip);
+		spiStartReceiveI(VND1.spip, async_vn_msg.buf_size, async_vn_msg.buf);
+		chSysUnlockFromIsr();
+		break;
+
+	case VN_ASYNC_2ND_SLEEP:
+		// finished, clear it all
+		memset(&async_vn_msg, 0, sizeof(async_vn_msg));
+		break;
+
+	case VN_ASYNC_INACTIVE:
+	case VN_ASYNC_1ST_SPI_CB:
+	case VN_ASYNC_2ND_SPI_CB:
+	default:
+		// @TODO: assert?
+		break;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -73,12 +158,14 @@ void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)channel;
 
 	chSysLockFromIsr();
-	if (vnThread != NULL)
-	{
-		vnThread->p_u.rdymsg = (msg_t)1;
-		chSchReadyI(vnThread);
-		vnThread = NULL;
-	}
+	memset(&async_vn_msg, 0, sizeof(async_vn_msg));
+	async_vn_msg.reg = VN100_REG_YPR;
+	async_vn_msg.buf[0] = 1;
+	async_vn_msg.buf[1] = async_vn_msg.reg;
+	async_vn_msg.buf_size = VN100_REG_YPR_SIZE + VN100_HEADER_SIZE;
+	async_vn_msg.state = VN_ASYNC_1ST_SPI_CB;
+	spiSelectI(VND1.spip);
+	spiStartSendI(VND1.spip, 4, async_vn_msg.buf);
 	chSysUnlockFromIsr();
 }
 
@@ -92,8 +179,6 @@ int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
 
 	spiStart(nvp->spip, &nvp->cfgp->spicfg);
 	gptStart(nvp->gpdp, &nvp->cfgp->gptcfg);
-
-	/* vnThread = */chThdCreateStatic(waVN, sizeof(waVN), NORMALPRIO, thVN, NULL);
 	return KB_OK;
 }
 

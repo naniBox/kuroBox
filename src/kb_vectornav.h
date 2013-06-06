@@ -63,16 +63,20 @@
 #define     VN100_REG_COV       254
 #define     VN100_REG_CAL       255
 
-#define     VN100_REG_USER_TAG_SIZE  20
-#define     VN100_REG_MODEL_SIZE     24
-#define     VN100_REG_HWREV_SIZE     4
-#define     VN100_REG_SN_SIZE        12
-#define     VN100_REG_FWVER_SIZE     4
+#define 	VN100_HEADER_SIZE	4
 
-#define     VN100_REG_YPR_SIZE       (3*4)
+#define     VN100_REG_USER_TAG_SIZE  	20
+#define     VN100_REG_MODEL_SIZE     	24
+#define     VN100_REG_HWREV_SIZE     	4
+#define     VN100_REG_SN_SIZE        	12
+#define     VN100_REG_FWVER_SIZE     	4
 
-#define     VN100_REG_RAW_SIZE       (10*4)
-#define     VN100_REG_CMV_SIZE       (10*4)
+#define     VN100_REG_YPR_SIZE       	(3*4)
+
+#define     VN100_REG_RAW_SIZE       	(10*4)
+#define     VN100_REG_CMV_SIZE       	(10*4)
+
+#define		VN100_MAX_MSG_SIZE			1024
 
 //----------------------------------------------------------------------------
 typedef struct VectorNavConfig VectorNavConfig;
