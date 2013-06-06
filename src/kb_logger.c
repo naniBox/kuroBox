@@ -53,7 +53,7 @@
 #define LOGGER_VERSION			11
 
 //-----------------------------------------------------------------------------
-struct __PACKED__ log_msg_v01
+struct __PACKED__ log_msg_v01_t
 {
 	uint32_t preamble;					// 4
 	uint8_t version;					// 1
@@ -73,7 +73,8 @@ struct __PACKED__ log_msg_v01
 
 	uint8_t __pad[512 - (16 + 46 + 64)];
 };
-STATIC_ASSERT(sizeof(struct log_msg_v01)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
+STATIC_ASSERT(sizeof(struct log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
+
 
 //-----------------------------------------------------------------------------
 static Thread * loggerThread;
@@ -87,12 +88,15 @@ static FATFS SDC_FS;
 uint32_t cardsize_MB;
 
 //-----------------------------------------------------------------------------
-static struct log_msg_v01 current_msg,writing_msg;
+static struct log_msg_v01_t current_msg,writing_msg;
+
+static struct log_msg_v01_t write_buffers[2][16];
+static uint8_t current_write_buffer;
 
 #define NANIBOX_DNAME "/nanibox"
 #define KUROBOX_FNAME_STEM "kuro"
 #define KUROBOX_FNAME_EXT ".kbb"
-#define KUROBOX_BLANK_FNAME "--"
+#define KUROBOX_BLANK_FNAME "----"
 FIL kbfile;
 
 //-----------------------------------------------------------------------------
