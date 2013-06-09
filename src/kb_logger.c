@@ -75,9 +75,9 @@ struct __PACKED__ log_msg_v01_t
 };
 STATIC_ASSERT(sizeof(struct log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
-
 //-----------------------------------------------------------------------------
 static Thread * loggerThread;
+static Thread * writerThread;
 static uint8_t sd_det_count;
 static uint8_t logger_state;
 
@@ -88,16 +88,90 @@ static FATFS SDC_FS;
 uint32_t cardsize_MB;
 
 //-----------------------------------------------------------------------------
-static struct log_msg_v01_t current_msg,writing_msg;
+static struct log_msg_v01_t current_msg;
 
-static struct log_msg_v01_t write_buffers[2][16];
-static uint8_t current_write_buffer;
+#define BUFFER_NUM			3
+#define BUFFER_SIZE			32		// size in "log_msg_v01_t" units
+struct write_buffer_t
+{
+	struct log_msg_v01_t buffer[BUFFER_SIZE];
+	int8_t current_idx;
+};
+static Semaphore 				write_buffer_semaphore;
+static struct write_buffer_t 	write_buffers[BUFFER_NUM];
 
 #define NANIBOX_DNAME "/nanibox"
 #define KUROBOX_FNAME_STEM "kuro"
 #define KUROBOX_FNAME_EXT ".kbb"
 #define KUROBOX_BLANK_FNAME "----"
 FIL kbfile;
+
+//-----------------------------------------------------------------------------
+static int8_t
+new_write_buffer_idx_to_fill(void)
+{
+	int8_t buffer_idx = -1;
+	chSemWait(&write_buffer_semaphore);
+	for ( int8_t idx = 0 ; idx < BUFFER_NUM ; idx++ )
+	{
+		// we know it's empty and ready to be filled when current_idx == -1
+		if ( write_buffers[idx].current_idx == -1 )
+		{
+			// ok, we're going to return this one, initialise it ready!
+			write_buffers[idx].current_idx = 0;
+			buffer_idx = idx;
+			break;
+		}
+	}
+
+	chSemSignal(&write_buffer_semaphore);
+	return buffer_idx;
+}
+
+//-----------------------------------------------------------------------------
+static void
+return_write_buffer_idx_after_filling(int8_t idx)
+{
+	if (writerThread)
+	{
+		chSysLock();
+		writerThread->p_u.rdymsg = (msg_t)idx+1;
+		chSchReadyI(writerThread);
+		writerThread = NULL;
+		chSysUnlock();
+	}
+}
+
+//-----------------------------------------------------------------------------
+static int8_t
+new_write_buffer_idx_to_write(void)
+{
+	int8_t buffer_idx = -1;
+	chSemWait(&write_buffer_semaphore);
+	for ( int8_t idx = 0 ; idx < BUFFER_NUM ; idx++ )
+	{
+		// we know it's full and ready to be written out when current_idx is
+		// at the end
+		if ( write_buffers[idx].current_idx == BUFFER_SIZE )
+		{
+			buffer_idx = idx;
+			break;
+		}
+	}
+
+	chSemSignal(&write_buffer_semaphore);
+	return buffer_idx;
+}
+
+//-----------------------------------------------------------------------------
+static void
+return_write_buffer_idx_after_writing(int8_t idx)
+{
+	chSemWait(&write_buffer_semaphore);
+	memset(&write_buffers[idx],0,sizeof(write_buffers[idx]));
+	write_buffers[idx].current_idx = -1;
+	chSemSignal(&write_buffer_semaphore);
+}
 
 //-----------------------------------------------------------------------------
 static uint8_t
@@ -142,8 +216,7 @@ new_file(void)
 	{
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
-		chprintf((BaseSequentialStream *)&msb, "%s%.4d%s", KUROBOX_FNAME_STEM,
-				fnum, KUROBOX_FNAME_EXT);
+		chprintf((BaseSequentialStream *)&msb, "%s%.4d", KUROBOX_FNAME_STEM, fnum);
 		kbs_setFName(charbuf);
 	}
 
@@ -256,10 +329,9 @@ sd_card_status(void)
 
 //-----------------------------------------------------------------------------
 static uint8_t
-run(void)
+writing_run(void)
 {
 	uint8_t ret = 1;
-	systime_t sleep_until = chTimeNow() + MS2ST(5);
 	while(LS_RUNNING == logger_state)
 	{
 		if (chThdShouldTerminate())
@@ -268,68 +340,45 @@ run(void)
 			break;
 		}
 
-		//------------------------------------------------------
-		// LOG IT!
-		rtcGetTimeTm(&RTCD1, &current_msg.rtc);
+		int8_t idx = new_write_buffer_idx_to_write();
+		if ( idx == -1 )
+		{
+			chSysLock();
+			    writerThread = chThdSelf();
+			    chSchGoSleepS(THD_STATE_SUSPENDED);
+			chSysUnlock();
+			continue;
+		}
 
-		// the only really critical thing here:
-		chSysLock();
-		memcpy(&writing_msg, &current_msg, sizeof(writing_msg));
-		chSysUnlock();
-
-		uint8_t * buf = (uint8_t*) &writing_msg;
-		writing_msg.checksum = calc_checksum_8(buf+16, LOGGER_MESSAGE_SIZE-16);
+		struct write_buffer_t * buf = &write_buffers[idx];
 
 		UINT bytes_written = 0;
 		FRESULT err = FR_OK;
-		err = f_write(&kbfile, &writing_msg, sizeof(writing_msg), &bytes_written);
-		if (bytes_written != sizeof(writing_msg) || err != FR_OK)
+		err = f_write(&kbfile, buf->buffer, sizeof(buf->buffer), &bytes_written);
+		if (bytes_written != sizeof(buf->buffer) || err != FR_OK)
 			current_msg.write_errors++;
-		if (current_msg.msg_num%LOGGER_FSYNC_INTERVAL==0)
-		{
-			err = f_sync(&kbfile);
-			if (err != FR_OK)
-				current_msg.write_errors++;
-		}
-		//------------------------------------------------------
-
-		//------------------------------------------------------
-		kbs_setCounter(current_msg.msg_num);
-
+		err = f_sync(&kbfile);
+		if (err != FR_OK)
+			current_msg.write_errors++;
+		kbs_setWriteCount(current_msg.msg_num);
+		kbs_setWriteErrors(current_msg.write_errors);
 		sd_card_status();
 		if (LS_RUNNING != logger_state)
 			break;
-		//------------------------------------------------------
 
-		// chTimeNow() will roll over every ~49 days
-		// @TODO: make this code handle that
-		while ( sleep_until < chTimeNow() )
-		{
-			// this code handles for when we skipped a writing-slot
-			// i'm counting a skipped msg as a write error
-			current_msg.write_errors++;
-			current_msg.msg_num++;
-			sleep_until += MS2ST(5);
-		}
-		chThdSleepUntil(sleep_until);
-		sleep_until += MS2ST(5);            // Next deadline
-		current_msg.msg_num++;
-		if ( current_msg.msg_num%2048 == 0 ) // we write 1MB every 2048 msgs
-		{
-			kbs_setSDCFree(--cardsize_MB);
-		}
+		return_write_buffer_idx_after_writing(idx);
 	}
 	return ret;
 }
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waLogger, 1024*8);
+static WORKING_AREA(waWriter, 1024*8);
 static msg_t 
-thLogger(void *arg) 
+thWriter(void *arg)
 {
-	chDbgAssert(LS_INIT == logger_state, "thLogger, 1", "logger_state is not LS_INIT");
+	chDbgAssert(LS_INIT == logger_state, "thWriter, 1", "logger_state is not LS_INIT");
 	(void)arg;
-	chRegSetThreadName("Logger");
+	chRegSetThreadName("Writer");
 
 	current_msg.preamble = LOGGER_PREAMBLE;
 	current_msg.version = LOGGER_VERSION;
@@ -348,7 +397,7 @@ thLogger(void *arg)
 			wait_for_sd();
 			break;
 		case LS_RUNNING:
-			run();
+			writing_run();
 			break;
 		case LS_EXITING:
 			break;
@@ -357,14 +406,89 @@ thLogger(void *arg)
 	return 0;
 }
 	
+//-----------------------------------------------------------------------------
+static WORKING_AREA(waLogger, 1024*1);
+static msg_t
+thLogger(void *arg)
+{
+	(void)arg;
+
+	// initialise the buffers
+	memset(&write_buffers, 0, sizeof(write_buffers));
+	for ( int8_t idx = 0 ; idx < BUFFER_NUM ; idx++ )
+		write_buffers[idx].current_idx = -1;
+
+	systime_t sleep_until = chTimeNow() + MS2ST(5);
+	int8_t current_idx = -1;
+	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
+	{
+		if ( current_idx == -1 )
+		{
+			current_idx = new_write_buffer_idx_to_fill();
+			if ( current_idx == -1 )
+			{
+				chThdSleepMilliseconds(1);
+				continue;
+			}
+		}
+
+		// here we'll have a good buffer to fill up until it's all full!
+		struct write_buffer_t * wb = &write_buffers[current_idx];
+		struct log_msg_v01_t * lm = &wb->buffer[wb->current_idx];
+
+		chSysLock();
+		// make sure that we complete a write uninterrupted
+		memcpy(lm, &current_msg, sizeof(current_msg));
+		chSysUnlock();
+
+		uint8_t * buf = (uint8_t*) lm;
+		lm->checksum = calc_checksum_8(buf+16, LOGGER_MESSAGE_SIZE-16);
+		rtcGetTimeTm(&RTCD1, &lm->rtc);
+
+		// chTimeNow() will roll over every ~49 days
+		// @TODO: make this code handle that
+		while ( sleep_until < chTimeNow() )
+		{
+			// this code handles for when we skipped a writing-slot
+			// i'm counting a skipped msg as a write error
+			current_msg.write_errors++;
+			current_msg.msg_num++;
+			sleep_until += MS2ST(5);
+		}
+		chThdSleepUntil(sleep_until);
+		sleep_until += MS2ST(5);            // Next deadline
+		current_msg.msg_num++;
+		if ( current_msg.msg_num%2048 == 0 ) // we write 1MB every 2048 msgs
+		{
+			kbs_setSDCFree(--cardsize_MB);
+		}
+
+		wb->current_idx++;
+		if ( wb->current_idx == BUFFER_SIZE )
+		{
+			// we're full up, return it for a new one
+			return_write_buffer_idx_after_filling(current_idx);
+
+			// now set it to -1, it will get a new one on next loop
+			current_idx = -1;
+		}
+	}
+	return 0;
+}
+
 
 //-----------------------------------------------------------------------------
 int kuroBoxLoggerInit(void)
 {
 	chDbgAssert(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
 
-	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), HIGHPRIO, thLogger, NULL);
+	chSemInit(&write_buffer_semaphore, 1);
 	kbs_setFName(KUROBOX_BLANK_FNAME);
+
+	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
+	// don't store it here, because it needs to be kept NULL until the first sleep
+	/* writerThread = */chThdCreateStatic(waWriter, sizeof(waWriter), HIGHPRIO, thWriter, NULL);
+
 	return 0;
 }
 

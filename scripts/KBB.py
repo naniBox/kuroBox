@@ -160,7 +160,7 @@ class KBB_V11_nav_sol():
 	def calculateLLA(self):
 		import math
 		# Constants (WGS ellipsoid)
-		a = 6378137
+		a = 6378137.0
 		e = 8.1819190842622e-2
 		b = 6356752.3142451793 # math.sqrt(pow(a,2) * (1-pow(e,2)))
 		ep = 0.082094437949695676 #math.sqrt((pow(a,2)-pow(b,2))/pow(b,2))
@@ -218,7 +218,7 @@ class KBB_V11(object):
 			self.msg_num_prev = self.header.msg_num
 		else:
 			if self.msg_num_prev + 1 != self.header.msg_num:
-				if DBG>2:print "Skipped a beat:", self.msg_num_prev, "->", self.header.msg_num, "@", self.msg_count, self.get_err("msg_skipped")
+				if DBG>2:print "Skipped a beat:", self.msg_num_prev, "->", self.header.msg_num, "@", self.msg_count, self.get_err("msg_skipped"), self.header.msg_num-self.msg_num_prev
 				self.inc_err("msg_skipped", self.header.msg_num-self.msg_num_prev)
 			self.msg_num_prev = self.header.msg_num
 		self.msg_count+=1

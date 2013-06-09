@@ -9,12 +9,14 @@ KBB.DBG = 0
 
 def fmt_h32(x):		return "0x%08X"%x
 def fmt_i(x):		return "%i"%x
+def fmt_f(x,d):		fmt="%."+"%d"%d+"f";return fmt%x
 def fmt_h8(x):		return "0x%02x"%x
 
 def fmt_preamble(kbb):return "%s / %s"%(fmt_h32(kbb.header.preamble),struct.pack("<I",kbb.header.preamble))
 def fmt_checksum(kbb):return "%s / %s"%(fmt_h8(kbb.header.checksum),"valid"if kbb.valid_packet else"INVALID")
 
 def fmt_3xi(a,b,c): return "%s, %s, %s"%(fmt_i(a),fmt_i(b),fmt_i(c))
+def fmt_3xf(a,b,c,d=5): return "%s, %s, %s"%(fmt_f(a,d),fmt_f(b,d),fmt_f(c,d))
 def fmt_2xi(a,b): return "%s, %s"%(fmt_i(a),fmt_i(b))
 
 class KBB_Viewer(QtGui.QMainWindow):
@@ -95,7 +97,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.nav_sol_pdop_numsv.setText(fmt_2xi(self.kbb.nav_sol.pdop, self.kbb.nav_sol.numSV))
 
 		self.kbb.nav_sol.calculateLLA()
-		self.nav_sol_lla.setText(fmt_3xi(self.kbb.nav_sol.lat,self.kbb.nav_sol.lon,self.kbb.nav_sol.alt))
+		self.nav_sol_lla.setText(fmt_3xf(self.kbb.nav_sol.lat,self.kbb.nav_sol.lon,self.kbb.nav_sol.alt,7))
 
 		#self.pps,self.header,self.msg_id,self.msg_len,self.itow,self.ftow,self.week,self.gpsfix,self.flags, \
 		#	self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \

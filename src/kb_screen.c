@@ -43,7 +43,8 @@ struct kuroBoxScreen
 	int16_t temperature;
 	int32_t sdc_free;
 	char sdc_fname[23]; // we can fit 128/26=21.3 chars per line, i think
-	uint32_t counter;
+	uint32_t write_count;
+	uint32_t write_errors;
 	uint8_t btn0;
 	uint8_t btn1;
 	uint8_t pps;
@@ -91,8 +92,7 @@ thScreen(void *arg)
 //----------------------------------------------------------------------------
 		INIT_CBUF();
 		chprintf(bss,"%s/%d",
-				screen.sdc_fname,
-				screen.counter/1000);
+				screen.sdc_fname);
 		st7565_drawstring(&ST7565D1, 0, 0, "F");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 0, charbuf);
 
@@ -116,6 +116,7 @@ thScreen(void *arg)
 
 //----------------------------------------------------------------------------
 		// LTC
+		/*
 		INIT_CBUF();
 		chprintf(bss,"%.2d:%.2d:%.2d.%.2d  %.2d%.2d%.2d",
 				screen.ltc.hours,
@@ -125,7 +126,7 @@ thScreen(void *arg)
 				timp.tm_hour,timp.tm_min,timp.tm_sec);
 		st7565_drawstring(&ST7565D1, 0, 1, "T");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
-
+		*/
 //----------------------------------------------------------------------------
 		INIT_CBUF();
 		chprintf(bss,"%4i, %4i, %4i",
@@ -150,6 +151,11 @@ thScreen(void *arg)
 		// from here
 		//
 		//
+		INIT_CBUF();
+		chprintf(bss,"C/E %d/%d",
+				screen.write_count, screen.write_errors);
+		st7565_drawstring(&ST7565D1, 0, 1, "T");
+		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
 
 		if ( screen.btn0 )
 			st7565_drawline(&ST7565D1, C2P(-4), 0, C2P(-4), CHAR_HEIGHT-1, COLOUR_BLACK);
@@ -208,9 +214,15 @@ void kbs_setLTC(struct smpte_timecode_t * ltc)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setCounter(uint32_t count)
+void kbs_setWriteCount(uint32_t write_count)
 {
-	screen.counter = count;
+	screen.write_count = write_count;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setWriteErrors(uint32_t write_errors)
+{
+	screen.write_errors = write_errors;
 }
 
 //-----------------------------------------------------------------------------
