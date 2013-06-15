@@ -45,7 +45,7 @@ def calc_checksum_16(buf):
 
 class KBB_V11_header():
 	def __init__(self,msg):
-		self.preamble,self.version,self.checksum,self.msg_size,self.msg_num,self.write_errors = \
+		self.preamble,self.checksum,self.version,self.msg_size,self.msg_num,self.write_errors = \
 			struct.unpack("<IBBHII",msg[0:16])
 
 class KBB_V11_ltc():
@@ -224,7 +224,7 @@ class KBB_V11(object):
 		self.msg_count+=1
 
 		# check the checksum
-		self.header.calculated_checksum = calc_checksum_8(self.msg[16:])
+		self.header.calculated_checksum = calc_checksum_8(self.msg[5:])
 		if self.header.calculated_checksum != self.header.checksum:
 			self.valid_packet = False
 			self.inc_err("checksum mismatch",1)

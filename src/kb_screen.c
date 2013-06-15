@@ -91,7 +91,7 @@ thScreen(void *arg)
 
 //----------------------------------------------------------------------------
 		INIT_CBUF();
-		chprintf(bss,"%s/%d",
+		chprintf(bss,"%s",
 				screen.sdc_fname);
 		st7565_drawstring(&ST7565D1, 0, 0, "F");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 0, charbuf);
@@ -100,9 +100,9 @@ thScreen(void *arg)
 		INIT_CBUF();
 		int32_t sdc_free = screen.sdc_free<0?-screen.sdc_free:screen.sdc_free;
 		chprintf(bss,"%4dMB", sdc_free);
-		st7565_drawstring(&ST7565D1, C2P(11), 0, charbuf);
+		st7565_drawstring(&ST7565D1, C2P(-10), 0, charbuf);
 		if ( screen.sdc_free<0 )
-			st7565_drawline(&ST7565D1, C2P(11), CHAR_HEIGHT, C2P(17), 0, COLOUR_BLACK);
+			st7565_drawline(&ST7565D1, C2P(-10), CHAR_HEIGHT, C2P(-4), 0, COLOUR_BLACK);
 
 		// input voltage
 		INIT_CBUF();
@@ -116,7 +116,7 @@ thScreen(void *arg)
 
 //----------------------------------------------------------------------------
 		// LTC
-		/*
+
 		INIT_CBUF();
 		chprintf(bss,"%.2d:%.2d:%.2d.%.2d  %.2d%.2d%.2d",
 				screen.ltc.hours,
@@ -126,7 +126,7 @@ thScreen(void *arg)
 				timp.tm_hour,timp.tm_min,timp.tm_sec);
 		st7565_drawstring(&ST7565D1, 0, 1, "T");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
-		*/
+
 //----------------------------------------------------------------------------
 		INIT_CBUF();
 		chprintf(bss,"%4i, %4i, %4i",
@@ -151,12 +151,13 @@ thScreen(void *arg)
 		// from here
 		//
 		//
+		/*
 		INIT_CBUF();
 		chprintf(bss,"C/E %d/%d",
 				screen.write_count, screen.write_errors);
 		st7565_drawstring(&ST7565D1, 0, 1, "T");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
-
+		 */
 		if ( screen.btn0 )
 			st7565_drawline(&ST7565D1, C2P(-4), 0, C2P(-4), CHAR_HEIGHT-1, COLOUR_BLACK);
 		if ( screen.btn1 )

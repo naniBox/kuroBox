@@ -51,13 +51,14 @@
 // swizzle the bytes
 #define LOGGER_PREAMBLE			0x426b426e
 #define LOGGER_VERSION			11
+#define LOGGER_MSG_START_OF_CHECKSUM	5
 
 //-----------------------------------------------------------------------------
 struct __PACKED__ log_msg_v01_t
 {
 	uint32_t preamble;					// 4
-	uint8_t version;					// 1
 	uint8_t checksum;					// 1
+	uint8_t version;					// 1
 	uint16_t msg_size;					// 2
 	uint32_t msg_num;					// 4
 	uint32_t write_errors;				// 4
@@ -104,6 +105,13 @@ static struct write_buffer_t 	write_buffers[BUFFER_NUM];
 #define KUROBOX_FNAME_STEM "kuro"
 #define KUROBOX_FNAME_EXT ".kbb"
 #define KUROBOX_BLANK_FNAME "----"
+#define KUROBOX_LOADING_NAME "<loading>"
+#define KUROBOX_WP_NAME "WriteProt"
+#define KUROBOX_ERR1 "Error 1"
+#define KUROBOX_ERR2 "Error 2"
+#define KUROBOX_ERR3 "Error 3"
+#define KUROBOX_ERR4 "Error 4"
+#define KUROBOX_ERR5 "Error 5"
 FIL kbfile;
 
 //-----------------------------------------------------------------------------
@@ -229,13 +237,16 @@ on_insert(void)
 {
 	FRESULT err;
 
+	kbs_setFName(KUROBOX_LOADING_NAME);
 	if (sdcConnect(&SDCD1) != CH_SUCCESS)
 	{
+		kbs_setFName(KUROBOX_ERR1);
 		return;
 	}
 	err = f_mount(0, &SDC_FS);
 	if (err != FR_OK)
 	{
+		kbs_setFName(KUROBOX_ERR2);
 		sdcDisconnect(&SDCD1);
 		return;
 	}
@@ -246,6 +257,7 @@ on_insert(void)
 	err = f_getfree("/", &clusters, &fsp);
 	if (err != FR_OK)
 	{
+		kbs_setFName(KUROBOX_ERR3);
 		sdcDisconnect(&SDCD1);
 		return;
 	}
@@ -254,12 +266,16 @@ on_insert(void)
 
 	fs_write_protected = sdc_lld_is_write_protected(&SDCD1);
 	if ( fs_write_protected )
+	{
+		kbs_setFName(KUROBOX_WP_NAME);
 		cardsize_MB = -cardsize_MB;
+	}
 	kbs_setSDCFree(cardsize_MB);
 
 	err = make_dirs();
 	if (err != FR_OK)
 	{
+		kbs_setFName(KUROBOX_ERR4);
 		sdcDisconnect(&SDCD1);
 		return;
 	}
@@ -267,6 +283,7 @@ on_insert(void)
 	err = new_file();
 	if (err != FR_OK)
 	{
+		kbs_setFName(KUROBOX_ERR5);
 		sdcDisconnect(&SDCD1);
 		return;
 	}
@@ -434,16 +451,21 @@ thLogger(void *arg)
 
 		// here we'll have a good buffer to fill up until it's all full!
 		struct write_buffer_t * wb = &write_buffers[current_idx];
-		struct log_msg_v01_t * lm = &wb->buffer[wb->current_idx];
+		{
+			struct log_msg_v01_t * lm = &wb->buffer[wb->current_idx];
 
-		chSysLock();
-		// make sure that we complete a write uninterrupted
-		memcpy(lm, &current_msg, sizeof(current_msg));
-		chSysUnlock();
+			chSysLock();
+			// make sure that we complete a write uninterrupted
+			memcpy(lm, &current_msg, sizeof(current_msg));
+			chSysUnlock();
 
-		uint8_t * buf = (uint8_t*) lm;
-		lm->checksum = calc_checksum_8(buf+16, LOGGER_MESSAGE_SIZE-16);
-		rtcGetTimeTm(&RTCD1, &lm->rtc);
+			rtcGetTimeTm(&RTCD1, &lm->rtc);
+
+			uint8_t * buf = (uint8_t*) lm;
+			// NOTHING must get written after this, ok?
+			lm->checksum = calc_checksum_8(buf+LOGGER_MSG_START_OF_CHECKSUM,
+					LOGGER_MESSAGE_SIZE-LOGGER_MSG_START_OF_CHECKSUM);
+		}
 
 		// chTimeNow() will roll over every ~49 days
 		// @TODO: make this code handle that
