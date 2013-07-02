@@ -52,7 +52,6 @@ typedef uint32_t kuroBoxState_t;
 static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
 /*static Thread * blinkerThread;*/
 static kuroBoxState_t global_state;
-static VirtualTimer adc_trigger;
 
 //-----------------------------------------------------------------------------
 static SerialConfig serial1_cfg = {
@@ -145,6 +144,7 @@ thBlinker(void *arg)
 	while( !chThdShouldTerminate() )
 	{
 		palTogglePad(GPIOB, GPIOB_LED1);
+		//palTogglePad(GPIOD, GPIOD_SERIAL1_PWR);
 		chThdSleepMilliseconds(1000);
 	}
 	return 0;
@@ -216,10 +216,8 @@ kuroBoxInit(void)
 	// read config goes here
 	// @TODO: add config reading from eeprom
 	
-	// this will trigger the callback 
-	chSysLock();
-	chVTSetI(&adc_trigger, MS2ST(200), adc_trigger_cb, &adc_trigger);
-	chSysUnlock();
+	// start all the ADC stuff!
+	kuroBoxADCInit();
 	
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();

@@ -98,11 +98,13 @@ thScreen(void *arg)
 
 		// free bytes
 		INIT_CBUF();
-		int32_t sdc_free = screen.sdc_free<0?-screen.sdc_free:screen.sdc_free;
+		// only display between 0-9999; <0 indicates read only, >9999 is because our
+		// screen realestate is limited.
+		int32_t sdc_free = screen.sdc_free<0?0:screen.sdc_free>9999?9999:screen.sdc_free;
 		chprintf(bss,"%4dMB", sdc_free);
 		st7565_drawstring(&ST7565D1, C2P(-10), 0, charbuf);
 		if ( screen.sdc_free<0 )
-			st7565_drawline(&ST7565D1, C2P(-10), CHAR_HEIGHT, C2P(-4), 0, COLOUR_BLACK);
+			st7565_drawline(&ST7565D1, C2P(-8), CHAR_HEIGHT, C2P(-4), 0, COLOUR_BLACK);
 
 		// input voltage
 		INIT_CBUF();
@@ -129,7 +131,7 @@ thScreen(void *arg)
 
 //----------------------------------------------------------------------------
 		INIT_CBUF();
-		chprintf(bss,"%4i, %4i, %4i",
+		chprintf(bss,"%4i/%4i/%4i",
 				(int)screen.ypr[0], (int)screen.ypr[1], (int)screen.ypr[2]);
 		st7565_drawstring(&ST7565D1, 0, 2, "A");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 2, charbuf);
@@ -140,7 +142,7 @@ thScreen(void *arg)
 		ecef_to_lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
 				&lat, &lon, &alt);
 		INIT_CBUF();
-		chprintf(bss,"%3f, %3f, %3f",
+		chprintf(bss,"%3f/%3f/%3f",
 				lat, lon, alt);
 		st7565_drawstring(&ST7565D1, 0, 3, "G");
 		st7565_drawstring(&ST7565D1, C2P(1)+2, 3, charbuf);
@@ -166,7 +168,7 @@ thScreen(void *arg)
 		INIT_CBUF();
 		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
 		chprintf(bss,"%d", idle_time);
-		st7565_drawstring(&ST7565D1, C2P(-2), 3, charbuf);
+		st7565_drawstring(&ST7565D1, C2P(-2), 2, charbuf);
 		//
 		//
 		// to here

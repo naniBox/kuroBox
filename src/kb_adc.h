@@ -27,7 +27,6 @@
 #include <hal.h>
 
 //-----------------------------------------------------------------------------
-void adc_trigger_cb(void * p);
-
+int kuroBoxADCInit(void);
 
 #endif /* _naniBox_kuroBox_adc */

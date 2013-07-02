@@ -31,6 +31,7 @@
 
 void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static adcsample_t adc_samples[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
+static VirtualTimer adc_trigger;
 
 //-----------------------------------------------------------------------------
 static const ADCConversionGroup adc_grp_cfg =
@@ -90,4 +91,15 @@ void adc_trigger_cb(void * p)
 	adcStartConversionI(&ADCD1, &adc_grp_cfg, adc_samples, ADC_BUF_DEPTH);
 	chVTSetI(vt, MS2ST(200), adc_trigger_cb, vt);
 	chSysUnlockFromIsr();
+}
+
+
+//-----------------------------------------------------------------------------
+int kuroBoxADCInit(void)
+{
+	chSysLock();
+	chVTSetI(&adc_trigger, MS2ST(200), adc_trigger_cb, &adc_trigger);
+	chSysUnlock();
+
+	return KB_OK;
 }

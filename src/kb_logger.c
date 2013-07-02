@@ -105,13 +105,13 @@ static struct write_buffer_t 	write_buffers[BUFFER_NUM];
 #define KUROBOX_FNAME_STEM "kuro"
 #define KUROBOX_FNAME_EXT ".kbb"
 #define KUROBOX_BLANK_FNAME "----"
-#define KUROBOX_LOADING_NAME "<loading>"
-#define KUROBOX_WP_NAME "WriteProt"
-#define KUROBOX_ERR1 "Error 1"
-#define KUROBOX_ERR2 "Error 2"
-#define KUROBOX_ERR3 "Error 3"
-#define KUROBOX_ERR4 "Error 4"
-#define KUROBOX_ERR5 "Error 5"
+#define KUROBOX_LOADING_NAME "<load |>"
+#define KUROBOX_WP_NAME "<Locked>"
+#define KUROBOX_ERR1 "<load />"
+#define KUROBOX_ERR2 "<load ->"
+#define KUROBOX_ERR3 "<load \\>"
+#define KUROBOX_ERR4 "<load |>"
+#define KUROBOX_ERR5 "<load />"
 FIL kbfile;
 
 //-----------------------------------------------------------------------------
@@ -261,16 +261,16 @@ on_insert(void)
 		sdcDisconnect(&SDCD1);
 		return;
 	}
-	uint64_t cardsize = clusters * (uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE;
-	cardsize_MB = cardsize / (1024*1024);
+	uint64_t cardsize = clusters * (((uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE) / 1024);
+	cardsize_MB = cardsize / 1024;
 
 	fs_write_protected = sdc_lld_is_write_protected(&SDCD1);
 	if ( fs_write_protected )
 	{
+		kbs_setSDCFree(-1);
 		kbs_setFName(KUROBOX_WP_NAME);
-		cardsize_MB = -cardsize_MB;
+		return;
 	}
-	kbs_setSDCFree(cardsize_MB);
 
 	err = make_dirs();
 	if (err != FR_OK)
@@ -319,6 +319,7 @@ wait_for_sd(void)
 		}
 		else
 		{
+			kbs_setFName(KUROBOX_BLANK_FNAME);
 			sd_det_count = POLLING_COUNT;
 		}
 		chThdSleepMilliseconds(POLLING_DELAY);
