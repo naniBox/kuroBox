@@ -5,8 +5,8 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99
-#  USE_OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+#  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99
+  USE_OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
 endif
 
 # C specific options here (added to USE_OPT).
@@ -113,16 +113,10 @@ CSRC = $(PORTSRC) \
         ./src/kb_gps.c \
         ./src/kb_util.c \
         ./src/kb_vectornav.c \
+        ./src/kb_menu.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
-
-#        ./src/fatfs_diskio.c \
-#        ./src/ff.c \
-#        ./src/ltc/decoder.c \
-#        ./src/ltc/ltc.c \
-#        ./src/ltc/timecode.c \
-#
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

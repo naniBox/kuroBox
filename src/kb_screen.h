@@ -38,8 +38,8 @@ void kbs_setWriteErrors(uint32_t write_errors);
 void kbs_setSDCFree(int32_t sdc_free);	// if negative, then write protected
 void kbs_setFName(const char * fname);
 
-void kbs_setBtn0(uint8_t on);
-void kbs_setBtn1(uint8_t on);
+void kbs_btn0(uint8_t on);
+void kbs_btn1(uint8_t on);
 
 void kbs_PPS(void);
 void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z);

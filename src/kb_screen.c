@@ -23,6 +23,7 @@
 #include "kb_screen.h"
 #include "kb_util.h"
 #include "kb_gps.h"
+#include "kb_menu.h"
 #include "ST7565.h"
 #include <memstreams.h>
 #include <chrtclib.h>
@@ -84,106 +85,109 @@ thScreen(void *arg)
 	BaseSequentialStream * bss = (BaseSequentialStream *)&msb;
 	while( !chThdShouldTerminate() )
 	{
-		struct tm timp;
-		rtcGetTimeTm(&RTCD1, &timp);
-
-		st7565_clear(&ST7565D1);
-
-//----------------------------------------------------------------------------
-		INIT_CBUF();
-		chprintf(bss,"%s",
-				screen.sdc_fname);
-		st7565_drawstring(&ST7565D1, 0, 0, "F");
-		st7565_drawstring(&ST7565D1, C2P(1)+2, 0, charbuf);
-
-		// free bytes
-		INIT_CBUF();
-		// only display between 0-9999; <0 indicates read only, >9999 is because our
-		// screen realestate is limited.
-		int32_t sdc_free = screen.sdc_free<0?0:screen.sdc_free>9999?9999:screen.sdc_free;
-		chprintf(bss,"%4dMB", sdc_free);
-		st7565_drawstring(&ST7565D1, C2P(-10), 0, charbuf);
-		if ( screen.sdc_free<0 )
-			st7565_drawline(&ST7565D1, C2P(-8), CHAR_HEIGHT, C2P(-4), 0, COLOUR_BLACK);
-
-		// input voltage
-		INIT_CBUF();
-		chprintf(bss,"%2dV", screen.voltage/10);
-		st7565_drawstring(&ST7565D1, -C2P(3), 0, charbuf);
-
-		// core temperature
-		//INIT_CBUF();
-		//chprintf(bss,"%2d", screen.temperature);
-		//st7565_drawstring(&ST7565D1, -C2P(2), 0, charbuf);
-
-//----------------------------------------------------------------------------
-		// LTC
-
-		INIT_CBUF();
-		chprintf(bss,"%.2d:%.2d:%.2d.%.2d  %.2d%.2d%.2d",
-				screen.ltc.hours,
-				screen.ltc.minutes,
-				screen.ltc.seconds,
-				screen.ltc.frames,
-				timp.tm_hour,timp.tm_min,timp.tm_sec);
-		st7565_drawstring(&ST7565D1, 0, 1, "T");
-		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
-
-//----------------------------------------------------------------------------
-		INIT_CBUF();
-		chprintf(bss,"%4i/%4i/%4i",
-				(int)screen.ypr[0], (int)screen.ypr[1], (int)screen.ypr[2]);
-		st7565_drawstring(&ST7565D1, 0, 2, "A");
-		st7565_drawstring(&ST7565D1, C2P(1)+2, 2, charbuf);
-
-//----------------------------------------------------------------------------
-		float lat,lon,alt;
-		lat=lon=alt=0.0f;
-		ecef_to_lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
-				&lat, &lon, &alt);
-		INIT_CBUF();
-		chprintf(bss,"%3f/%3f/%3f",
-				lat, lon, alt);
-		st7565_drawstring(&ST7565D1, 0, 3, "G");
-		st7565_drawstring(&ST7565D1, C2P(1)+2, 3, charbuf);
-
-//----------------------------------------------------------------------------
-		// @OTODO: remove these, they are just for show!
-		//
-		// from here
-		//
-		//
-		/*
-		INIT_CBUF();
-		chprintf(bss,"C/E %d/%d",
-				screen.write_count, screen.write_errors);
-		st7565_drawstring(&ST7565D1, 0, 1, "T");
-		st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
-		 */
-		if ( screen.btn0 )
-			st7565_drawline(&ST7565D1, C2P(-4), 0, C2P(-4), CHAR_HEIGHT-1, COLOUR_BLACK);
-		if ( screen.btn1 )
-			st7565_drawline(&ST7565D1, C2P(-4)+2, 0, C2P(-4)+2, CHAR_HEIGHT-1, COLOUR_BLACK);
-
-		INIT_CBUF();
-		uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
-		chprintf(bss,"%d", idle_time);
-		st7565_drawstring(&ST7565D1, C2P(-2), 2, charbuf);
-		//
-		//
-		// to here
-		//
-//----------------------------------------------------------------------------
-
-		// we want to draw this over the top, so put it last.
-		st7565_drawline(&ST7565D1, C2P(1), 0, C2P(1), 31, COLOUR_BLACK);
-		if ( screen.pps )
+		if ( !kbm_display() )
 		{
-			screen.pps--;
-			st7565_fillrect(&ST7565D1, C2P(-1), CHAR_HEIGHT+1, CHAR_WIDTH-1, CHAR_HEIGHT, COLOUR_BLACK);
-		}
+			struct tm timp;
+			rtcGetTimeTm(&RTCD1, &timp);
 
-		st7565_display(&ST7565D1);
+			st7565_clear(&ST7565D1);
+
+	//----------------------------------------------------------------------------
+			INIT_CBUF();
+			chprintf(bss,"%s",
+					screen.sdc_fname);
+			st7565_drawstring(&ST7565D1, 0, 0, "F");
+			st7565_drawstring(&ST7565D1, C2P(1)+2, 0, charbuf);
+
+			// free bytes
+			INIT_CBUF();
+			// only display between 0-9999; <0 indicates read only, >9999 is because our
+			// screen realestate is limited.
+			int32_t sdc_free = screen.sdc_free<0?0:screen.sdc_free>9999?9999:screen.sdc_free;
+			chprintf(bss,"%4dMB", sdc_free);
+			st7565_drawstring(&ST7565D1, C2P(-10), 0, charbuf);
+			if ( screen.sdc_free<0 )
+				st7565_drawline(&ST7565D1, C2P(-8), CHAR_HEIGHT, C2P(-4), 0, COLOUR_BLACK);
+
+			// input voltage
+			INIT_CBUF();
+			chprintf(bss,"%2dV", screen.voltage/10);
+			st7565_drawstring(&ST7565D1, -C2P(3), 0, charbuf);
+
+			// core temperature
+			//INIT_CBUF();
+			//chprintf(bss,"%2d", screen.temperature);
+			//st7565_drawstring(&ST7565D1, -C2P(2), 0, charbuf);
+
+	//----------------------------------------------------------------------------
+			// LTC
+
+			INIT_CBUF();
+			chprintf(bss,"%.2d:%.2d:%.2d.%.2d  %.2d%.2d%.2d",
+					screen.ltc.hours,
+					screen.ltc.minutes,
+					screen.ltc.seconds,
+					screen.ltc.frames,
+					timp.tm_hour,timp.tm_min,timp.tm_sec);
+			st7565_drawstring(&ST7565D1, 0, 1, "T");
+			st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
+
+	//----------------------------------------------------------------------------
+			INIT_CBUF();
+			chprintf(bss,"%4i/%4i/%4i",
+					(int)screen.ypr[0], (int)screen.ypr[1], (int)screen.ypr[2]);
+			st7565_drawstring(&ST7565D1, 0, 2, "A");
+			st7565_drawstring(&ST7565D1, C2P(1)+2, 2, charbuf);
+
+	//----------------------------------------------------------------------------
+			float lat,lon,alt;
+			lat=lon=alt=0.0f;
+			ecef_to_lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
+					&lat, &lon, &alt);
+			INIT_CBUF();
+			chprintf(bss,"%3f/%3f/%3f",
+					lat, lon, alt);
+			st7565_drawstring(&ST7565D1, 0, 3, "G");
+			st7565_drawstring(&ST7565D1, C2P(1)+2, 3, charbuf);
+
+	//----------------------------------------------------------------------------
+			// @OTODO: remove these, they are just for show!
+			//
+			// from here
+			//
+			//
+			/*
+			INIT_CBUF();
+			chprintf(bss,"C/E %d/%d",
+					screen.write_count, screen.write_errors);
+			st7565_drawstring(&ST7565D1, 0, 1, "T");
+			st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
+			 */
+			if ( screen.btn0 )
+				st7565_drawline(&ST7565D1, C2P(-4), 0, C2P(-4), CHAR_HEIGHT-1, COLOUR_BLACK);
+			if ( screen.btn1 )
+				st7565_drawline(&ST7565D1, C2P(-4)+2, 0, C2P(-4)+2, CHAR_HEIGHT-1, COLOUR_BLACK);
+
+			INIT_CBUF();
+			uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
+			chprintf(bss,"%d", idle_time);
+			st7565_drawstring(&ST7565D1, C2P(-2), 2, charbuf);
+			//
+			//
+			// to here
+			//
+	//----------------------------------------------------------------------------
+
+			// we want to draw this over the top, so put it last.
+			st7565_drawline(&ST7565D1, C2P(1), 0, C2P(1), 31, COLOUR_BLACK);
+			if ( screen.pps )
+			{
+				screen.pps--;
+				st7565_fillrect(&ST7565D1, C2P(-1), CHAR_HEIGHT+1, CHAR_WIDTH-1, CHAR_HEIGHT, COLOUR_BLACK);
+			}
+
+			st7565_display(&ST7565D1);
+		}
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
 	}
 	#undef INIT_CBUF
@@ -241,13 +245,13 @@ void kbs_setFName(const char * fname)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setBtn0(uint8_t on)
+void kbs_btn0(uint8_t on)
 {
 	screen.btn0 = on;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setBtn1(uint8_t on)
+void kbs_btn1(uint8_t on)
 {
 	screen.btn1 = on;
 }

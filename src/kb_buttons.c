@@ -22,15 +22,35 @@
 
 #include "kb_buttons.h"
 #include "kb_screen.h"
+#include "kb_menu.h"
 
-static bool_t btn_0_state;
-static bool_t btn_1_state;
+#define BUTTON_DOWN 	0
+#define BUTTON_UP		1
+
+static bool_t btn_0_pressed;
+static bool_t btn_1_pressed;
+
+//-----------------------------------------------------------------------------
+static void on_btn0(bool_t pressed)
+{
+	kbs_btn0(pressed);
+	kbm_btn0(pressed);
+}
+
+//-----------------------------------------------------------------------------
+static void on_btn1(bool_t pressed)
+{
+	kbs_btn1(pressed);
+	kbm_btn1(pressed);
+}
 
 //-----------------------------------------------------------------------------
 int kuroBoxButtonsInit(void)
 {
-	kbs_setBtn0(btn_0_state=palReadPad(GPIOA, GPIOA_BTN0));
-	kbs_setBtn1(btn_1_state=palReadPad(GPIOA, GPIOA_BTN1));
+	btn_0_pressed=palReadPad(GPIOA, GPIOA_BTN0) == BUTTON_DOWN;
+	btn_1_pressed=palReadPad(GPIOA, GPIOA_BTN1) == BUTTON_DOWN;
+	on_btn0(btn_0_pressed);
+	on_btn1(btn_1_pressed);
 	return KB_OK;
 }
 
@@ -39,7 +59,8 @@ void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	kbs_setBtn0(btn_0_state=palReadPad(GPIOA, GPIOA_BTN0));
+	btn_0_pressed=palReadPad(GPIOA, GPIOA_BTN0) == BUTTON_DOWN;
+	on_btn0(btn_0_pressed);
 }
 
 //-----------------------------------------------------------------------------
@@ -47,17 +68,18 @@ void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	kbs_setBtn1(btn_1_state=palReadPad(GPIOA, GPIOA_BTN1));
+	btn_1_pressed=palReadPad(GPIOA, GPIOA_BTN1) == BUTTON_DOWN;
+	on_btn1(btn_1_pressed);
 }
 
 //-----------------------------------------------------------------------------
 bool_t is_btn_0_pressed(void)
 {
-	return btn_0_state == 0;
+	return btn_0_pressed == 0;
 }
 
 //-----------------------------------------------------------------------------
 bool_t is_btn_1_pressed(void)
 {
-	return btn_1_state == 0;
+	return btn_1_pressed == 0;
 }

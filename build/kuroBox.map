@@ -905,6 +905,9 @@ Discarded input sections
  .bss           0x00000000        0x0 build/obj/kb_vectornav.o
  .text.kbv_readRegister
                 0x00000000      0x150 build/obj/kb_vectornav.o
+ .text          0x00000000        0x0 build/obj/kb_menu.o
+ .data          0x00000000        0x0 build/obj/kb_menu.o
+ .bss           0x00000000        0x0 build/obj/kb_menu.o
  .text          0x00000000        0x0 build/obj/main.o
  .data          0x00000000        0x0 build/obj/main.o
  .bss           0x00000000        0x0 build/obj/main.o
@@ -1188,6 +1191,7 @@ LOAD build/obj/kb_time.o
 LOAD build/obj/kb_gps.o
 LOAD build/obj/kb_util.o
 LOAD build/obj/kb_vectornav.o
+LOAD build/obj/kb_menu.o
 LOAD build/obj/main.o
 LOAD build/obj/spiEEPROM.o
 LOAD build/obj/ST7565.o
@@ -1221,7 +1225,7 @@ destructors     0x08000188        0x0
  *(SORT(.fini_array.*))
                 0x08000188                PROVIDE (__fini_array_end, .)
 
-.text           0x08000190    0x12984
+.text           0x08000190    0x12d84
  *(.text.startup.*)
  *(.text)
  .text          0x08000190       0x12 build/obj/kb_debug_asm.o
@@ -2062,410 +2066,435 @@ destructors     0x08000188        0x0
  .text.kuroBoxADCInit
                 0x0800aaa0       0x50 build/obj/kb_adc.o
                 0x0800aaa0                kuroBoxADCInit
+ .text.on_btn0  0x0800aaf0       0x30 build/obj/kb_buttons.o
+ .text.on_btn1  0x0800ab20       0x30 build/obj/kb_buttons.o
  .text.kuroBoxButtonsInit
-                0x0800aaf0       0x80 build/obj/kb_buttons.o
-                0x0800aaf0                kuroBoxButtonsInit
+                0x0800ab50       0x80 build/obj/kb_buttons.o
+                0x0800ab50                kuroBoxButtonsInit
  .text.btn_0_exti_cb
-                0x0800ab70       0x40 build/obj/kb_buttons.o
-                0x0800ab70                btn_0_exti_cb
+                0x0800abd0       0x40 build/obj/kb_buttons.o
+                0x0800abd0                btn_0_exti_cb
  .text.btn_1_exti_cb
-                0x0800abb0       0x50 build/obj/kb_buttons.o
-                0x0800abb0                btn_1_exti_cb
+                0x0800ac10       0x50 build/obj/kb_buttons.o
+                0x0800ac10                btn_1_exti_cb
  .text.new_write_buffer_idx_to_fill
-                0x0800ac00       0xa0 build/obj/kb_logger.o
+                0x0800ac60       0xa0 build/obj/kb_logger.o
  .text.return_write_buffer_idx_after_filling
-                0x0800aca0       0x70 build/obj/kb_logger.o
+                0x0800ad00       0x70 build/obj/kb_logger.o
  .text.new_write_buffer_idx_to_write
-                0x0800ad10       0x80 build/obj/kb_logger.o
+                0x0800ad70       0x80 build/obj/kb_logger.o
  .text.return_write_buffer_idx_after_writing
-                0x0800ad90       0x70 build/obj/kb_logger.o
+                0x0800adf0       0x70 build/obj/kb_logger.o
  .text.make_dirs
-                0x0800ae00       0x40 build/obj/kb_logger.o
+                0x0800ae60       0x40 build/obj/kb_logger.o
  .text.new_file
-                0x0800ae40      0x120 build/obj/kb_logger.o
+                0x0800aea0      0x120 build/obj/kb_logger.o
  .text.on_insert
-                0x0800af60      0x1b0 build/obj/kb_logger.o
+                0x0800afc0      0x1b0 build/obj/kb_logger.o
  .text.on_remove
-                0x0800b110       0x40 build/obj/kb_logger.o
+                0x0800b170       0x40 build/obj/kb_logger.o
  .text.wait_for_sd
-                0x0800b150       0x70 build/obj/kb_logger.o
+                0x0800b1b0       0x70 build/obj/kb_logger.o
  .text.sd_card_status
-                0x0800b1c0       0x70 build/obj/kb_logger.o
+                0x0800b220       0x70 build/obj/kb_logger.o
  .text.writing_run
-                0x0800b230      0x170 build/obj/kb_logger.o
+                0x0800b290      0x170 build/obj/kb_logger.o
  .text.thWriter
-                0x0800b3a0       0xf0 build/obj/kb_logger.o
+                0x0800b400       0xf0 build/obj/kb_logger.o
  .text.thLogger
-                0x0800b490      0x240 build/obj/kb_logger.o
+                0x0800b4f0      0x240 build/obj/kb_logger.o
  .text.kuroBoxLoggerInit
-                0x0800b6d0       0xa0 build/obj/kb_logger.o
-                0x0800b6d0                kuroBoxLoggerInit
+                0x0800b730       0xa0 build/obj/kb_logger.o
+                0x0800b730                kuroBoxLoggerInit
  .text.kbl_setLTC
-                0x0800b770       0x20 build/obj/kb_logger.o
-                0x0800b770                kbl_setLTC
+                0x0800b7d0       0x20 build/obj/kb_logger.o
+                0x0800b7d0                kbl_setLTC
  .text.kbl_incPPS
-                0x0800b790       0x20 build/obj/kb_logger.o
-                0x0800b790                kbl_incPPS
+                0x0800b7f0       0x20 build/obj/kb_logger.o
+                0x0800b7f0                kbl_incPPS
  .text.kbl_setGpsNavSol
-                0x0800b7b0       0x50 build/obj/kb_logger.o
-                0x0800b7b0                kbl_setGpsNavSol
+                0x0800b810       0x50 build/obj/kb_logger.o
+                0x0800b810                kbl_setGpsNavSol
  .text.thScreen
-                0x0800b800      0x600 build/obj/kb_screen.o
+                0x0800b860      0x610 build/obj/kb_screen.o
  .text.kuroBoxScreenInit
-                0x0800be00       0x50 build/obj/kb_screen.o
-                0x0800be00                kuroBoxScreenInit
+                0x0800be70       0x50 build/obj/kb_screen.o
+                0x0800be70                kuroBoxScreenInit
  .text.kbs_setVoltage
-                0x0800be50       0x20 build/obj/kb_screen.o
-                0x0800be50                kbs_setVoltage
+                0x0800bec0       0x20 build/obj/kb_screen.o
+                0x0800bec0                kbs_setVoltage
  .text.kbs_setTemperature
-                0x0800be70       0x20 build/obj/kb_screen.o
-                0x0800be70                kbs_setTemperature
+                0x0800bee0       0x20 build/obj/kb_screen.o
+                0x0800bee0                kbs_setTemperature
  .text.kbs_setLTC
-                0x0800be90       0x20 build/obj/kb_screen.o
-                0x0800be90                kbs_setLTC
+                0x0800bf00       0x20 build/obj/kb_screen.o
+                0x0800bf00                kbs_setLTC
  .text.kbs_setWriteCount
-                0x0800beb0       0x20 build/obj/kb_screen.o
-                0x0800beb0                kbs_setWriteCount
+                0x0800bf20       0x20 build/obj/kb_screen.o
+                0x0800bf20                kbs_setWriteCount
  .text.kbs_setWriteErrors
-                0x0800bed0       0x20 build/obj/kb_screen.o
-                0x0800bed0                kbs_setWriteErrors
+                0x0800bf40       0x20 build/obj/kb_screen.o
+                0x0800bf40                kbs_setWriteErrors
  .text.kbs_setSDCFree
-                0x0800bef0       0x20 build/obj/kb_screen.o
-                0x0800bef0                kbs_setSDCFree
+                0x0800bf60       0x20 build/obj/kb_screen.o
+                0x0800bf60                kbs_setSDCFree
  .text.kbs_setFName
-                0x0800bf10       0x20 build/obj/kb_screen.o
-                0x0800bf10                kbs_setFName
- .text.kbs_setBtn0
-                0x0800bf30       0x20 build/obj/kb_screen.o
-                0x0800bf30                kbs_setBtn0
- .text.kbs_setBtn1
-                0x0800bf50       0x20 build/obj/kb_screen.o
-                0x0800bf50                kbs_setBtn1
- .text.kbs_PPS  0x0800bf70       0x20 build/obj/kb_screen.o
-                0x0800bf70                kbs_PPS
+                0x0800bf80       0x20 build/obj/kb_screen.o
+                0x0800bf80                kbs_setFName
+ .text.kbs_btn0
+                0x0800bfa0       0x20 build/obj/kb_screen.o
+                0x0800bfa0                kbs_btn0
+ .text.kbs_btn1
+                0x0800bfc0       0x20 build/obj/kb_screen.o
+                0x0800bfc0                kbs_btn1
+ .text.kbs_PPS  0x0800bfe0       0x20 build/obj/kb_screen.o
+                0x0800bfe0                kbs_PPS
  .text.kbs_setGpsEcef
-                0x0800bf90       0x30 build/obj/kb_screen.o
-                0x0800bf90                kbs_setGpsEcef
+                0x0800c000       0x30 build/obj/kb_screen.o
+                0x0800c000                kbs_setGpsEcef
  .text.kbs_setYPR
-                0x0800bfc0       0x30 build/obj/kb_screen.o
-                0x0800bfc0                kbs_setYPR
+                0x0800c030       0x30 build/obj/kb_screen.o
+                0x0800c030                kbs_setYPR
  .text.frame_to_time
-                0x0800bff0       0xc0 build/obj/kb_time.o
+                0x0800c060       0xc0 build/obj/kb_time.o
  .text.ltc_store
-                0x0800c0b0      0x110 build/obj/kb_time.o
-                0x0800c0b0                ltc_store
+                0x0800c120      0x110 build/obj/kb_time.o
+                0x0800c120                ltc_store
  .text.ltc_exti_cb
-                0x0800c1c0       0xc0 build/obj/kb_time.o
-                0x0800c1c0                ltc_exti_cb
+                0x0800c230       0xc0 build/obj/kb_time.o
+                0x0800c230                ltc_exti_cb
  .text.kuroBoxTimeInit
-                0x0800c280       0x20 build/obj/kb_time.o
-                0x0800c280                kuroBoxTimeInit
+                0x0800c2f0       0x20 build/obj/kb_time.o
+                0x0800c2f0                kuroBoxTimeInit
  .text.ecef_to_lla
-                0x0800c2a0      0x340 build/obj/kb_gps.o
-                0x0800c2a0                ecef_to_lla
+                0x0800c310      0x340 build/obj/kb_gps.o
+                0x0800c310                ecef_to_lla
  .text.parse_and_store_nav_sol
-                0x0800c5e0       0xb0 build/obj/kb_gps.o
- .text.thGps    0x0800c690      0x110 build/obj/kb_gps.o
+                0x0800c650       0xb0 build/obj/kb_gps.o
+ .text.thGps    0x0800c700      0x110 build/obj/kb_gps.o
  .text.gps_timepulse_exti_cb
-                0x0800c7a0       0x30 build/obj/kb_gps.o
-                0x0800c7a0                gps_timepulse_exti_cb
+                0x0800c810       0x30 build/obj/kb_gps.o
+                0x0800c810                gps_timepulse_exti_cb
  .text.kuroBoxGPSInit
-                0x0800c7d0       0x50 build/obj/kb_gps.o
-                0x0800c7d0                kuroBoxGPSInit
+                0x0800c840       0x50 build/obj/kb_gps.o
+                0x0800c840                kuroBoxGPSInit
  .text.calc_checksum_8
-                0x0800c820       0x60 build/obj/kb_util.o
-                0x0800c820                calc_checksum_8
+                0x0800c890       0x60 build/obj/kb_util.o
+                0x0800c890                calc_checksum_8
  .text.calc_checksum_16
-                0x0800c880       0x80 build/obj/kb_util.o
-                0x0800c880                calc_checksum_16
+                0x0800c8f0       0x80 build/obj/kb_util.o
+                0x0800c8f0                calc_checksum_16
  .text.vectornav_dispatch_register
-                0x0800c900       0x90 build/obj/kb_vectornav.o
-                0x0800c900                vectornav_dispatch_register
+                0x0800c970       0x90 build/obj/kb_vectornav.o
+                0x0800c970                vectornav_dispatch_register
  .text.vectornav_spi_end_cb
-                0x0800c990       0xe0 build/obj/kb_vectornav.o
-                0x0800c990                vectornav_spi_end_cb
+                0x0800ca00       0xe0 build/obj/kb_vectornav.o
+                0x0800ca00                vectornav_spi_end_cb
  .text.vectornav_gpt_end_cb
-                0x0800ca70       0xb0 build/obj/kb_vectornav.o
-                0x0800ca70                vectornav_gpt_end_cb
+                0x0800cae0       0xb0 build/obj/kb_vectornav.o
+                0x0800cae0                vectornav_gpt_end_cb
  .text.vn_dr_int_exti_cb
-                0x0800cb20       0xc0 build/obj/kb_vectornav.o
-                0x0800cb20                vn_dr_int_exti_cb
+                0x0800cb90       0xc0 build/obj/kb_vectornav.o
+                0x0800cb90                vn_dr_int_exti_cb
  .text.kuroBoxVectorNavInit
-                0x0800cbe0       0x50 build/obj/kb_vectornav.o
-                0x0800cbe0                kuroBoxVectorNavInit
+                0x0800cc50       0x50 build/obj/kb_vectornav.o
+                0x0800cc50                kuroBoxVectorNavInit
+ .text.me_exit  0x0800cca0       0x20 build/obj/kb_menu.o
+                0x0800cca0                me_exit
+ .text.me_serial1_pwr
+                0x0800ccc0       0x20 build/obj/kb_menu.o
+                0x0800ccc0                me_serial1_pwr
+ .text.me_serial2_pwr
+                0x0800cce0       0x20 build/obj/kb_menu.o
+                0x0800cce0                me_serial2_pwr
+ .text.kbm_display
+                0x0800cd00      0x140 build/obj/kb_menu.o
+                0x0800cd00                kbm_display
+ .text.kbm_btn0
+                0x0800ce40       0x80 build/obj/kb_menu.o
+                0x0800ce40                kbm_btn0
+ .text.kbm_btn1
+                0x0800cec0       0xc0 build/obj/kb_menu.o
+                0x0800cec0                kbm_btn1
+ .text.thMenu   0x0800cf80       0x50 build/obj/kb_menu.o
+ .text.kuroBoxMenuInit
+                0x0800cfd0       0x30 build/obj/kb_menu.o
+                0x0800cfd0                kuroBoxMenuInit
  .text.thBlinker
-                0x0800cc30       0x60 build/obj/main.o
+                0x0800d000       0x60 build/obj/main.o
  .text.kuroBox_panic
-                0x0800cc90       0x10 build/obj/main.o
-                0x0800cc90                kuroBox_panic
+                0x0800d060       0x10 build/obj/main.o
+                0x0800d060                kuroBox_panic
  .text.kuroBoxInit
-                0x0800cca0      0x1f0 build/obj/main.o
-                0x0800cca0                kuroBoxInit
- .text.main     0x0800ce90       0x50 build/obj/main.o
-                0x0800ce90                main
+                0x0800d070      0x1f0 build/obj/main.o
+                0x0800d070                kuroBoxInit
+ .text.main     0x0800d260       0x50 build/obj/main.o
+                0x0800d260                main
  .text.spiEepromStart
-                0x0800cee0       0x20 build/obj/spiEEPROM.o
-                0x0800cee0                spiEepromStart
+                0x0800d2b0       0x20 build/obj/spiEEPROM.o
+                0x0800d2b0                spiEepromStart
  .text.updateBoundingBox
-                0x0800cf00       0xa0 build/obj/ST7565.o
+                0x0800d2d0       0xa0 build/obj/ST7565.o
  .text.st7565Start
-                0x0800cfa0      0x180 build/obj/ST7565.o
-                0x0800cfa0                st7565Start
+                0x0800d370      0x180 build/obj/ST7565.o
+                0x0800d370                st7565Start
  .text.st7565_display
-                0x0800d120      0x1d0 build/obj/ST7565.o
-                0x0800d120                st7565_display
+                0x0800d4f0      0x1d0 build/obj/ST7565.o
+                0x0800d4f0                st7565_display
  .text.st7565_clear
-                0x0800d2f0       0x30 build/obj/ST7565.o
-                0x0800d2f0                st7565_clear
+                0x0800d6c0       0x30 build/obj/ST7565.o
+                0x0800d6c0                st7565_clear
  .text.st7565_drawchar
-                0x0800d320       0xb0 build/obj/ST7565.o
-                0x0800d320                st7565_drawchar
+                0x0800d6f0       0xb0 build/obj/ST7565.o
+                0x0800d6f0                st7565_drawchar
  .text.st7565_drawstring
-                0x0800d3d0       0xc0 build/obj/ST7565.o
-                0x0800d3d0                st7565_drawstring
+                0x0800d7a0       0xc0 build/obj/ST7565.o
+                0x0800d7a0                st7565_drawstring
  .text.st7565_setpixel
-                0x0800d490      0x100 build/obj/ST7565.o
-                0x0800d490                st7565_setpixel
+                0x0800d860      0x100 build/obj/ST7565.o
+                0x0800d860                st7565_setpixel
  .text.st7565_drawline
-                0x0800d590      0x1d0 build/obj/ST7565.o
-                0x0800d590                st7565_drawline
+                0x0800d960      0x1d0 build/obj/ST7565.o
+                0x0800d960                st7565_drawline
  .text.st7565_fillrect
-                0x0800d760       0xc0 build/obj/ST7565.o
-                0x0800d760                st7565_fillrect
- .text.cos      0x0800d820       0x90 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
-                0x0800d820                cos
- .text.sin      0x0800d8b0       0x98 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
-                0x0800d8b0                sin
- *fill*         0x0800d948        0x8 00
- .text.atan2    0x0800d950        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
-                0x0800d950                atan2
- *fill*         0x0800d954        0xc 00
- .text.pow      0x0800d960      0x310 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
-                0x0800d960                pow
- .text.sqrt     0x0800dc70       0xa8 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
-                0x0800dc70                sqrt
+                0x0800db30       0xc0 build/obj/ST7565.o
+                0x0800db30                st7565_fillrect
+ .text.cos      0x0800dbf0       0x90 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
+                0x0800dbf0                cos
+ .text.sin      0x0800dc80       0x98 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
+                0x0800dc80                sin
  *fill*         0x0800dd18        0x8 00
+ .text.atan2    0x0800dd20        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
+                0x0800dd20                atan2
+ *fill*         0x0800dd24        0xc 00
+ .text.pow      0x0800dd30      0x310 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
+                0x0800dd30                pow
+ .text.sqrt     0x0800e040       0xa8 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
+                0x0800e040                sqrt
+ *fill*         0x0800e0e8        0x8 00
  .text.__ieee754_atan2
-                0x0800dd20      0x218 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
-                0x0800dd20                __ieee754_atan2
- *fill*         0x0800df38        0x8 00
+                0x0800e0f0      0x218 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
+                0x0800e0f0                __ieee754_atan2
+ *fill*         0x0800e308        0x8 00
  .text.__ieee754_pow
-                0x0800df40      0xb20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
-                0x0800df40                __ieee754_pow
+                0x0800e310      0xb20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+                0x0800e310                __ieee754_pow
  .text.__ieee754_rem_pio2
-                0x0800ea60      0x468 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
-                0x0800ea60                __ieee754_rem_pio2
- *fill*         0x0800eec8        0x8 00
+                0x0800ee30      0x468 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
+                0x0800ee30                __ieee754_rem_pio2
+ *fill*         0x0800f298        0x8 00
  .text.__ieee754_sqrt
-                0x0800eed0      0x208 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
-                0x0800eed0                __ieee754_sqrt
- *fill*         0x0800f0d8        0x8 00
+                0x0800f2a0      0x208 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
+                0x0800f2a0                __ieee754_sqrt
+ *fill*         0x0800f4a8        0x8 00
  .text.__kernel_cos
-                0x0800f0e0      0x258 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
-                0x0800f0e0                __kernel_cos
- *fill*         0x0800f338        0x8 00
+                0x0800f4b0      0x258 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
+                0x0800f4b0                __kernel_cos
+ *fill*         0x0800f708        0x8 00
  .text.__kernel_rem_pio2
-                0x0800f340      0xdec c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
-                0x0800f340                __kernel_rem_pio2
- *fill*         0x0801012c        0x4 00
+                0x0800f710      0xdec c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
+                0x0800f710                __kernel_rem_pio2
+ *fill*         0x080104fc        0x4 00
  .text.__kernel_sin
-                0x08010130      0x170 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
-                0x08010130                __kernel_sin
- .text.atan     0x080102a0      0x368 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
-                0x080102a0                atan
- *fill*         0x08010608        0x8 00
- .text.fabs     0x08010610        0x8 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
-                0x08010610                fabs
- *fill*         0x08010618        0x8 00
- .text.finite   0x08010620        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
-                0x08010620                finite
- *fill*         0x0801062c        0x4 00
- .text.floor    0x08010630      0x110 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
-                0x08010630                floor
+                0x08010500      0x170 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
+                0x08010500                __kernel_sin
+ .text.atan     0x08010670      0x368 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
+                0x08010670                atan
+ *fill*         0x080109d8        0x8 00
+ .text.fabs     0x080109e0        0x8 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
+                0x080109e0                fabs
+ *fill*         0x080109e8        0x8 00
+ .text.finite   0x080109f0        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
+                0x080109f0                finite
+ *fill*         0x080109fc        0x4 00
+ .text.floor    0x08010a00      0x110 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
+                0x08010a00                floor
  .text.__fpclassifyd
-                0x08010740       0x68 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
-                0x08010740                __fpclassifyd
- *fill*         0x080107a8        0x8 00
- .text.matherr  0x080107b0        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
-                0x080107b0                matherr
- *fill*         0x080107b4        0xc 00
- .text.nan      0x080107c0        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
-                0x080107c0                nan
- *fill*         0x080107cc        0x4 00
- .text.rint     0x080107d0      0x128 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
-                0x080107d0                rint
- *fill*         0x080108f8        0x8 00
- .text.scalbn   0x08010900      0x108 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
-                0x08010900                scalbn
- *fill*         0x08010a08        0x8 00
- .text.copysign
-                0x08010a10       0x18 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
-                0x08010a10                copysign
- *fill*         0x08010a28        0x8 00
- .text.__errno  0x08010a30        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
-                0x08010a30                __errno
- *fill*         0x08010a3c        0x4 00
- .text.memcpy   0x08010a40      0x144 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
-                0x08010a40                memcpy
+                0x08010b10       0x68 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
+                0x08010b10                __fpclassifyd
+ *fill*         0x08010b78        0x8 00
+ .text.matherr  0x08010b80        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
+                0x08010b80                matherr
  *fill*         0x08010b84        0xc 00
- .text.memset   0x08010b90      0x12c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
-                0x08010b90                memset
- *fill*         0x08010cbc        0x4 00
- .text.strcpy   0x08010cc0       0xbc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
-                0x08010cc0                strcpy
+ .text.nan      0x08010b90        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
+                0x08010b90                nan
+ *fill*         0x08010b9c        0x4 00
+ .text.rint     0x08010ba0      0x128 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
+                0x08010ba0                rint
+ *fill*         0x08010cc8        0x8 00
+ .text.scalbn   0x08010cd0      0x108 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
+                0x08010cd0                scalbn
+ *fill*         0x08010dd8        0x8 00
+ .text.copysign
+                0x08010de0       0x18 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
+                0x08010de0                copysign
+ *fill*         0x08010df8        0x8 00
+ .text.__errno  0x08010e00        0xc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
+                0x08010e00                __errno
+ *fill*         0x08010e0c        0x4 00
+ .text.memcpy   0x08010e10      0x144 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
+                0x08010e10                memcpy
+ *fill*         0x08010f54        0xc 00
+ .text.memset   0x08010f60      0x12c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
+                0x08010f60                memset
+ *fill*         0x0801108c        0x4 00
+ .text.strcpy   0x08011090       0xbc c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
+                0x08011090                strcpy
  *(.rodata)
- *fill*         0x08010d7c        0x4 00
- .rodata        0x08010d80        0x8 build/obj/chsys.o
- *fill*         0x08010d88        0x8 00
- .rodata        0x08010d90       0x58 build/obj/chdebug.o
- *fill*         0x08010de8        0x8 00
- .rodata        0x08010df0       0x34 build/obj/chvt.o
- *fill*         0x08010e24        0xc 00
- .rodata        0x08010e30       0x24 build/obj/chschd.o
- *fill*         0x08010e54        0xc 00
- .rodata        0x08010e60       0x94 build/obj/chthreads.o
- *fill*         0x08010ef4        0xc 00
- .rodata        0x08010f00      0x148 build/obj/chsem.o
- *fill*         0x08011048        0x8 00
- .rodata        0x08011050       0xac build/obj/chmtx.o
- *fill*         0x080110fc        0x4 00
- .rodata        0x08011100       0x90 build/obj/chevents.o
- .rodata        0x08011190       0x2c build/obj/chqueues.o
- *fill*         0x080111bc        0x4 00
- .rodata        0x080111c0      0x110 build/obj/adc.o
- .rodata        0x080112d0       0xd0 build/obj/ext.o
- .rodata        0x080113a0      0x10c build/obj/gpt.o
- *fill*         0x080114ac        0x4 00
- .rodata        0x080114b0       0x14 build/obj/mmcsd.o
- *fill*         0x080114c4        0xc 00
- .rodata        0x080114d0       0x40 build/obj/rtc.o
- .rodata        0x08011510      0x138 build/obj/sdc.o
- *fill*         0x08011648        0x8 00
- .rodata        0x08011650       0x60 build/obj/serial.o
- .rodata        0x080116b0      0x238 build/obj/spi.o
- *fill*         0x080118e8        0x8 00
- .rodata        0x080118f0       0x48 build/obj/stm32_dma.o
- *fill*         0x08011938        0x8 00
- .rodata        0x08011940       0x3c build/obj/adc_lld.o
- *fill*         0x0801197c        0x4 00
- .rodata        0x08011980       0x14 build/obj/gpt_lld.o
- *fill*         0x08011994        0xc 00
- .rodata        0x080119a0       0x80 build/obj/sdc_lld.o
- .rodata        0x08011a20       0x50 build/obj/spi_lld.o
- .rodata        0x08011a70        0x8 build/obj/chprintf.o
- *fill*         0x08011a78        0x8 00
- .rodata        0x08011a80       0x54 build/obj/ff.o
- *fill*         0x08011ad4        0xc 00
- .rodata        0x08011ae0      0x114 build/obj/kb_debug.o
- *fill*         0x08011bf4        0xc 00
- .rodata        0x08011c00       0xac build/obj/kb_logger.o
- *fill*         0x08011cac        0x4 00
- .rodata        0x08011cb0       0x6c build/obj/kb_screen.o
- *fill*         0x08011d1c        0x4 00
- .rodata        0x08011d20        0x4 build/obj/kb_gps.o
- *fill*         0x08011d24        0xc 00
- .rodata        0x08011d30       0x3c build/obj/main.o
+ *fill*         0x0801114c        0x4 00
+ .rodata        0x08011150        0x8 build/obj/chsys.o
+ *fill*         0x08011158        0x8 00
+ .rodata        0x08011160       0x58 build/obj/chdebug.o
+ *fill*         0x080111b8        0x8 00
+ .rodata        0x080111c0       0x34 build/obj/chvt.o
+ *fill*         0x080111f4        0xc 00
+ .rodata        0x08011200       0x24 build/obj/chschd.o
+ *fill*         0x08011224        0xc 00
+ .rodata        0x08011230       0x94 build/obj/chthreads.o
+ *fill*         0x080112c4        0xc 00
+ .rodata        0x080112d0      0x148 build/obj/chsem.o
+ *fill*         0x08011418        0x8 00
+ .rodata        0x08011420       0xac build/obj/chmtx.o
+ *fill*         0x080114cc        0x4 00
+ .rodata        0x080114d0       0x90 build/obj/chevents.o
+ .rodata        0x08011560       0x2c build/obj/chqueues.o
+ *fill*         0x0801158c        0x4 00
+ .rodata        0x08011590      0x110 build/obj/adc.o
+ .rodata        0x080116a0       0xd0 build/obj/ext.o
+ .rodata        0x08011770      0x10c build/obj/gpt.o
+ *fill*         0x0801187c        0x4 00
+ .rodata        0x08011880       0x14 build/obj/mmcsd.o
+ *fill*         0x08011894        0xc 00
+ .rodata        0x080118a0       0x40 build/obj/rtc.o
+ .rodata        0x080118e0      0x138 build/obj/sdc.o
+ *fill*         0x08011a18        0x8 00
+ .rodata        0x08011a20       0x60 build/obj/serial.o
+ .rodata        0x08011a80      0x238 build/obj/spi.o
+ *fill*         0x08011cb8        0x8 00
+ .rodata        0x08011cc0       0x48 build/obj/stm32_dma.o
+ *fill*         0x08011d08        0x8 00
+ .rodata        0x08011d10       0x3c build/obj/adc_lld.o
+ *fill*         0x08011d4c        0x4 00
+ .rodata        0x08011d50       0x14 build/obj/gpt_lld.o
+ *fill*         0x08011d64        0xc 00
+ .rodata        0x08011d70       0x80 build/obj/sdc_lld.o
+ .rodata        0x08011df0       0x50 build/obj/spi_lld.o
+ .rodata        0x08011e40        0x8 build/obj/chprintf.o
+ *fill*         0x08011e48        0x8 00
+ .rodata        0x08011e50       0x54 build/obj/ff.o
+ *fill*         0x08011ea4        0xc 00
+ .rodata        0x08011eb0      0x114 build/obj/kb_debug.o
+ *fill*         0x08011fc4        0xc 00
+ .rodata        0x08011fd0       0xac build/obj/kb_logger.o
+ *fill*         0x0801207c        0x4 00
+ .rodata        0x08012080       0x6c build/obj/kb_screen.o
+ *fill*         0x080120ec        0x4 00
+ .rodata        0x080120f0        0x4 build/obj/kb_gps.o
+ *fill*         0x080120f4        0xc 00
+ .rodata        0x08012100       0x24 build/obj/kb_menu.o
+ *fill*         0x08012124        0xc 00
+ .rodata        0x08012130       0x3c build/obj/main.o
  *(.rodata.*)
- *fill*         0x08011d6c        0x4 00
+ *fill*         0x0801216c        0x4 00
  .rodata.ch_debug
-                0x08011d70       0x18 build/obj/chregistry.o
-                0x08011d70                ch_debug
- *fill*         0x08011d88        0x8 00
+                0x08012170       0x18 build/obj/chregistry.o
+                0x08012170                ch_debug
+ *fill*         0x08012188        0x8 00
  .rodata.sdc_vmt
-                0x08011d90       0x20 build/obj/sdc.o
- .rodata.vmt    0x08011db0       0x20 build/obj/serial.o
+                0x08012190       0x20 build/obj/sdc.o
+ .rodata.vmt    0x080121b0       0x20 build/obj/serial.o
  .rodata._stm32_dma_streams
-                0x08011dd0       0xc0 build/obj/stm32_dma.o
-                0x08011dd0                _stm32_dma_streams
+                0x080121d0       0xc0 build/obj/stm32_dma.o
+                0x080121d0                _stm32_dma_streams
  .rodata.default_config
-                0x08011e90        0xc build/obj/serial_lld.o
- *fill*         0x08011e9c        0x4 00
+                0x08012290        0xc build/obj/serial_lld.o
+ *fill*         0x0801229c        0x4 00
  .rodata.pal_default_config
-                0x08011ea0       0xfc build/obj/board.o
-                0x08011ea0                pal_default_config
- *fill*         0x08011f9c        0x4 00
- .rodata.vmt    0x08011fa0       0x10 build/obj/memstreams.o
- .rodata.ExCvt  0x08011fb0       0x80 build/obj/ff.o
+                0x080122a0       0xfc build/obj/board.o
+                0x080122a0                pal_default_config
+ *fill*         0x0801239c        0x4 00
+ .rodata.vmt    0x080123a0       0x10 build/obj/memstreams.o
+ .rodata.ExCvt  0x080123b0       0x80 build/obj/ff.o
  .rodata.ST7565font
-                0x08012030      0x4fc build/obj/glcdfont.o
-                0x08012030                ST7565font
- *fill*         0x0801252c        0x4 00
+                0x08012430      0x4fc build/obj/glcdfont.o
+                0x08012430                ST7565font
+ *fill*         0x0801292c        0x4 00
  .rodata.adc_grp_cfg
-                0x08012530       0x28 build/obj/kb_adc.o
- *fill*         0x08012558        0x8 00
+                0x08012930       0x28 build/obj/kb_adc.o
+ *fill*         0x08012958        0x8 00
  .rodata.default_vectornav_config
-                0x08012560       0x14 build/obj/kb_vectornav.o
- *fill*         0x08012574        0xc 00
+                0x08012960       0x14 build/obj/kb_vectornav.o
+ *fill*         0x08012974        0xc 00
  .rodata.sdio_cfg
-                0x08012580        0x4 build/obj/main.o
- *fill*         0x08012584        0xc 00
+                0x08012980        0x4 build/obj/main.o
+ *fill*         0x08012984        0xc 00
  .rodata.eeprom_cfg
-                0x08012590        0xc build/obj/main.o
- *fill*         0x0801259c        0x4 00
+                0x08012990        0xc build/obj/main.o
+ *fill*         0x0801299c        0x4 00
  .rodata.lcd_cfg
-                0x080125a0       0x1c build/obj/main.o
- *fill*         0x080125bc        0x4 00
+                0x080129a0       0x1c build/obj/main.o
+ *fill*         0x080129bc        0x4 00
  .rodata.extcfg
-                0x080125c0       0xb8 build/obj/main.o
- *fill*         0x08012678        0x8 00
+                0x080129c0       0xb8 build/obj/main.o
+ *fill*         0x08012a78        0x8 00
  .rodata.pagemap
-                0x08012680        0x4 build/obj/ST7565.o
- *fill*         0x08012684        0xc 00
+                0x08012a80        0x4 build/obj/ST7565.o
+ *fill*         0x08012a84        0xc 00
  .rodata.st7565_nanibox
-                0x08012690      0x200 build/obj/ST7565.o
+                0x08012a90      0x200 build/obj/ST7565.o
  .rodata.str1.4
-                0x08012890        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
- *fill*         0x08012894        0xc 00
+                0x08012c90        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
+ *fill*         0x08012c94        0xc 00
  .rodata.str1.4
-                0x080128a0        0x5 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
+                0x08012ca0        0x5 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
                                   0x8 (size before relaxing)
- *fill*         0x080128a5        0xb 00
- .rodata.dp_h   0x080128b0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
- .rodata.dp_l   0x080128c0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
- .rodata.bp     0x080128d0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+ *fill*         0x08012ca5        0xb 00
+ .rodata.dp_h   0x08012cb0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+ .rodata.dp_l   0x08012cc0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+ .rodata.bp     0x08012cd0       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
  .rodata.str1.4
                 0x00000000        0x5 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
                                   0x4 (size before relaxing)
  .rodata.npio2_hw
-                0x080128e0       0x80 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
+                0x08012ce0       0x80 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
  .rodata.two_over_pi
-                0x08012960      0x108 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
- *fill*         0x08012a68        0x8 00
+                0x08012d60      0x108 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
+ *fill*         0x08012e68        0x8 00
  .rodata.init_jk
-                0x08012a70       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
- .rodata.PIo2   0x08012a80       0x40 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
+                0x08012e70       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
+ .rodata.PIo2   0x08012e80       0x40 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
  .rodata.atanlo
-                0x08012ac0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
+                0x08012ec0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
  .rodata.atanhi
-                0x08012ae0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
- .rodata.TWO52  0x08012b00       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
+                0x08012ee0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
+ .rodata.TWO52  0x08012f00       0x10 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
  .rodata.str1.4
-                0x08012b10        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x08012f10        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
  *(.glue_7t)
  .glue_7t       0x00000000        0x0 linker stubs
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
  *(.gcc*)
 
-.vfp11_veneer   0x08012b14        0x0
+.vfp11_veneer   0x08012f14        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x08012b14        0x0
+.v4_bx          0x08012f14        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x08012b14        0x0
+.iplt           0x08012f14        0x0
  .iplt          0x00000000        0x0 build/obj/kb_debug_asm.o
 
-.rel.dyn        0x08012b14        0x0
+.rel.dyn        0x08012f14        0x0
  .rel.iplt      0x00000000        0x0 build/obj/kb_debug_asm.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.ARM.exidx      0x08012b14        0x0
-                0x08012b14                PROVIDE (__exidx_start, .)
+.ARM.exidx      0x08012f14        0x0
+                0x08012f14                PROVIDE (__exidx_start, .)
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x08012b14                PROVIDE (__exidx_end, .)
+                0x08012f14                PROVIDE (__exidx_end, .)
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
@@ -2473,11 +2502,11 @@ destructors     0x08000188        0x0
 .eh_frame
  *(.eh_frame)
 
-.textalign      0x08012b14        0x4
-                0x08012b18                . = ALIGN (0x8)
- *fill*         0x08012b14        0x4 00
-                0x08012b18                _etext = .
-                0x08012b18                _textdata = _etext
+.textalign      0x08012f14        0x4
+                0x08012f18                . = ALIGN (0x8)
+ *fill*         0x08012f14        0x4 00
+                0x08012f18                _etext = .
+                0x08012f18                _textdata = _etext
 
 .stacks         0x20000000      0x800
                 0x20000000                . = ALIGN (0x8)
@@ -2494,190 +2523,199 @@ destructors     0x08000188        0x0
                 0x20000800                __process_stack_end__ = .
                 0x20000800                __main_thread_stack_end__ = .
 
-.data           0x20000800      0x454 load address 0x08012b18
+.data           0x20000800      0x50c load address 0x08012f18
                 0x20000800                . = ALIGN (0x4)
                 0x20000800                PROVIDE (_data, .)
  *(.data)
                 0x20000800                . = ALIGN (0x4)
  *(.data.*)
  .data.gps_cfg  0x20000800        0xc build/obj/kb_gps.o
+ .data.current_item
+                0x2000080c        0x2 build/obj/kb_menu.o
+                0x2000080c                current_item
+ *fill*         0x2000080e        0x2 00
+ .data.menu_items
+                0x20000810       0xb0 build/obj/kb_menu.o
+                0x20000810                menu_items
  .data.serial1_cfg
-                0x2000080c        0xc build/obj/main.o
+                0x200008c0        0xc build/obj/main.o
  .data.serial2_cfg
-                0x20000818        0xc build/obj/main.o
+                0x200008cc        0xc build/obj/main.o
  .data.__fdlib_version
-                0x20000824        0x1 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_lib_ver.o)
-                0x20000824                __fdlib_version
- *fill*         0x20000825        0x3 00
+                0x200008d8        0x1 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_lib_ver.o)
+                0x200008d8                __fdlib_version
+ *fill*         0x200008d9        0x7 00
  .data.impure_data
-                0x20000828      0x428 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x200008e0      0x428 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
  .data._impure_ptr
-                0x20000c50        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
-                0x20000c50                _impure_ptr
-                0x20000c54                . = ALIGN (0x4)
+                0x20000d08        0x4 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x20000d08                _impure_ptr
+                0x20000d0c                . = ALIGN (0x4)
  *(.ramtext)
-                0x20000c54                . = ALIGN (0x4)
-                0x20000c54                PROVIDE (_edata, .)
+                0x20000d0c                . = ALIGN (0x4)
+                0x20000d0c                PROVIDE (_edata, .)
 
-.igot.plt       0x20000c54        0x0 load address 0x08012f6c
+.igot.plt       0x20000d0c        0x0 load address 0x08013424
  .igot.plt      0x00000000        0x0 build/obj/kb_debug_asm.o
 
-.bss            0x20000c58    0x115c8 load address 0x08012f6c
-                0x20000c58                . = ALIGN (0x4)
-                0x20000c58                PROVIDE (_bss_start, .)
+.bss            0x20000d10    0x12790 load address 0x08013424
+                0x20000d10                . = ALIGN (0x4)
+                0x20000d10                PROVIDE (_bss_start, .)
  *(.bss)
-                0x20000c58                . = ALIGN (0x4)
+                0x20000d10                . = ALIGN (0x4)
  *(.bss.*)
  .bss._idle_thread_wa
-                0x20000c58      0x158 build/obj/chsys.o
-                0x20000c58                _idle_thread_wa
+                0x20000d10      0x158 build/obj/chsys.o
+                0x20000d10                _idle_thread_wa
  .bss.mainthread.4860
-                0x20000db0       0x4c build/obj/chsys.o
+                0x20000e68       0x4c build/obj/chsys.o
  .bss.dbg_isr_cnt
-                0x20000dfc        0x4 build/obj/chdebug.o
-                0x20000dfc                dbg_isr_cnt
+                0x20000eb4        0x4 build/obj/chdebug.o
+                0x20000eb4                dbg_isr_cnt
  .bss.dbg_lock_cnt
-                0x20000e00        0x4 build/obj/chdebug.o
-                0x20000e00                dbg_lock_cnt
+                0x20000eb8        0x4 build/obj/chdebug.o
+                0x20000eb8                dbg_lock_cnt
  .bss.dbg_trace_buffer
-                0x20000e04      0x408 build/obj/chdebug.o
-                0x20000e04                dbg_trace_buffer
+                0x20000ebc      0x408 build/obj/chdebug.o
+                0x20000ebc                dbg_trace_buffer
  .bss.dbg_panic_msg
-                0x2000120c        0x4 build/obj/chdebug.o
-                0x2000120c                dbg_panic_msg
- .bss.vtlist    0x20001210       0x10 build/obj/chvt.o
-                0x20001210                vtlist
- .bss.rlist     0x20001220       0x1c build/obj/chschd.o
-                0x20001220                rlist
- .bss.nextmem   0x2000123c        0x4 build/obj/chmemcore.o
- .bss.endmem    0x20001240        0x4 build/obj/chmemcore.o
- *fill*         0x20001244        0x4 00
+                0x200012c4        0x4 build/obj/chdebug.o
+                0x200012c4                dbg_panic_msg
+ .bss.vtlist    0x200012c8       0x10 build/obj/chvt.o
+                0x200012c8                vtlist
+ .bss.rlist     0x200012d8       0x1c build/obj/chschd.o
+                0x200012d8                rlist
+ .bss.nextmem   0x200012f4        0x4 build/obj/chmemcore.o
+ .bss.endmem    0x200012f8        0x4 build/obj/chmemcore.o
+ *fill*         0x200012fc        0x4 00
  .bss.default_heap
-                0x20001248       0x20 build/obj/chheap.o
+                0x20001300       0x20 build/obj/chheap.o
  .bss.dma_streams_mask
-                0x20001268        0x4 build/obj/stm32_dma.o
+                0x20001320        0x4 build/obj/stm32_dma.o
  .bss.dma_isr_redir
-                0x2000126c       0x80 build/obj/stm32_dma.o
- .bss.ADCD1     0x200012ec       0x34 build/obj/adc_lld.o
-                0x200012ec                ADCD1
- .bss.ADCD2     0x20001320       0x34 build/obj/adc_lld.o
-                0x20001320                ADCD2
- .bss.ADCD3     0x20001354       0x34 build/obj/adc_lld.o
-                0x20001354                ADCD3
- .bss.EXTD1     0x20001388        0x8 build/obj/ext_lld.o
-                0x20001388                EXTD1
- .bss.GPTD14    0x20001390       0x10 build/obj/gpt_lld.o
-                0x20001390                GPTD14
- .bss.ICUD1     0x200013a0       0x18 build/obj/icu_lld.o
-                0x200013a0                ICUD1
- .bss.SDCD1     0x200013b8       0x4c build/obj/sdc_lld.o
-                0x200013b8                SDCD1
- .bss.u         0x20001404      0x200 build/obj/sdc_lld.o
- .bss.RTCD1     0x20001604        0x4 build/obj/rtc_lld.o
-                0x20001604                RTCD1
- .bss.SPID1     0x20001608       0x30 build/obj/spi_lld.o
-                0x20001608                SPID1
- .bss.SPID2     0x20001638       0x30 build/obj/spi_lld.o
-                0x20001638                SPID2
- .bss.dummytx   0x20001668        0x2 build/obj/spi_lld.o
- .bss.dummyrx   0x2000166a        0x2 build/obj/spi_lld.o
- .bss.SD1       0x2000166c       0xd8 build/obj/serial_lld.o
-                0x2000166c                SD1
- .bss.SD2       0x20001744       0xd8 build/obj/serial_lld.o
-                0x20001744                SD2
- .bss.SD6       0x2000181c       0xd8 build/obj/serial_lld.o
-                0x2000181c                SD6
- .bss.FatFs     0x200018f4        0x4 build/obj/ff.o
- .bss.Fsid      0x200018f8        0x2 build/obj/ff.o
- *fill*         0x200018fa        0x2 00
+                0x20001324       0x80 build/obj/stm32_dma.o
+ .bss.ADCD1     0x200013a4       0x34 build/obj/adc_lld.o
+                0x200013a4                ADCD1
+ .bss.ADCD2     0x200013d8       0x34 build/obj/adc_lld.o
+                0x200013d8                ADCD2
+ .bss.ADCD3     0x2000140c       0x34 build/obj/adc_lld.o
+                0x2000140c                ADCD3
+ .bss.EXTD1     0x20001440        0x8 build/obj/ext_lld.o
+                0x20001440                EXTD1
+ .bss.GPTD14    0x20001448       0x10 build/obj/gpt_lld.o
+                0x20001448                GPTD14
+ .bss.ICUD1     0x20001458       0x18 build/obj/icu_lld.o
+                0x20001458                ICUD1
+ .bss.SDCD1     0x20001470       0x4c build/obj/sdc_lld.o
+                0x20001470                SDCD1
+ .bss.u         0x200014bc      0x200 build/obj/sdc_lld.o
+ .bss.RTCD1     0x200016bc        0x4 build/obj/rtc_lld.o
+                0x200016bc                RTCD1
+ .bss.SPID1     0x200016c0       0x30 build/obj/spi_lld.o
+                0x200016c0                SPID1
+ .bss.SPID2     0x200016f0       0x30 build/obj/spi_lld.o
+                0x200016f0                SPID2
+ .bss.dummytx   0x20001720        0x2 build/obj/spi_lld.o
+ .bss.dummyrx   0x20001722        0x2 build/obj/spi_lld.o
+ .bss.SD1       0x20001724       0xd8 build/obj/serial_lld.o
+                0x20001724                SD1
+ .bss.SD2       0x200017fc       0xd8 build/obj/serial_lld.o
+                0x200017fc                SD2
+ .bss.SD6       0x200018d4       0xd8 build/obj/serial_lld.o
+                0x200018d4                SD6
+ .bss.FatFs     0x200019ac        0x4 build/obj/ff.o
+ .bss.Fsid      0x200019b0        0x2 build/obj/ff.o
+ *fill*         0x200019b2        0x2 00
  .bss.adc_samples
-                0x200018fc        0xc build/obj/kb_adc.o
+                0x200019b4        0xc build/obj/kb_adc.o
  .bss.adc_trigger
-                0x20001908       0x14 build/obj/kb_adc.o
- .bss.btn_0_state
-                0x2000191c        0x1 build/obj/kb_buttons.o
- .bss.btn_1_state
-                0x2000191d        0x1 build/obj/kb_buttons.o
- *fill*         0x2000191e        0x2 00
+                0x200019c0       0x14 build/obj/kb_adc.o
+ .bss.btn_0_pressed
+                0x200019d4        0x1 build/obj/kb_buttons.o
+ .bss.btn_1_pressed
+                0x200019d5        0x1 build/obj/kb_buttons.o
+ *fill*         0x200019d6        0x2 00
  .bss.loggerThread
-                0x20001920        0x4 build/obj/kb_logger.o
+                0x200019d8        0x4 build/obj/kb_logger.o
  .bss.writerThread
-                0x20001924        0x4 build/obj/kb_logger.o
+                0x200019dc        0x4 build/obj/kb_logger.o
  .bss.sd_det_count
-                0x20001928        0x1 build/obj/kb_logger.o
+                0x200019e0        0x1 build/obj/kb_logger.o
  .bss.logger_state
-                0x20001929        0x1 build/obj/kb_logger.o
- .bss.fs_ready  0x2000192a        0x1 build/obj/kb_logger.o
+                0x200019e1        0x1 build/obj/kb_logger.o
+ .bss.fs_ready  0x200019e2        0x1 build/obj/kb_logger.o
  .bss.fs_write_protected
-                0x2000192b        0x1 build/obj/kb_logger.o
- .bss.SDC_FS    0x2000192c      0x234 build/obj/kb_logger.o
+                0x200019e3        0x1 build/obj/kb_logger.o
+ .bss.SDC_FS    0x200019e4      0x234 build/obj/kb_logger.o
  .bss.cardsize_MB
-                0x20001b60        0x4 build/obj/kb_logger.o
-                0x20001b60                cardsize_MB
+                0x20001c18        0x4 build/obj/kb_logger.o
+                0x20001c18                cardsize_MB
  .bss.current_msg
-                0x20001b64      0x200 build/obj/kb_logger.o
+                0x20001c1c      0x200 build/obj/kb_logger.o
  .bss.write_buffer_semaphore
-                0x20001d64        0xc build/obj/kb_logger.o
+                0x20001e1c        0xc build/obj/kb_logger.o
  .bss.write_buffers
-                0x20001d70     0xc004 build/obj/kb_logger.o
- .bss.kbfile    0x2000dd74      0x224 build/obj/kb_logger.o
-                0x2000dd74                kbfile
- .bss.waWriter  0x2000df98     0x2138 build/obj/kb_logger.o
- .bss.waLogger  0x200100d0      0x538 build/obj/kb_logger.o
- .bss.screen    0x20010608       0x48 build/obj/kb_screen.o
- .bss.charbuf   0x20010650       0x80 build/obj/kb_screen.o
- .bss.msb       0x200106d0       0x14 build/obj/kb_screen.o
- *fill*         0x200106e4        0x4 00
- .bss.waScreen  0x200106e8     0x1138 build/obj/kb_screen.o
+                0x20001e28     0xc004 build/obj/kb_logger.o
+ .bss.kbfile    0x2000de2c      0x224 build/obj/kb_logger.o
+                0x2000de2c                kbfile
+ .bss.waWriter  0x2000e050     0x2138 build/obj/kb_logger.o
+ .bss.waLogger  0x20010188      0x538 build/obj/kb_logger.o
+ .bss.screen    0x200106c0       0x48 build/obj/kb_screen.o
+ .bss.charbuf   0x20010708       0x80 build/obj/kb_screen.o
+ .bss.msb       0x20010788       0x14 build/obj/kb_screen.o
+ *fill*         0x2001079c        0x4 00
+ .bss.waScreen  0x200107a0     0x1138 build/obj/kb_screen.o
  .bss.last_edge_time
-                0x20011820        0x4 build/obj/kb_time.o
+                0x200118d8        0x4 build/obj/kb_time.o
  .bss.was_last_edge_short
-                0x20011824        0x1 build/obj/kb_time.o
- *fill*         0x20011825        0x3 00
+                0x200118dc        0x1 build/obj/kb_time.o
+ *fill*         0x200118dd        0x3 00
  .bss.ltc_frame
-                0x20011828        0xc build/obj/kb_time.o
+                0x200118e0        0xc build/obj/kb_time.o
  .bss.ltc_timecode
-                0x20011834        0x4 build/obj/kb_time.o
+                0x200118ec        0x4 build/obj/kb_time.o
  .bss.ubx_nav_sol_buffer
-                0x20011838       0x3c build/obj/kb_gps.o
-                0x20011838                ubx_nav_sol_buffer
+                0x200118f0       0x3c build/obj/kb_gps.o
+                0x200118f0                ubx_nav_sol_buffer
  .bss.ubx_nav_sol_idx
-                0x20011874        0x1 build/obj/kb_gps.o
-                0x20011874                ubx_nav_sol_idx
- *fill*         0x20011875        0x3 00
- .bss.waGps     0x20011878      0x1b8 build/obj/kb_gps.o
- .bss.VND1      0x20011a30        0xc build/obj/kb_vectornav.o
-                0x20011a30                VND1
+                0x2001192c        0x1 build/obj/kb_gps.o
+                0x2001192c                ubx_nav_sol_idx
+ *fill*         0x2001192d        0x3 00
+ .bss.waGps     0x20011930      0x1b8 build/obj/kb_gps.o
+ .bss.VND1      0x20011ae8        0xc build/obj/kb_vectornav.o
+                0x20011ae8                VND1
  .bss.async_vn_msg
-                0x20011a3c      0x408 build/obj/kb_vectornav.o
+                0x20011af4      0x408 build/obj/kb_vectornav.o
+ .bss.charbuf   0x20011efc       0x80 build/obj/kb_menu.o
+ .bss.msb       0x20011f7c       0x14 build/obj/kb_menu.o
+ .bss.waMenu    0x20011f90     0x1138 build/obj/kb_menu.o
  .bss.lcd_buffer
-                0x20011e44      0x200 build/obj/main.o
+                0x200130c8      0x200 build/obj/main.o
  .bss.global_state
-                0x20012044        0x4 build/obj/main.o
- .bss.adc_cfg   0x20012048        0x4 build/obj/main.o
- *fill*         0x2001204c        0x4 00
+                0x200132c8        0x4 build/obj/main.o
+ .bss.adc_cfg   0x200132cc        0x4 build/obj/main.o
  .bss.waBlinker
-                0x20012050      0x1b8 build/obj/main.o
+                0x200132d0      0x1b8 build/obj/main.o
  .bss.spiEepromD1
-                0x20012208        0x8 build/obj/spiEEPROM.o
-                0x20012208                spiEepromD1
- .bss.ST7565D1  0x20012210        0xc build/obj/ST7565.o
-                0x20012210                ST7565D1
+                0x20013488        0x8 build/obj/spiEEPROM.o
+                0x20013488                spiEepromD1
+ .bss.ST7565D1  0x20013490        0xc build/obj/ST7565.o
+                0x20013490                ST7565D1
  .bss.xUpdateMin
-                0x2001221c        0x1 build/obj/ST7565.o
+                0x2001349c        0x1 build/obj/ST7565.o
  .bss.xUpdateMax
-                0x2001221d        0x1 build/obj/ST7565.o
+                0x2001349d        0x1 build/obj/ST7565.o
  .bss.yUpdateMin
-                0x2001221e        0x1 build/obj/ST7565.o
+                0x2001349e        0x1 build/obj/ST7565.o
  .bss.yUpdateMax
-                0x2001221f        0x1 build/obj/ST7565.o
-                0x20012220                . = ALIGN (0x4)
+                0x2001349f        0x1 build/obj/ST7565.o
+                0x200134a0                . = ALIGN (0x4)
  *(COMMON)
-                0x20012220                . = ALIGN (0x4)
-                0x20012220                PROVIDE (_bss_end, .)
-                0x20012220                PROVIDE (end, .)
-                0x20012220                _end = .
-                0x20012220                __heap_base__ = _end
+                0x200134a0                . = ALIGN (0x4)
+                0x200134a0                PROVIDE (_bss_end, .)
+                0x200134a0                PROVIDE (end, .)
+                0x200134a0                _end = .
+                0x200134a0                __heap_base__ = _end
                 0x2001c000                __heap_end__ = __ram_end__
 OUTPUT(build/kuroBox.elf elf32-littlearm)
 
@@ -2796,77 +2834,79 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .ARM.attributes
                 0x00000c27       0x39 build/obj/kb_vectornav.o
  .ARM.attributes
-                0x00000c60       0x39 build/obj/main.o
+                0x00000c60       0x39 build/obj/kb_menu.o
  .ARM.attributes
-                0x00000c99       0x39 build/obj/spiEEPROM.o
+                0x00000c99       0x39 build/obj/main.o
  .ARM.attributes
-                0x00000cd2       0x39 build/obj/ST7565.o
+                0x00000cd2       0x39 build/obj/spiEEPROM.o
  .ARM.attributes
-                0x00000d0b       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
+                0x00000d0b       0x39 build/obj/ST7565.o
  .ARM.attributes
-                0x00000d39       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
+                0x00000d44       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
  .ARM.attributes
-                0x00000d67       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
+                0x00000d72       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
  .ARM.attributes
-                0x00000d95       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
+                0x00000da0       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
  .ARM.attributes
-                0x00000dc3       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
+                0x00000dce       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
  .ARM.attributes
-                0x00000df1       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
+                0x00000dfc       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
  .ARM.attributes
-                0x00000e1f       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+                0x00000e2a       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
  .ARM.attributes
-                0x00000e4d       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
+                0x00000e58       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
  .ARM.attributes
-                0x00000e7b       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
+                0x00000e86       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
  .ARM.attributes
-                0x00000ea9       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
+                0x00000eb4       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
  .ARM.attributes
-                0x00000ed7       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
+                0x00000ee2       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
  .ARM.attributes
-                0x00000f05       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
+                0x00000f10       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
  .ARM.attributes
-                0x00000f33       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
+                0x00000f3e       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
  .ARM.attributes
-                0x00000f61       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
+                0x00000f6c       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
  .ARM.attributes
-                0x00000f8f       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
+                0x00000f9a       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
  .ARM.attributes
-                0x00000fbd       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
+                0x00000fc8       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
  .ARM.attributes
-                0x00000feb       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
+                0x00000ff6       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
  .ARM.attributes
-                0x00001019       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_lib_ver.o)
+                0x00001024       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
  .ARM.attributes
-                0x00001047       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
+                0x00001052       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_lib_ver.o)
  .ARM.attributes
-                0x00001075       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
+                0x00001080       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
  .ARM.attributes
-                0x000010a3       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
+                0x000010ae       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
  .ARM.attributes
-                0x000010d1       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
+                0x000010dc       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
  .ARM.attributes
-                0x000010ff       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
+                0x0000110a       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
  .ARM.attributes
-                0x0000112d       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_addsubdf3.o)
+                0x00001138       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
  .ARM.attributes
-                0x0000114b       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_muldivdf3.o)
+                0x00001166       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_addsubdf3.o)
  .ARM.attributes
-                0x00001169       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_cmpdf2.o)
+                0x00001184       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_muldivdf3.o)
  .ARM.attributes
-                0x00001187       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_fixdfsi.o)
+                0x000011a2       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_cmpdf2.o)
  .ARM.attributes
-                0x000011a5       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_truncdfsf2.o)
+                0x000011c0       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_fixdfsi.o)
  .ARM.attributes
-                0x000011c3       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
+                0x000011de       0x1e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/armv7e-m\libgcc.a(_arm_truncdfsf2.o)
  .ARM.attributes
-                0x000011f1       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x000011fc       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
  .ARM.attributes
-                0x0000121f       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
+                0x0000122a       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
  .ARM.attributes
-                0x0000124d       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
+                0x00001258       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
  .ARM.attributes
-                0x0000127b       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
+                0x00001286       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
+ .ARM.attributes
+                0x000012b4       0x2e c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
 
 .comment        0x00000000       0x70
  .comment       0x00000000       0x70 build/obj/crt0.o
@@ -2925,11 +2965,12 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .comment       0x00000000       0x71 build/obj/kb_gps.o
  .comment       0x00000000       0x71 build/obj/kb_util.o
  .comment       0x00000000       0x71 build/obj/kb_vectornav.o
+ .comment       0x00000000       0x71 build/obj/kb_menu.o
  .comment       0x00000000       0x71 build/obj/main.o
  .comment       0x00000000       0x71 build/obj/spiEEPROM.o
  .comment       0x00000000       0x71 build/obj/ST7565.o
 
-.debug_info     0x00000000    0x247f0
+.debug_info     0x00000000    0x2570d
  .debug_info    0x00000000      0x2a3 build/obj/crt0.o
  .debug_info    0x000002a3      0x1f0 build/obj/vectors.o
  .debug_info    0x00000493       0x9a build/obj/chcore.o
@@ -2978,18 +3019,19 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_info    0x000196e5      0xc92 build/obj/kb_debug.o
  .debug_info    0x0001a377       0x54 build/obj/glcdfont.o
  .debug_info    0x0001a3cb      0xc04 build/obj/kb_adc.o
- .debug_info    0x0001afcf      0x383 build/obj/kb_buttons.o
- .debug_info    0x0001b352     0x1d6e build/obj/kb_logger.o
- .debug_info    0x0001d0c0     0x14e5 build/obj/kb_screen.o
- .debug_info    0x0001e5a5      0x5bc build/obj/kb_time.o
- .debug_info    0x0001eb61      0xf24 build/obj/kb_gps.o
- .debug_info    0x0001fa85      0x169 build/obj/kb_util.o
- .debug_info    0x0001fbee     0x1168 build/obj/kb_vectornav.o
- .debug_info    0x00020d56     0x1ead build/obj/main.o
- .debug_info    0x00022c03      0xbd6 build/obj/spiEEPROM.o
- .debug_info    0x000237d9     0x1017 build/obj/ST7565.o
+ .debug_info    0x0001afcf      0x3d3 build/obj/kb_buttons.o
+ .debug_info    0x0001b3a2     0x1d6e build/obj/kb_logger.o
+ .debug_info    0x0001d110     0x14e5 build/obj/kb_screen.o
+ .debug_info    0x0001e5f5      0x5bc build/obj/kb_time.o
+ .debug_info    0x0001ebb1      0xf24 build/obj/kb_gps.o
+ .debug_info    0x0001fad5      0x169 build/obj/kb_util.o
+ .debug_info    0x0001fc3e     0x1168 build/obj/kb_vectornav.o
+ .debug_info    0x00020da6      0xecc build/obj/kb_menu.o
+ .debug_info    0x00021c72     0x1eae build/obj/main.o
+ .debug_info    0x00023b20      0xbd6 build/obj/spiEEPROM.o
+ .debug_info    0x000246f6     0x1017 build/obj/ST7565.o
 
-.debug_abbrev   0x00000000     0x5fa4
+.debug_abbrev   0x00000000     0x61fc
  .debug_abbrev  0x00000000       0xaf build/obj/crt0.o
  .debug_abbrev  0x000000af       0xb1 build/obj/vectors.o
  .debug_abbrev  0x00000160       0x44 build/obj/chcore.o
@@ -3038,18 +3080,19 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_abbrev  0x00004873      0x18f build/obj/kb_debug.o
  .debug_abbrev  0x00004a02       0x45 build/obj/glcdfont.o
  .debug_abbrev  0x00004a47      0x1ea build/obj/kb_adc.o
- .debug_abbrev  0x00004c31      0x159 build/obj/kb_buttons.o
- .debug_abbrev  0x00004d8a      0x301 build/obj/kb_logger.o
- .debug_abbrev  0x0000508b      0x279 build/obj/kb_screen.o
- .debug_abbrev  0x00005304      0x191 build/obj/kb_time.o
- .debug_abbrev  0x00005495      0x22f build/obj/kb_gps.o
- .debug_abbrev  0x000056c4       0xa3 build/obj/kb_util.o
- .debug_abbrev  0x00005767      0x1f7 build/obj/kb_vectornav.o
- .debug_abbrev  0x0000595e      0x213 build/obj/main.o
- .debug_abbrev  0x00005b71      0x1dc build/obj/spiEEPROM.o
- .debug_abbrev  0x00005d4d      0x257 build/obj/ST7565.o
+ .debug_abbrev  0x00004c31      0x171 build/obj/kb_buttons.o
+ .debug_abbrev  0x00004da2      0x301 build/obj/kb_logger.o
+ .debug_abbrev  0x000050a3      0x279 build/obj/kb_screen.o
+ .debug_abbrev  0x0000531c      0x191 build/obj/kb_time.o
+ .debug_abbrev  0x000054ad      0x22f build/obj/kb_gps.o
+ .debug_abbrev  0x000056dc       0xa3 build/obj/kb_util.o
+ .debug_abbrev  0x0000577f      0x1f7 build/obj/kb_vectornav.o
+ .debug_abbrev  0x00005976      0x240 build/obj/kb_menu.o
+ .debug_abbrev  0x00005bb6      0x213 build/obj/main.o
+ .debug_abbrev  0x00005dc9      0x1dc build/obj/spiEEPROM.o
+ .debug_abbrev  0x00005fa5      0x257 build/obj/ST7565.o
 
-.debug_aranges  0x00000000     0x1518
+.debug_aranges  0x00000000     0x1580
  .debug_aranges
                 0x00000000       0x38 build/obj/crt0.o
  .debug_aranges
@@ -3147,27 +3190,29 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_aranges
                 0x00001198       0x38 build/obj/kb_adc.o
  .debug_aranges
-                0x000011d0       0x40 build/obj/kb_buttons.o
+                0x000011d0       0x50 build/obj/kb_buttons.o
  .debug_aranges
-                0x00001210       0xa0 build/obj/kb_logger.o
+                0x00001220       0xa0 build/obj/kb_logger.o
  .debug_aranges
-                0x000012b0       0x88 build/obj/kb_screen.o
+                0x000012c0       0x88 build/obj/kb_screen.o
  .debug_aranges
-                0x00001338       0x38 build/obj/kb_time.o
+                0x00001348       0x38 build/obj/kb_time.o
  .debug_aranges
-                0x00001370       0x40 build/obj/kb_gps.o
+                0x00001380       0x40 build/obj/kb_gps.o
  .debug_aranges
-                0x000013b0       0x28 build/obj/kb_util.o
+                0x000013c0       0x28 build/obj/kb_util.o
  .debug_aranges
-                0x000013d8       0x48 build/obj/kb_vectornav.o
+                0x000013e8       0x48 build/obj/kb_vectornav.o
  .debug_aranges
-                0x00001420       0x38 build/obj/main.o
+                0x00001430       0x58 build/obj/kb_menu.o
  .debug_aranges
-                0x00001458       0x50 build/obj/spiEEPROM.o
+                0x00001488       0x38 build/obj/main.o
  .debug_aranges
-                0x000014a8       0x70 build/obj/ST7565.o
+                0x000014c0       0x50 build/obj/spiEEPROM.o
+ .debug_aranges
+                0x00001510       0x70 build/obj/ST7565.o
 
-.debug_ranges   0x00000000     0x11a0
+.debug_ranges   0x00000000     0x11f8
  .debug_ranges  0x00000000       0x28 build/obj/crt0.o
  .debug_ranges  0x00000028       0x10 build/obj/vectors.o
  .debug_ranges  0x00000038       0x10 build/obj/chcore.o
@@ -3215,18 +3260,19 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_ranges  0x00000d28      0x180 build/obj/ff.o
  .debug_ranges  0x00000ea8       0x10 build/obj/kb_debug.o
  .debug_ranges  0x00000eb8       0x28 build/obj/kb_adc.o
- .debug_ranges  0x00000ee0       0x30 build/obj/kb_buttons.o
- .debug_ranges  0x00000f10       0x90 build/obj/kb_logger.o
- .debug_ranges  0x00000fa0       0x78 build/obj/kb_screen.o
- .debug_ranges  0x00001018       0x28 build/obj/kb_time.o
- .debug_ranges  0x00001040       0x30 build/obj/kb_gps.o
- .debug_ranges  0x00001070       0x18 build/obj/kb_util.o
- .debug_ranges  0x00001088       0x38 build/obj/kb_vectornav.o
- .debug_ranges  0x000010c0       0x28 build/obj/main.o
- .debug_ranges  0x000010e8       0x40 build/obj/spiEEPROM.o
- .debug_ranges  0x00001128       0x78 build/obj/ST7565.o
+ .debug_ranges  0x00000ee0       0x40 build/obj/kb_buttons.o
+ .debug_ranges  0x00000f20       0x90 build/obj/kb_logger.o
+ .debug_ranges  0x00000fb0       0x78 build/obj/kb_screen.o
+ .debug_ranges  0x00001028       0x28 build/obj/kb_time.o
+ .debug_ranges  0x00001050       0x30 build/obj/kb_gps.o
+ .debug_ranges  0x00001080       0x18 build/obj/kb_util.o
+ .debug_ranges  0x00001098       0x38 build/obj/kb_vectornav.o
+ .debug_ranges  0x000010d0       0x48 build/obj/kb_menu.o
+ .debug_ranges  0x00001118       0x28 build/obj/main.o
+ .debug_ranges  0x00001140       0x40 build/obj/spiEEPROM.o
+ .debug_ranges  0x00001180       0x78 build/obj/ST7565.o
 
-.debug_line     0x00000000     0xb445
+.debug_line     0x00000000     0xb850
  .debug_line    0x00000000      0x169 build/obj/crt0.o
  .debug_line    0x00000169       0xf3 build/obj/vectors.o
  .debug_line    0x0000025c       0x60 build/obj/chcore.o
@@ -3275,18 +3321,19 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_line    0x000089fc      0x2e5 build/obj/kb_debug.o
  .debug_line    0x00008ce1       0x31 build/obj/glcdfont.o
  .debug_line    0x00008d12      0x2d7 build/obj/kb_adc.o
- .debug_line    0x00008fe9      0x217 build/obj/kb_buttons.o
- .debug_line    0x00009200      0x5e2 build/obj/kb_logger.o
- .debug_line    0x000097e2      0x50d build/obj/kb_screen.o
- .debug_line    0x00009cef      0x24a build/obj/kb_time.o
- .debug_line    0x00009f39      0x3aa build/obj/kb_gps.o
- .debug_line    0x0000a2e3      0x139 build/obj/kb_util.o
- .debug_line    0x0000a41c      0x3ca build/obj/kb_vectornav.o
- .debug_line    0x0000a7e6      0x49a build/obj/main.o
- .debug_line    0x0000ac80      0x32b build/obj/spiEEPROM.o
- .debug_line    0x0000afab      0x49a build/obj/ST7565.o
+ .debug_line    0x00008fe9      0x242 build/obj/kb_buttons.o
+ .debug_line    0x0000922b      0x5e2 build/obj/kb_logger.o
+ .debug_line    0x0000980d      0x50e build/obj/kb_screen.o
+ .debug_line    0x00009d1b      0x24a build/obj/kb_time.o
+ .debug_line    0x00009f65      0x3aa build/obj/kb_gps.o
+ .debug_line    0x0000a30f      0x139 build/obj/kb_util.o
+ .debug_line    0x0000a448      0x3ca build/obj/kb_vectornav.o
+ .debug_line    0x0000a812      0x3de build/obj/kb_menu.o
+ .debug_line    0x0000abf0      0x49b build/obj/main.o
+ .debug_line    0x0000b08b      0x32b build/obj/spiEEPROM.o
+ .debug_line    0x0000b3b6      0x49a build/obj/ST7565.o
 
-.debug_str      0x00000000     0x49b3
+.debug_str      0x00000000     0x4a4d
  .debug_str     0x00000000      0x1fa build/obj/crt0.o
                                 0x234 (size before relaxing)
  .debug_str     0x000001fa      0x14d build/obj/vectors.o
@@ -3383,28 +3430,30 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
                                  0x9d (size before relaxing)
  .debug_str     0x00003d84       0x79 build/obj/kb_adc.o
                                 0x59a (size before relaxing)
- .debug_str     0x00003dfd       0x7c build/obj/kb_buttons.o
-                                0x280 (size before relaxing)
- .debug_str     0x00003e79      0x448 build/obj/kb_logger.o
+ .debug_str     0x00003dfd       0x74 build/obj/kb_buttons.o
+                                0x29c (size before relaxing)
+ .debug_str     0x00003e71      0x448 build/obj/kb_logger.o
                                 0xdaf (size before relaxing)
- .debug_str     0x000042c1      0x1a1 build/obj/kb_screen.o
-                                0x8b8 (size before relaxing)
- .debug_str     0x00004462       0xa8 build/obj/kb_time.o
+ .debug_str     0x000042b9      0x191 build/obj/kb_screen.o
+                                0x8b2 (size before relaxing)
+ .debug_str     0x0000444a       0xa8 build/obj/kb_time.o
                                 0x42d (size before relaxing)
- .debug_str     0x0000450a       0x9b build/obj/kb_gps.o
+ .debug_str     0x000044f2       0x9b build/obj/kb_gps.o
                                 0x666 (size before relaxing)
- .debug_str     0x000045a5       0x3a build/obj/kb_util.o
+ .debug_str     0x0000458d       0x3a build/obj/kb_util.o
                                 0x162 (size before relaxing)
- .debug_str     0x000045df       0xfe build/obj/kb_vectornav.o
+ .debug_str     0x000045c7       0xfe build/obj/kb_vectornav.o
                                 0x76f (size before relaxing)
- .debug_str     0x000046dd       0xe8 build/obj/main.o
+ .debug_str     0x000046c5       0xb2 build/obj/kb_menu.o
+                                0x664 (size before relaxing)
+ .debug_str     0x00004777       0xe8 build/obj/main.o
                                 0xce1 (size before relaxing)
- .debug_str     0x000047c5       0xa6 build/obj/spiEEPROM.o
+ .debug_str     0x0000485f       0xa6 build/obj/spiEEPROM.o
                                 0x569 (size before relaxing)
- .debug_str     0x0000486b      0x148 build/obj/ST7565.o
+ .debug_str     0x00004905      0x148 build/obj/ST7565.o
                                 0x645 (size before relaxing)
 
-.debug_frame    0x00000000     0x3b08
+.debug_frame    0x00000000     0x3c10
  .debug_frame   0x00000000       0x50 build/obj/crt0.o
  .debug_frame   0x00000050       0x20 build/obj/vectors.o
  .debug_frame   0x00000070       0x20 build/obj/chcore.o
@@ -3452,44 +3501,45 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_frame   0x00002890      0x4ec build/obj/ff.o
  .debug_frame   0x00002d7c       0x2c build/obj/kb_debug.o
  .debug_frame   0x00002da8       0x78 build/obj/kb_adc.o
- .debug_frame   0x00002e20       0x84 build/obj/kb_buttons.o
- .debug_frame   0x00002ea4      0x1e4 build/obj/kb_logger.o
- .debug_frame   0x00003088      0x148 build/obj/kb_screen.o
- .debug_frame   0x000031d0       0x78 build/obj/kb_time.o
- .debug_frame   0x00003248       0xac build/obj/kb_gps.o
- .debug_frame   0x000032f4       0x38 build/obj/kb_util.o
- .debug_frame   0x0000332c       0xb8 build/obj/kb_vectornav.o
- .debug_frame   0x000033e4       0x78 build/obj/main.o
- .debug_frame   0x0000345c       0xcc build/obj/spiEEPROM.o
- .debug_frame   0x00003528      0x13c build/obj/ST7565.o
- .debug_frame   0x00003664       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
- .debug_frame   0x00003690       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
- .debug_frame   0x000036bc       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
- .debug_frame   0x000036dc       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
- .debug_frame   0x00003714       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
- .debug_frame   0x0000374c       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
- .debug_frame   0x00003784       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
- .debug_frame   0x000037bc       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
- .debug_frame   0x000037f4       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
- .debug_frame   0x00003828       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
- .debug_frame   0x00003860       0x3c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
- .debug_frame   0x0000389c       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
- .debug_frame   0x000038d4       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
- .debug_frame   0x0000390c       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
- .debug_frame   0x0000392c       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
- .debug_frame   0x0000394c       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
- .debug_frame   0x00003980       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
- .debug_frame   0x000039a0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
- .debug_frame   0x000039c0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
- .debug_frame   0x000039e0       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
- .debug_frame   0x00003a14       0x30 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
- .debug_frame   0x00003a44       0x28 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
- .debug_frame   0x00003a6c       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
- .debug_frame   0x00003a8c       0x30 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
- .debug_frame   0x00003abc       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
- .debug_frame   0x00003ae8       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
+ .debug_frame   0x00002e20       0xbc build/obj/kb_buttons.o
+ .debug_frame   0x00002edc      0x1e4 build/obj/kb_logger.o
+ .debug_frame   0x000030c0      0x148 build/obj/kb_screen.o
+ .debug_frame   0x00003208       0x78 build/obj/kb_time.o
+ .debug_frame   0x00003280       0xac build/obj/kb_gps.o
+ .debug_frame   0x0000332c       0x38 build/obj/kb_util.o
+ .debug_frame   0x00003364       0xb8 build/obj/kb_vectornav.o
+ .debug_frame   0x0000341c       0xd0 build/obj/kb_menu.o
+ .debug_frame   0x000034ec       0x78 build/obj/main.o
+ .debug_frame   0x00003564       0xcc build/obj/spiEEPROM.o
+ .debug_frame   0x00003630      0x13c build/obj/ST7565.o
+ .debug_frame   0x0000376c       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
+ .debug_frame   0x00003798       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_sin.o)
+ .debug_frame   0x000037c4       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_atan2.o)
+ .debug_frame   0x000037e4       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
+ .debug_frame   0x0000381c       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
+ .debug_frame   0x00003854       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_atan2.o)
+ .debug_frame   0x0000388c       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_pow.o)
+ .debug_frame   0x000038c4       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_rem_pio2.o)
+ .debug_frame   0x000038fc       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-e_sqrt.o)
+ .debug_frame   0x00003930       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_cos.o)
+ .debug_frame   0x00003968       0x3c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_rem_pio2.o)
+ .debug_frame   0x000039a4       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-k_sin.o)
+ .debug_frame   0x000039dc       0x38 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_atan.o)
+ .debug_frame   0x00003a14       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fabs.o)
+ .debug_frame   0x00003a34       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_finite.o)
+ .debug_frame   0x00003a54       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_floor.o)
+ .debug_frame   0x00003a88       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_fpclassify.o)
+ .debug_frame   0x00003aa8       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
+ .debug_frame   0x00003ac8       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
+ .debug_frame   0x00003ae8       0x34 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_rint.o)
+ .debug_frame   0x00003b1c       0x30 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
+ .debug_frame   0x00003b4c       0x28 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_copysign.o)
+ .debug_frame   0x00003b74       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-errno.o)
+ .debug_frame   0x00003b94       0x30 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
+ .debug_frame   0x00003bc4       0x2c c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
+ .debug_frame   0x00003bf0       0x20 c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-strcpy.o)
 
-.debug_loc      0x00000000     0x4a83
+.debug_loc      0x00000000     0x4c0b
  .debug_loc     0x00000000       0xb8 build/obj/chcore_v7m.o
  .debug_loc     0x000000b8       0x84 build/obj/nvic.o
  .debug_loc     0x0000013c       0x78 build/obj/chsys.o
@@ -3534,16 +3584,17 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_loc     0x000036dc      0x7b4 build/obj/ff.o
  .debug_loc     0x00003e90       0x2c build/obj/kb_debug.o
  .debug_loc     0x00003ebc       0x98 build/obj/kb_adc.o
- .debug_loc     0x00003f54       0x78 build/obj/kb_buttons.o
- .debug_loc     0x00003fcc      0x29d build/obj/kb_logger.o
- .debug_loc     0x00004269      0x1c5 build/obj/kb_screen.o
- .debug_loc     0x0000442e       0x98 build/obj/kb_time.o
- .debug_loc     0x000044c6       0xdd build/obj/kb_gps.o
- .debug_loc     0x000045a3       0x40 build/obj/kb_util.o
- .debug_loc     0x000045e3      0x108 build/obj/kb_vectornav.o
- .debug_loc     0x000046eb       0x98 build/obj/main.o
- .debug_loc     0x00004783      0x128 build/obj/spiEEPROM.o
- .debug_loc     0x000048ab      0x1d8 build/obj/ST7565.o
+ .debug_loc     0x00003f54       0xd0 build/obj/kb_buttons.o
+ .debug_loc     0x00004024      0x29d build/obj/kb_logger.o
+ .debug_loc     0x000042c1      0x1c5 build/obj/kb_screen.o
+ .debug_loc     0x00004486       0x98 build/obj/kb_time.o
+ .debug_loc     0x0000451e       0xdd build/obj/kb_gps.o
+ .debug_loc     0x000045fb       0x40 build/obj/kb_util.o
+ .debug_loc     0x0000463b      0x108 build/obj/kb_vectornav.o
+ .debug_loc     0x00004743      0x130 build/obj/kb_menu.o
+ .debug_loc     0x00004873       0x98 build/obj/main.o
+ .debug_loc     0x0000490b      0x128 build/obj/spiEEPROM.o
+ .debug_loc     0x00004a33      0x1d8 build/obj/ST7565.o
 
 Cross Reference Table
 
@@ -3588,6 +3639,7 @@ SPID2                                             build/obj/spi_lld.o
                                                   build/obj/main.o
 ST7565D1                                          build/obj/ST7565.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
 ST7565font                                        build/obj/glcdfont.o
                                                   build/obj/ST7565.o
@@ -4227,6 +4279,7 @@ chThdCreateI                                      build/obj/chthreads.o
                                                   build/obj/chdynamic.o
 chThdCreateStatic                                 build/obj/chthreads.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_gps.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
@@ -4242,6 +4295,7 @@ chThdSetPriority                                  build/obj/chthreads.o
 chThdSleep                                        build/obj/chthreads.o
                                                   build/obj/ST7565.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
                                                   build/obj/sdc.o
@@ -4260,6 +4314,7 @@ ch_debug                                          build/obj/chregistry.o
                                                   build/obj/chsys.o
 chprintf                                          build/obj/chprintf.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
                                                   build/obj/kb_debug.o
@@ -4268,6 +4323,7 @@ copysign                                          c:/chibistudio/tools/gnu tools
                                                   c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_scalbn.o)
 cos                                               c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_cos.o)
                                                   build/obj/kb_gps.o
+current_item                                      build/obj/kb_menu.o
 dbg_check_disable                                 build/obj/chdebug.o
 dbg_check_enable                                  build/obj/chdebug.o
                                                   build/obj/chsys.o
@@ -4529,11 +4585,17 @@ kbl_setGpsNavSol                                  build/obj/kb_logger.o
                                                   build/obj/kb_gps.o
 kbl_setLTC                                        build/obj/kb_logger.o
                                                   build/obj/kb_time.o
+kbm_btn0                                          build/obj/kb_menu.o
+                                                  build/obj/kb_buttons.o
+kbm_btn1                                          build/obj/kb_menu.o
+                                                  build/obj/kb_buttons.o
+kbm_display                                       build/obj/kb_menu.o
+                                                  build/obj/kb_screen.o
 kbs_PPS                                           build/obj/kb_screen.o
                                                   build/obj/kb_gps.o
-kbs_setBtn0                                       build/obj/kb_screen.o
+kbs_btn0                                          build/obj/kb_screen.o
                                                   build/obj/kb_buttons.o
-kbs_setBtn1                                       build/obj/kb_screen.o
+kbs_btn1                                          build/obj/kb_screen.o
                                                   build/obj/kb_buttons.o
 kbs_setFName                                      build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
@@ -4563,6 +4625,8 @@ kuroBoxGPSInit                                    build/obj/kb_gps.o
 kuroBoxInit                                       build/obj/main.o
 kuroBoxLoggerInit                                 build/obj/kb_logger.o
                                                   build/obj/main.o
+kuroBoxMenuInit                                   build/obj/kb_menu.o
+                                                  build/obj/main.o
 kuroBoxScreenInit                                 build/obj/kb_screen.o
                                                   build/obj/main.o
 kuroBoxTimeInit                                   build/obj/kb_time.o
@@ -4582,6 +4646,9 @@ main                                              build/obj/main.o
 matherr                                           c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_matherr.o)
                                                   c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_sqrt.o)
                                                   c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
+me_exit                                           build/obj/kb_menu.o
+me_serial1_pwr                                    build/obj/kb_menu.o
+me_serial2_pwr                                    build/obj/kb_menu.o
 memcpy                                            c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memcpy.o)
                                                   build/obj/ST7565.o
                                                   build/obj/kb_logger.o
@@ -4590,16 +4657,19 @@ memcpy                                            c:/chibistudio/tools/gnu tools
 memset                                            c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-memset.o)
                                                   build/obj/ST7565.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_vectornav.o
                                                   build/obj/kb_gps.o
                                                   build/obj/kb_time.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
+menu_items                                        build/obj/kb_menu.o
 mktime                                            c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-mktime.o)
                                                   build/obj/chrtclib.o
 mmcsdGetCapacity                                  build/obj/mmcsd.o
                                                   build/obj/sdc.o
 msObjectInit                                      build/obj/memstreams.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
 nan                                               c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-s_nan.o)
@@ -4636,6 +4706,7 @@ rint                                              c:/chibistudio/tools/gnu tools
                                                   c:/chibistudio/tools/gnu tools arm embedded/4.7 2013q1/bin/../lib/gcc/arm-none-eabi/4.7.3/../../../../arm-none-eabi/lib/armv7e-m\libm.a(lib_a-w_pow.o)
 rlist                                             build/obj/chschd.o
                                                   build/obj/main.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_gps.o
                                                   build/obj/kb_screen.o
                                                   build/obj/kb_logger.o
@@ -4829,15 +4900,18 @@ sqrt                                              c:/chibistudio/tools/gnu tools
 st7565Start                                       build/obj/ST7565.o
                                                   build/obj/main.o
 st7565_clear                                      build/obj/ST7565.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
 st7565_clear_display                              build/obj/ST7565.o
 st7565_display                                    build/obj/ST7565.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
 st7565_drawchar                                   build/obj/ST7565.o
 st7565_drawline                                   build/obj/ST7565.o
                                                   build/obj/kb_screen.o
 st7565_drawrect                                   build/obj/ST7565.o
 st7565_drawstring                                 build/obj/ST7565.o
+                                                  build/obj/kb_menu.o
                                                   build/obj/kb_screen.o
 st7565_fillrect                                   build/obj/ST7565.o
                                                   build/obj/kb_screen.o

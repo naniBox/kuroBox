@@ -35,6 +35,7 @@
 #include "kb_time.h"
 #include "kb_gps.h"
 #include "kb_vectornav.h"
+#include "kb_menu.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -238,6 +239,8 @@ kuroBoxInit(void)
 
 	// the actual logging thread
 	kuroBoxLoggerInit();
+
+	kuroBoxMenuInit();
 
 	// indicate we're ready
 	chThdSleepMilliseconds(100);
