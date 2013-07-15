@@ -79,6 +79,7 @@ STATIC_ASSERT(sizeof(struct log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_
 //-----------------------------------------------------------------------------
 static Thread * loggerThread;
 static Thread * writerThread;
+static Thread * writerThreadForSleep;
 static uint8_t sd_det_count;
 static uint8_t logger_state;
 
@@ -140,12 +141,12 @@ new_write_buffer_idx_to_fill(void)
 static void
 return_write_buffer_idx_after_filling(int8_t idx)
 {
-	if (writerThread)
+	if (writerThreadForSleep)
 	{
 		chSysLock();
-		writerThread->p_u.rdymsg = (msg_t)idx+1;
-		chSchReadyI(writerThread);
-		writerThread = NULL;
+		writerThreadForSleep->p_u.rdymsg = (msg_t)idx+1;
+		chSchReadyI(writerThreadForSleep);
+		writerThreadForSleep = NULL;
 		chSysUnlock();
 	}
 }
@@ -309,6 +310,12 @@ wait_for_sd(void)
 {
 	while(1)
 	{
+		if (chThdShouldTerminate())
+		{
+			logger_state = LS_EXITING;
+			break;
+		}
+
 		if (sdc_lld_is_card_inserted(&SDCD1))
 		{
 			if (--sd_det_count == 0)
@@ -355,6 +362,9 @@ writing_run(void)
 		if (chThdShouldTerminate())
 		{
 			logger_state = LS_EXITING;
+			f_sync(&kbfile);
+			f_close(&kbfile);
+			sdcDisconnect(&SDCD1);
 			break;
 		}
 
@@ -362,7 +372,7 @@ writing_run(void)
 		if ( idx == -1 )
 		{
 			chSysLock();
-			    writerThread = chThdSelf();
+				writerThreadForSleep = chThdSelf();
 			    chSchGoSleepS(THD_STATE_SUSPENDED);
 			chSysUnlock();
 			continue;
@@ -509,10 +519,20 @@ int kuroBoxLoggerInit(void)
 	kbs_setFName(KUROBOX_BLANK_FNAME);
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
-	// don't store it here, because it needs to be kept NULL until the first sleep
-	/* writerThread = */chThdCreateStatic(waWriter, sizeof(waWriter), HIGHPRIO, thWriter, NULL);
+	writerThread = chThdCreateStatic(waWriter, sizeof(waWriter), HIGHPRIO, thWriter, NULL);
 
-	return 0;
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+int kuroBoxLoggerStop(void)
+{
+	chThdTerminate(loggerThread);
+	chThdWait(loggerThread);
+	chThdTerminate(writerThread);
+	chThdWait(writerThread);
+
+	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 // I usually keep this at 1000/24 ~= 40
-#define SCREEN_REFRESH_SLEEP			40
+#define SCREEN_REFRESH_SLEEP			10//40
 
 //-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
@@ -54,7 +54,7 @@ struct kuroBoxScreen
 };
 
 //-----------------------------------------------------------------------------
-//static Thread * screenThread;
+static Thread * screenThread;
 static kuroBoxScreen screen;
 static char charbuf[128];
 static MemoryStream msb;
@@ -67,6 +67,7 @@ thScreen(void *arg)
 	(void)arg;
 	chRegSetThreadName("Screen");
 	
+	uint32_t serial_update = 10;
 
 	// let the splash screen get some glory, but not 
 	// in debug, gotta get work DONE!
@@ -188,6 +189,13 @@ thScreen(void *arg)
 
 			st7565_display(&ST7565D1);
 		}
+		//if ( serial_update-- == 0 )
+		{
+			BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
+			chprintf(prnt, "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
+			serial_update = 2;
+		}
+
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
 	}
 	#undef INIT_CBUF
@@ -198,7 +206,16 @@ thScreen(void *arg)
 int kuroBoxScreenInit(void)
 {
 	memset(&screen, 0, sizeof(screen));
-	/*screenThread = */chThdCreateStatic(waScreen, sizeof(waScreen), NORMALPRIO, thScreen, NULL);
+	screenThread = chThdCreateStatic(waScreen, sizeof(waScreen), NORMALPRIO, thScreen, NULL);
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+int kuroBoxScreenStop(void)
+{
+	chThdTerminate(screenThread);
+	chThdWait(screenThread);
+
 	return KB_OK;
 }
 
@@ -277,3 +294,4 @@ void kbs_setYPR(float yaw, float pitch, float roll)
 	screen.ypr[1] = pitch;
 	screen.ypr[2] = roll;
 }
+

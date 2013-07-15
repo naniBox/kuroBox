@@ -28,5 +28,6 @@
 
 //-----------------------------------------------------------------------------
 int kuroBoxADCInit(void);
+int kuroBoxADCStop(void);
 
 #endif /* _naniBox_kuroBox_adc */

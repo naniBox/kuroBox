@@ -86,7 +86,7 @@ parse_and_store_nav_sol(void)
 }
 
 //-----------------------------------------------------------------------------
-/*static Thread * gpsThread;*/
+static Thread * gpsThread;
 //-----------------------------------------------------------------------------
 static WORKING_AREA(waGps, 128);
 static msg_t
@@ -133,7 +133,17 @@ gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
 int kuroBoxGPSInit(void)
 {
 	sdStart(&SD6, &gps_cfg);
-	/*gpsThread = */chThdCreateStatic(waGps, sizeof(waGps), NORMALPRIO, thGps, NULL);
+	gpsThread = chThdCreateStatic(waGps, sizeof(waGps), NORMALPRIO, thGps, NULL);
 	return KB_OK;
 }
 
+//-----------------------------------------------------------------------------
+int kuroBoxGPSStop(void)
+{
+	chThdTerminate(gpsThread);
+	chThdWait(gpsThread);
+
+	gpsThread = NULL;
+
+	return KB_OK;
+}

@@ -182,6 +182,15 @@ int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
 	return KB_OK;
 }
 
+
+//-----------------------------------------------------------------------------
+int kuroBoxVectorNavStop(VectorNavDriver * nvp)
+{
+	spiStop(nvp->spip);
+	gptStop(nvp->gpdp);
+	return KB_OK;
+}
+
 //-----------------------------------------------------------------------------
 uint8_t
 kbv_readRegister(VectorNavDriver * nvp, uint8_t reg, uint8_t size, uint8_t * buf)

@@ -98,10 +98,10 @@ struct VectorNavDriver
 //-----------------------------------------------------------------------------
 extern VectorNavDriver VND1;
 
-
 //-----------------------------------------------------------------------------
 void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel);
 int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg);
+int kuroBoxVectorNavStop(VectorNavDriver * nvp);
 //-----------------------------------------------------------------------------
 uint8_t kbv_readRegister(VectorNavDriver * nvp, uint8_t reg, uint8_t size, uint8_t * buf);
 

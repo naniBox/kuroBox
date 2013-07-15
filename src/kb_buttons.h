@@ -28,6 +28,7 @@
 
 //-----------------------------------------------------------------------------
 int kuroBoxButtonsInit(void);
+int kuroBoxButtonsStop(void);
 
 //-----------------------------------------------------------------------------
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel);

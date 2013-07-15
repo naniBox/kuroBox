@@ -103,3 +103,9 @@ int kuroBoxADCInit(void)
 
 	return KB_OK;
 }
+
+//-----------------------------------------------------------------------------
+int kuroBoxADCStop(void)
+{
+	return KB_OK;
+}

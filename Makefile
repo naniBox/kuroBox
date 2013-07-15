@@ -3,10 +3,15 @@
 # NOTE: Can be overridden externally.
 #
 
+DEBUG_BUILD = yes
+
 # Compiler options here.
 ifeq ($(USE_OPT),)
-#  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99
+ifeq ($(DEBUG_BUILD),yes)
   USE_OPT = -O0 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99
+else
+  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99
+endif
 endif
 
 # C specific options here (added to USE_OPT).
@@ -202,7 +207,11 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all default C defines here, like -D_DEBUG=1
-DDEFS =
+ifeq ($(DEBUG_BUILD),yes)
+	DDEFS = -D_DEBUG=1
+else
+	DDEFS = 
+endif
 
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =

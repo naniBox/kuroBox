@@ -152,5 +152,11 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 int kuroBoxTimeInit(void)
 {
 	memset(&ltc_frame,0,sizeof(ltc_frame));
-	return 0;
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+int kuroBoxTimeStop(void)
+{
+	return KB_OK;
 }

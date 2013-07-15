@@ -29,6 +29,7 @@
 
 //-----------------------------------------------------------------------------
 int kuroBoxLoggerInit(void);
+int kuroBoxLoggerStop(void);
 
 //-----------------------------------------------------------------------------
 void kbl_setLTC(struct ltc_frame_t * ltc_frame);

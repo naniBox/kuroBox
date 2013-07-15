@@ -70,8 +70,11 @@ struct __PACKED__ smpte_timecode_t
 };
 
 //-----------------------------------------------------------------------------
+int kuroBoxTimeInit(void);
+int kuroBoxTimeStop(void);
+
+//-----------------------------------------------------------------------------
 void ltc_exti_cb(EXTDriver *extp, expchannel_t channel);
 void ltc_icu_period_cb(ICUDriver *icup);
-int kuroBoxTimeInit(void);
 
 #endif // _naniBox_kuroBox_time

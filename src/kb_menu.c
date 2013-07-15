@@ -29,7 +29,8 @@
 
 //-----------------------------------------------------------------------------
 #define REFRESH_SLEEP 				50
-#define MENU_ITEMS_COUNT 			4
+#define MENU_ITEMS_COUNT 			6
+bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
 typedef void (*menucallback_t)(void * data);
@@ -46,33 +47,56 @@ struct menu_item_t
 int16_t current_item = -1;
 
 //-----------------------------------------------------------------------------
-void me_exit(void * data)
+static void mi_exit(void * data)
 {
 	(void)data;
 	current_item = -1;
 }
 
 //-----------------------------------------------------------------------------
-void me_serial1_pwr(void * data)
+static void mi_serial1_pwr(void * data)
 {
 	(void)data;
 	palTogglePad(GPIOD, GPIOD_SERIAL1_PWR);
 }
 
 //-----------------------------------------------------------------------------
-void me_serial2_pwr(void * data)
+static void mi_serial2_pwr(void * data)
 {
 	(void)data;
 	palTogglePad(GPIOD, GPIOD_SERIAL2_PWR);
 }
 
 //-----------------------------------------------------------------------------
+static void mi_led3(void * data)
+{
+	(void)data;
+	palTogglePad(GPIOA, GPIOA_LED3);
+}
+
+//-----------------------------------------------------------------------------
+static void mi_lcd_backlight(void * data)
+{
+	(void)data;
+	palTogglePad(GPIOD, GPIOD_LCD_LED_DRIVE);
+}
+
+//-----------------------------------------------------------------------------
+static void mi_standby(void * data)
+{
+	(void)data;
+	kuroBox_request_standby = 1;
+}
+
+//-----------------------------------------------------------------------------
 menu_item_t menu_items [MENU_ITEMS_COUNT] =
 {
-		{ "Serial 1 Pwr", 1, me_serial1_pwr, NULL },
-		{ "Serial 2 Pwr", 1, me_serial2_pwr, NULL },
-		{ "Power OFF", 1, NULL, NULL },
-		{ "Exit Menu", 1, me_exit, NULL },
+		{ "Serial 1 Pwr", 1, 	mi_serial1_pwr, 	NULL },
+		{ "Serial 2 Pwr", 1, 	mi_serial2_pwr, 	NULL },
+		{ "LED 3", 1, 			mi_led3, 			NULL },
+		{ "LCD Backlight", 1, 	mi_lcd_backlight, 	NULL },
+		{ "Power OFF", 1, 		mi_standby, 		NULL },
+		{ "Exit Menu", 1, 		mi_exit, 			NULL },
 };
 
 //-----------------------------------------------------------------------------
@@ -145,24 +169,13 @@ int kbm_btn1(bool_t pressed)
 }
 
 //-----------------------------------------------------------------------------
-//static Thread * menuThread;
-static WORKING_AREA(waMenu, 1024*4);
-static msg_t
-thMenu(void *arg)
+int kuroBoxMenuInit(void)
 {
-	(void)arg;
-	chRegSetThreadName("Menu");
-	while( !chThdShouldTerminate() )
-	{
-		chThdSleepMilliseconds(REFRESH_SLEEP);
-	}
-
-	return 0;
+	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxMenuInit(void)
+int kuroBoxMenuStop(void)
 {
-	/*menuThread = */chThdCreateStatic(waMenu, sizeof(waMenu), NORMALPRIO, thMenu, NULL);
 	return KB_OK;
 }

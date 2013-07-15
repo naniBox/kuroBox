@@ -55,6 +55,12 @@ int kuroBoxButtonsInit(void)
 }
 
 //-----------------------------------------------------------------------------
+int kuroBoxButtonsStop(void)
+{
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
 void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;

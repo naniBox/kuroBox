@@ -47,16 +47,18 @@ typedef uint32_t kuroBoxState_t;
 
 //-----------------------------------------------------------------------------
 // forward declarations
+int kuroBoxStop(void);
 
 //-----------------------------------------------------------------------------
 // static data
 static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
 /*static Thread * blinkerThread;*/
 static kuroBoxState_t global_state;
+extern bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
 static SerialConfig serial1_cfg = {
-	SERIAL_DEFAULT_BITRATE,
+	38400,
 	0,
 	USART_CR2_STOP1_BITS | USART_CR2_LINEN,
 	0
@@ -64,7 +66,7 @@ static SerialConfig serial1_cfg = {
 
 //-----------------------------------------------------------------------------
 static SerialConfig serial2_cfg = {
-	SERIAL_DEFAULT_BITRATE,
+	38400,
 	0,
 	USART_CR2_STOP1_BITS | USART_CR2_LINEN,
 	0
@@ -152,7 +154,8 @@ thBlinker(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-void kuroBox_panic(int msg)
+void
+kuroBox_panic(int msg)
 {
 	return;// this function is doing more harm than good...
 	switch( msg )
@@ -178,10 +181,36 @@ void kuroBox_panic(int msg)
 }
 
 //-----------------------------------------------------------------------------
+static void
+kuroBox_standby(void)
+{
+	kuroBoxStop();
+
+#if _DEBUG
+	DBGMCU->CR &= ~DBGMCU_CR_DBG_STANDBY;
+#endif
+
+	kuroBox_request_standby = 0;
+	palSetPad(GPIOA, GPIOA_LED3);
+	RTC->BKP0R = 0;
+	RCC->APB2LPENR = 0;
+	RCC->APB1LPENR = 0;
+
+	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+	PWR->CR |= (PWR_CR_PDDS | PWR_CR_LPDS | PWR_CR_CSBF | PWR_CR_CWUF);
+	PWR->CSR |= PWR_CSR_EWUP;
+	PWR->CSR &= ~PWR_CSR_WUF;
+	__WFI();
+}
+
+//-----------------------------------------------------------------------------
 int
 kuroBoxInit(void)
 {
-	chDbgAssert(GS_INIT == global_state, "kuroBoxInit, 1", "global_state is not GS_INIT");
+	halInit();
+	chSysInit();
+
+	PWR->CSR &= ~PWR_CSR_EWUP;
 
 	palSetPad(GPIOB, GPIOB_LED1);
 	palSetPad(GPIOB, GPIOB_LED2);
@@ -255,11 +284,32 @@ kuroBoxInit(void)
 }
 
 //-----------------------------------------------------------------------------
+int
+kuroBoxStop(void)
+{
+	extStop(&EXTD1);
+
+	kuroBoxMenuStop();
+	kuroBoxLoggerStop();
+	kuroBoxVectorNavStop(&VND1);
+	kuroBoxTimeStop();
+	kuroBoxGPSStop();
+	kuroBoxButtonsStop();
+	kuroBoxScreenStop();
+	kuroBoxADCStop();
+	sdcStop(&SDCD1);
+	spiStop(&SPID1);
+	adcStop(&ADCD1);
+	sdStop(&SD2);
+	sdStop(&SD1);
+	chSysDisable();
+
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
 int main(void) 
 {
-	global_state = GS_INIT;
-	halInit();
-	chSysInit();
 
 	/*
 		struct tm timp;
@@ -279,7 +329,9 @@ int main(void)
 
 	while( 1 )
 	{
-		chThdSleepMilliseconds(1000);
+		chThdSleepMilliseconds(100);
+		if ( kuroBox_request_standby )
+			kuroBox_standby();
 	}
 }
 

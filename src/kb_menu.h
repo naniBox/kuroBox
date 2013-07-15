@@ -28,9 +28,12 @@
 #include "kb_util.h"
 
 //-----------------------------------------------------------------------------
+int kuroBoxMenuInit(void);
+int kuroBoxMenuStop(void);
+
+//-----------------------------------------------------------------------------
 int kbm_display(void);
 int kbm_btn0(bool_t pressed);
 int kbm_btn1(bool_t pressed);
-int kuroBoxMenuInit(void);
 
 #endif // _naniBox_kuroBox_menu
