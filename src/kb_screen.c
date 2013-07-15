@@ -67,7 +67,7 @@ thScreen(void *arg)
 	(void)arg;
 	chRegSetThreadName("Screen");
 	
-	uint32_t serial_update = 10;
+	//uint32_t serial_update = 10;
 
 	// let the splash screen get some glory, but not 
 	// in debug, gotta get work DONE!
@@ -191,9 +191,9 @@ thScreen(void *arg)
 		}
 		//if ( serial_update-- == 0 )
 		{
-			BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
-			chprintf(prnt, "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
-			serial_update = 2;
+			//BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
+			//chprintf(prnt, "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
+			//serial_update = 2;
 		}
 
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
@@ -276,7 +276,7 @@ void kbs_btn1(uint8_t on)
 //-----------------------------------------------------------------------------
 void kbs_PPS(void)
 {
-	screen.pps = 5;
+	screen.pps = 20;
 }
 
 //-----------------------------------------------------------------------------

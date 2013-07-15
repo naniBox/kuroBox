@@ -60,7 +60,8 @@ typedef enum
 //----------------------------------------------------------------------------
 #define KB_OK				0
 #define KB_NOT_OK			1
-#define KB_UNKNOWN_ERR		255
+#define KB_ERR_VALUE		2
+#define KB_ERR_UNKNOWN		255
 
 //-----------------------------------------------------------------------------
 uint8_t  calc_checksum_8( uint8_t * buf, uint16_t buf_size );

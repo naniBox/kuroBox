@@ -36,6 +36,7 @@
 #include "kb_gps.h"
 #include "kb_vectornav.h"
 #include "kb_menu.h"
+#include "kb_config.h"kuroBoxConfigStop
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -223,6 +224,11 @@ kuroBoxInit(void)
 	BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
 	chprintf(prnt, "%s\n\r\n\r", BOARD_NAME);
 
+	// before anything, since this uses the internal SRAM (backup domain)
+	// for storage, it can be started whenever, but other modules may need
+	// for config settings.
+	kuroBoxConfigInit();
+
 	// ACD to monitor voltage levels.
 	adcStart(&ADCD1, &adc_cfg);
 	adcSTM32EnableTSVREFE();
@@ -300,6 +306,7 @@ kuroBoxStop(void)
 	sdcStop(&SDCD1);
 	spiStop(&SPID1);
 	adcStop(&ADCD1);
+	kuroBoxConfigStop();
 	sdStop(&SD2);
 	sdStop(&SD1);
 	chSysDisable();

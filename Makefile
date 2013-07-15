@@ -108,21 +108,22 @@ CSRC = $(PORTSRC) \
         $(CHIBIOS)/os/various/chrtclib.c \
         $(CHIBIOS)/os/various/memstreams.c \
         $(FATFSSRC) \
-        ./src/kb_debug.c \
         ./src/glcdfont.c \
         ./src/kb_adc.c \
         ./src/kb_buttons.c \
+        ./src/kb_config.c \
+        ./src/kb_debug.c \
+        ./src/kb_gps.c \
         ./src/kb_logger.c \
+        ./src/kb_menu.c \
         ./src/kb_screen.c \
         ./src/kb_time.c \
-        ./src/kb_gps.c \
         ./src/kb_util.c \
         ./src/kb_vectornav.c \
-        ./src/kb_menu.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
-
+        
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
 CPPSRC =
