@@ -24,6 +24,7 @@
 #include "kb_util.h"
 #include "kb_gps.h"
 #include "kb_menu.h"
+#include "kb_serial.h"
 #include "ST7565.h"
 #include <memstreams.h>
 #include <chrtclib.h>
@@ -191,8 +192,7 @@ thScreen(void *arg)
 		}
 		//if ( serial_update-- == 0 )
 		{
-			//BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
-			//chprintf(prnt, "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
+			chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
 			//serial_update = 2;
 		}
 

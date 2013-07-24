@@ -49,8 +49,8 @@ int kuroBoxButtonsInit(void)
 {
 	btn_0_pressed=palReadPad(GPIOA, GPIOA_BTN0) == BUTTON_DOWN;
 	btn_1_pressed=palReadPad(GPIOA, GPIOA_BTN1) == BUTTON_DOWN;
-	on_btn0(btn_0_pressed);
-	on_btn1(btn_1_pressed);
+	//on_btn0(btn_0_pressed);
+	//on_btn1(btn_1_pressed);
 	return KB_OK;
 }
 
@@ -66,7 +66,9 @@ void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 	btn_0_pressed=palReadPad(GPIOA, GPIOA_BTN0) == BUTTON_DOWN;
+	chSysLockFromIsr();
 	on_btn0(btn_0_pressed);
+	chSysUnlockFromIsr();
 }
 
 //-----------------------------------------------------------------------------
@@ -75,7 +77,9 @@ void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 	btn_1_pressed=palReadPad(GPIOA, GPIOA_BTN1) == BUTTON_DOWN;
+	chSysLockFromIsr();
 	on_btn1(btn_1_pressed);
+	chSysUnlockFromIsr();
 }
 
 //-----------------------------------------------------------------------------

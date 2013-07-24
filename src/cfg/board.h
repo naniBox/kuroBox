@@ -115,12 +115,12 @@
 #define GPIOD_L1_VN_NRST            3
 #define GPIOD_SD_DET                4
 #define GPIOD_SD_WP                 5
-#define GPIOD_SERIAL2_PWR           6
-#define GPIOD_SERIAL2_VALID         7
-#define GPIOD_SERIAL2_OC            8
-#define GPIOD_SERIAL1_PWR           9
-#define GPIOD_SERIAL1_VALID         10
-#define GPIOD_SERIAL1_OC            11
+#define GPIOD_SERIAL1_PWR           6
+#define GPIOD_SERIAL1_VALID         7
+#define GPIOD_SERIAL1_OC            8
+#define GPIOD_SERIAL2_PWR           9
+#define GPIOD_SERIAL2_VALID         10
+#define GPIOD_SERIAL2_OC            11
 #define GPIOD_LCD_LED_DRIVE         12
 #define GPIOD__D13                  13
 #define GPIOD__D14                  14
@@ -664,7 +664,7 @@
                                      PIN_PUPDR_PULLUP(GPIOD_SERIAL1_PWR) |  \
                                      PIN_PUPDR_PULLUP(GPIOD_SERIAL1_VALID) |\
                                      PIN_PUPDR_PULLUP(GPIOD_SERIAL1_OC) |   \
-                                     PIN_PUPDR_PULLUP(GPIOD_LCD_LED_DRIVE) |\
+                                     PIN_PUPDR_PULLDOWN(GPIOD_LCD_LED_DRIVE) |\
                                      PIN_PUPDR_PULLUP(GPIOD__D13) |         \
                                      PIN_PUPDR_PULLUP(GPIOD__D14) |         \
                                      PIN_PUPDR_PULLUP(GPIOD__D15))
@@ -680,7 +680,7 @@
                                      PIN_ODR_HIGH(GPIOD_SERIAL1_PWR) |      \
                                      PIN_ODR_HIGH(GPIOD_SERIAL1_VALID) |    \
                                      PIN_ODR_HIGH(GPIOD_SERIAL1_OC) |       \
-                                     PIN_ODR_LOW(GPIOD_LCD_LED_DRIVE) |     \
+                                     PIN_ODR_HIGH(GPIOD_LCD_LED_DRIVE) |     \
                                      PIN_ODR_HIGH(GPIOD__D13) |             \
                                      PIN_ODR_HIGH(GPIOD__D14) |             \
                                      PIN_ODR_HIGH(GPIOD__D15))

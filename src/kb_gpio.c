@@ -20,31 +20,6 @@
 
 */
 
-#ifndef _naniBox_kuroBox_config
-#define _naniBox_kuroBox_config
-
-#include <ch.h>
-#include <hal.h>
-
 //-----------------------------------------------------------------------------
-int kbc_save(void);
-int kbc_load(void);
+#include "kb_gpio.h"
 
-//-----------------------------------------------------------------------------
-uint8_t kbc_read8(uint32_t offset);
-uint16_t kbc_read16(uint32_t offset);
-uint32_t kbc_read32(uint32_t offset);
-int kbc_read(uint32_t offset, void * data, uint32_t length);
-
-//-----------------------------------------------------------------------------
-int kbc_write8(uint32_t offset, uint8_t data);
-int kbc_write16(uint32_t offset, uint16_t data);
-int kbc_write32(uint32_t offset, uint32_t data);
-int kbc_write(uint32_t offset, void * data, uint32_t length);
-
-//-----------------------------------------------------------------------------
-int kuroBoxConfigInit(void);
-int kuroBoxConfigStop(void);
-
-
-#endif // _naniBox_kuroBox_config

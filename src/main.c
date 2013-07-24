@@ -1,7 +1,7 @@
 /*
 	kuroBox / naniBox
 	Copyright (c) 2013
-	david morris-oliveros // naniBox.com
+	david morris-oliveros // dmo@nanibox.com // naniBox.com
 
     This file is part of kuroBox / naniBox.
 
@@ -28,15 +28,18 @@
 #include <time.h>
 #include "spiEEPROM.h"
 #include "ST7565.h"
+
 #include "kb_adc.h"
 #include "kb_buttons.h"
-#include "kb_logger.h"
-#include "kb_screen.h"
-#include "kb_time.h"
+#include "kb_config.h"
+#include "kb_gpio.h"
 #include "kb_gps.h"
-#include "kb_vectornav.h"
+#include "kb_logger.h"
 #include "kb_menu.h"
-#include "kb_config.h"kuroBoxConfigStop
+#include "kb_screen.h"
+#include "kb_serial.h"
+#include "kb_time.h"
+#include "kb_vectornav.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -56,22 +59,6 @@ static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
 /*static Thread * blinkerThread;*/
 static kuroBoxState_t global_state;
 extern bool_t kuroBox_request_standby;
-
-//-----------------------------------------------------------------------------
-static SerialConfig serial1_cfg = {
-	38400,
-	0,
-	USART_CR2_STOP1_BITS | USART_CR2_LINEN,
-	0
-};
-
-//-----------------------------------------------------------------------------
-static SerialConfig serial2_cfg = {
-	38400,
-	0,
-	USART_CR2_STOP1_BITS | USART_CR2_LINEN,
-	0
-};
 
 //-----------------------------------------------------------------------------
 static ADCConfig adc_cfg = {
@@ -218,16 +205,8 @@ kuroBoxInit(void)
 	palSetPad(GPIOA, GPIOA_LED3);
 
 	// Serial
-	sdStart(&SD1, &serial1_cfg);
-	sdStart(&SD2, &serial2_cfg);
-
-	BaseSequentialStream * prnt = (BaseSequentialStream *)&SD1;
-	chprintf(prnt, "%s\n\r\n\r", BOARD_NAME);
-
-	// before anything, since this uses the internal SRAM (backup domain)
-	// for storage, it can be started whenever, but other modules may need
-	// for config settings.
-	kuroBoxConfigInit();
+	kuroBoxSerialInit(NULL, NULL);
+	chprintf(DEBG, "%s\n\r\n\r", BOARD_NAME);
 
 	// ACD to monitor voltage levels.
 	adcStart(&ADCD1, &adc_cfg);
@@ -258,14 +237,10 @@ kuroBoxInit(void)
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();
 
-	// set initial button state.
-	kuroBoxButtonsInit();
-
 	// gps uart
 	kuroBoxGPSInit();
 
-	// LTC's, though this is now driven purely through interrupts, and it's
-	// VERY quick
+	// LTC's, interrupt driven, very quick now
 	kuroBoxTimeInit();
 	
 	VND1.spip = &SPID2;
@@ -276,6 +251,11 @@ kuroBoxInit(void)
 	kuroBoxLoggerInit();
 
 	kuroBoxMenuInit();
+
+	// set initial button state, AFTER menus!
+	kuroBoxButtonsInit();
+
+	kuroBoxConfigInit();
 
 	// indicate we're ready
 	chThdSleepMilliseconds(100);
@@ -295,6 +275,7 @@ kuroBoxStop(void)
 {
 	extStop(&EXTD1);
 
+	kuroBoxConfigStop();
 	kuroBoxMenuStop();
 	kuroBoxLoggerStop();
 	kuroBoxVectorNavStop(&VND1);
@@ -306,9 +287,7 @@ kuroBoxStop(void)
 	sdcStop(&SDCD1);
 	spiStop(&SPID1);
 	adcStop(&ADCD1);
-	kuroBoxConfigStop();
-	sdStop(&SD2);
-	sdStop(&SD1);
+	kuroBoxSerialStop();
 	chSysDisable();
 
 	return KB_OK;
