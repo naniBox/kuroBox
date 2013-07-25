@@ -28,6 +28,7 @@
 
 // config sources
 #include "kb_serial.h"
+#include "kb_featureA.h"
 #include "kb_gpio.h"
 
 //-----------------------------------------------------------------------------
@@ -41,24 +42,28 @@
 typedef struct config_t config_t;
 struct config_t
 {
-	uint8_t serial1_pwr;
-	uint8_t serial2_pwr;
-	uint8_t lcd_backlight;
+	uint8_t 		serial1_pwr;
+	int32_t 		serial1_baud;
+	uint8_t 		serial2_pwr;
+	int32_t 		serial2_baud;
+	uint8_t 		lcd_backlight;
+	int32_t			featureA;
 };
 config_t config;
 
 //-----------------------------------------------------------------------------
 // actual save/load
 //-----------------------------------------------------------------------------
-#define _SERIAL1_OFFSET				0
-#define _SERIAL2_OFFSET				1
 
 //-----------------------------------------------------------------------------
 int kbc_save(void)
 {
 	config.serial1_pwr = kbse_getPowerSerial1();
+	config.serial1_baud = kbse_getBaudSerial1();
 	config.serial2_pwr = kbse_getPowerSerial2();
+	config.serial2_baud = kbse_getBaudSerial2();
 	config.lcd_backlight = kbg_getLCDBacklight();
+	config.featureA = kbfa_getFeature();
 
 	return kbc_write(0, &config, sizeof(config));
 }
@@ -71,8 +76,11 @@ int kbc_load(void)
 		return ret;
 
 	kbse_setPowerSerial1(config.serial1_pwr);
+	kbse_setBaudSerial1(config.serial1_baud);
 	kbse_setPowerSerial2(config.serial2_pwr);
+	kbse_setBaudSerial2(config.serial2_baud);
 	kbg_setLCDBacklight(config.lcd_backlight);
+	kbfa_setFeature(config.featureA);
 	return KB_OK;
 }
 
@@ -181,7 +189,7 @@ int kuroBoxConfigInit(void)
 //-----------------------------------------------------------------------------
 int kuroBoxConfigStop(void)
 {
-	kbc_save();
+	//kbc_save();
 	return KB_OK;
 }
 

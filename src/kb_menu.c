@@ -24,6 +24,7 @@
 #include "kb_menu.h"
 #include "kb_serial.h"
 #include "kb_config.h"
+#include "kb_featureA.h"
 #include "kb_gpio.h"
 #include "ST7565.h"
 #include <memstreams.h>
@@ -32,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 #define REFRESH_SLEEP 				50
-#define MENU_ITEMS_COUNT 			7
+#define MENU_ITEMS_COUNT 			9
 bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
@@ -73,6 +74,19 @@ static void mi_exit(void * data)
 }
 
 //-----------------------------------------------------------------------------
+static void mi_featureA_change(void * data)
+{
+	(void)data;
+	kbfa_changeFeature();
+}
+
+//-----------------------------------------------------------------------------
+static int mi_featureA_getFeature(void)
+{
+	return kbfa_getFeature();
+}
+
+//-----------------------------------------------------------------------------
 static void mi_serial1_pwr(void * data)
 {
 	(void)data;
@@ -83,13 +97,13 @@ static void mi_serial1_pwr(void * data)
 static void mi_serial1_baud(void * data)
 {
 	(void)data;
-	kbse_changeSerial1Baud();
+	kbse_changeBaudSerial1();
 }
 
 //-----------------------------------------------------------------------------
 static int mi_serial1_getbaud(void)
 {
-	return kbse_getSerial1Baud();
+	return kbse_getBaudSerial1();
 }
 
 //-----------------------------------------------------------------------------
@@ -100,10 +114,23 @@ static void mi_serial2_pwr(void * data)
 }
 
 //-----------------------------------------------------------------------------
+static void mi_serial2_baud(void * data)
+{
+	(void)data;
+	kbse_changeBaudSerial2();
+}
+
+//-----------------------------------------------------------------------------
+static int mi_serial2_getbaud(void)
+{
+	return kbse_getBaudSerial2();
+}
+
+//-----------------------------------------------------------------------------
 static void mi_led3(void * data)
 {
 	(void)data;
-	kbg_setLED3(kbg_getLED3());
+	kbg_setLED3(!kbg_getLED3());
 }
 
 //-----------------------------------------------------------------------------
@@ -117,15 +144,17 @@ static void mi_lcd_backlight(void * data)
 static void mi_standby(void * data)
 {
 	(void)data;
-//	kuroBox_request_standby = 1;
+	kuroBox_request_standby = 1;
 }
 
 //-----------------------------------------------------------------------------
 menu_item_t menu_items [MENU_ITEMS_COUNT] =
 {
+		{ "Feature", 			1,		1, 		mi_featureA_change, mi_featureA_getFeature, NULL },
 		{ "Serial1 Pwr", 		1,		1, 		mi_serial1_pwr, 	NULL, NULL },
 		{ "Serial1 Baud", 		1,		1, 		mi_serial1_baud, 	mi_serial1_getbaud, NULL },
 		{ "Serial2 Pwr", 		1,		1, 		mi_serial2_pwr, 	NULL, NULL },
+		{ "Serial2 Baud", 		1,		1, 		mi_serial2_baud, 	mi_serial2_getbaud, NULL },
 		{ "LED 3", 				1,		1, 		mi_led3, 			NULL, NULL },
 		{ "LCD Backlight", 		1,		1, 		mi_lcd_backlight, 	NULL, NULL },
 		{ "Power OFF", 			1,		0, 		mi_standby, 		NULL, NULL },

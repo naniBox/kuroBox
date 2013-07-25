@@ -32,6 +32,7 @@
 #include "kb_adc.h"
 #include "kb_buttons.h"
 #include "kb_config.h"
+#include "kb_featureA.h"
 #include "kb_gpio.h"
 #include "kb_gps.h"
 #include "kb_logger.h"
@@ -56,7 +57,7 @@ int kuroBoxStop(void);
 //-----------------------------------------------------------------------------
 // static data
 static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
-/*static Thread * blinkerThread;*/
+static Thread * blinkerThread;
 static kuroBoxState_t global_state;
 extern bool_t kuroBox_request_standby;
 
@@ -174,21 +175,48 @@ kuroBox_standby(void)
 {
 	kuroBoxStop();
 
+	kuroBox_request_standby = 0;
+
+#define DO_FAKE_STANDBY
+#ifdef DO_FAKE_STANDBY
+	while ( !kbg_getBtn0() )
+		;
+
+	__DSB();                                                     /* Ensure all outstanding memory accesses included
+																  buffered write are completed before reset */
+	SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+				 (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
+				 SCB_AIRCR_SYSRESETREQ_Msk);                   /* Keep priority group unchanged */
+	__DSB();                                                     /* Ensure completion of memory access */
+	while(1)
+	  ;
+#else
+
 #if _DEBUG
-	DBGMCU->CR &= ~DBGMCU_CR_DBG_STANDBY;
+	DBGMCU->CR |= DBGMCU_CR_DBG_STANDBY;
 #endif
 
-	kuroBox_request_standby = 0;
-	palSetPad(GPIOA, GPIOA_LED3);
-	RTC->BKP0R = 0;
-	RCC->APB2LPENR = 0;
-	RCC->APB1LPENR = 0;
+		//PWR->CSR &= ~PWR_CSR_WUF;
+		PWR->CSR |= PWR_CSR_EWUP;
 
-	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
-	PWR->CR |= (PWR_CR_PDDS | PWR_CR_LPDS | PWR_CR_CSBF | PWR_CR_CWUF);
-	PWR->CSR |= PWR_CSR_EWUP;
-	PWR->CSR &= ~PWR_CSR_WUF;
-	__WFI();
+		// Clear Wakeup flag
+		PWR->CR |= PWR_CR_CWUF;
+
+		// Select STANDBY mode
+		PWR->CR |= PWR_CR_PDDS;
+
+		// Set SLEEPDEEP bit of Cortex System Control Register
+		SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+
+		// This option is used to ensure that store operations are completed
+		#if defined ( __CC_ARM   )
+		__force_stores();
+		#endif
+		// Request Wait For Interrupt
+		__WFI();
+
+#endif
+
 }
 
 //-----------------------------------------------------------------------------
@@ -200,9 +228,9 @@ kuroBoxInit(void)
 
 	PWR->CSR &= ~PWR_CSR_EWUP;
 
-	palSetPad(GPIOB, GPIOB_LED1);
-	palSetPad(GPIOB, GPIOB_LED2);
-	palSetPad(GPIOA, GPIOA_LED3);
+	kbg_setLED1(1);
+	kbg_setLED2(1);
+	kbg_setLED3(1);
 
 	// Serial
 	kuroBoxSerialInit(NULL, NULL);
@@ -226,7 +254,7 @@ kuroBoxInit(void)
 	sdcStart(&SDCD1, &sdio_cfg);
 	
 	// just blink to indicate we haven't crashed
-	/*blinkerThread = */chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
+	blinkerThread = chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
 
 	// read config goes here
 	// @TODO: add config reading from eeprom
@@ -257,11 +285,13 @@ kuroBoxInit(void)
 
 	kuroBoxConfigInit();
 
+	kuroBoxFeatureAInit();
+
 	// indicate we're ready
 	chThdSleepMilliseconds(100);
-	palClearPad(GPIOB, GPIOB_LED1);
-	palClearPad(GPIOB, GPIOB_LED2);
-	palClearPad(GPIOA, GPIOA_LED3);
+	kbg_setLED1(0);
+	kbg_setLED2(0);
+	kbg_setLED3(0);
 
 	// all external interrupts, all the system should now be ready for it
 	extStart(&EXTD1, &extcfg);
@@ -273,7 +303,11 @@ kuroBoxInit(void)
 int
 kuroBoxStop(void)
 {
+	kbg_setLED3(1);
+
 	extStop(&EXTD1);
+
+	kuroBoxFeatureAStop();
 
 	kuroBoxConfigStop();
 	kuroBoxMenuStop();
@@ -284,11 +318,17 @@ kuroBoxStop(void)
 	kuroBoxButtonsStop();
 	kuroBoxScreenStop();
 	kuroBoxADCStop();
+	chThdTerminate(blinkerThread);
+	chThdWait(blinkerThread);
 	sdcStop(&SDCD1);
 	spiStop(&SPID1);
 	adcStop(&ADCD1);
 	kuroBoxSerialStop();
 	chSysDisable();
+
+	kbg_setLED1(0);
+	kbg_setLED2(0);
+	kbg_setLED3(0);
 
 	return KB_OK;
 }
@@ -317,7 +357,12 @@ int main(void)
 	{
 		chThdSleepMilliseconds(100);
 		if ( kuroBox_request_standby )
+		{
 			kuroBox_standby();
+			break;
+		}
 	}
+	while( 1 )
+		;
 }
 

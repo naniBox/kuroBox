@@ -71,7 +71,7 @@ static void frame_to_time(struct smpte_timecode_t * smpte_timecode, struct ltc_f
 }
 
 //-----------------------------------------------------------------------------
-void ltc_store(uint8_t bit_set)
+static void ltc_store(uint8_t bit_set)
 {
 	// cast it into an array so it's easier to deal with for bitshifting
 	uint8_t * ltc_raw = (uint8_t*)&ltc_frame;
@@ -146,6 +146,14 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 		// 	implementing a clock-tracking algorithm
 		//other_count++;
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+void kbt_getLTC(struct smpte_timecode_t * ltc)
+{
+	if ( ltc )
+		memcpy(ltc, &ltc_timecode, sizeof(*ltc));
 }
 
 //-----------------------------------------------------------------------------

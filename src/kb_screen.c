@@ -25,6 +25,7 @@
 #include "kb_gps.h"
 #include "kb_menu.h"
 #include "kb_serial.h"
+#include "kb_gpio.h"
 #include "ST7565.h"
 #include <memstreams.h>
 #include <chrtclib.h>
@@ -33,8 +34,9 @@
 #include <time.h>
 
 //-----------------------------------------------------------------------------
-// I usually keep this at 1000/24 ~= 40
-#define SCREEN_REFRESH_SLEEP			10//40
+// I usually keep this at 1000/24 ~= 40, HOWEVER, the LCD's refresh rate
+// is about 100ms, so, set it to that instead.
+#define SCREEN_REFRESH_SLEEP			100
 
 //-----------------------------------------------------------------------------
 typedef struct kuroBoxScreen kuroBoxScreen;
@@ -68,8 +70,6 @@ thScreen(void *arg)
 	(void)arg;
 	chRegSetThreadName("Screen");
 	
-	//uint32_t serial_update = 10;
-
 	// let the splash screen get some glory, but not 
 	// in debug, gotta get work DONE!
 #ifdef NDEBUG
@@ -190,15 +190,14 @@ thScreen(void *arg)
 
 			st7565_display(&ST7565D1);
 		}
-		//if ( serial_update-- == 0 )
-		{
-			chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d",screen.ltc.seconds, screen.ltc.frames);
-			//serial_update = 2;
-		}
 
 		chThdSleepMilliseconds(SCREEN_REFRESH_SLEEP);
 	}
 	#undef INIT_CBUF
+
+	st7565_clear(&ST7565D1);
+	st7565_display(&ST7565D1);
+
 	return 0;
 }
 
@@ -215,6 +214,7 @@ int kuroBoxScreenStop(void)
 {
 	chThdTerminate(screenThread);
 	chThdWait(screenThread);
+	kbg_setLCDBacklight(0);
 
 	return KB_OK;
 }
@@ -276,7 +276,7 @@ void kbs_btn1(uint8_t on)
 //-----------------------------------------------------------------------------
 void kbs_PPS(void)
 {
-	screen.pps = 20;
+	screen.pps = 1000 / (SCREEN_REFRESH_SLEEP*10);
 }
 
 //-----------------------------------------------------------------------------

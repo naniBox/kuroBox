@@ -40,7 +40,7 @@ static const VectorNavConfig default_vectornav_config =
 		GPIOD_L1_VN_NSS,
 		SPI_CR1_CPOL | SPI_CR1_CPHA
 	},
-	{
+	{	// GPT config
 		1000000, // 1MHz should be fine enough to get a 50us timeout
 		vectornav_gpt_end_cb
 	}
@@ -66,6 +66,7 @@ struct async_vn_msg_t
 //-----------------------------------------------------------------------------
 VectorNavDriver VND1;
 static struct async_vn_msg_t async_vn_msg;
+float ypr[3];
 
 //-----------------------------------------------------------------------------
 void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
@@ -78,6 +79,7 @@ void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 		{
 			// data return is good, proceed
 			float * fbuf = (float*)(&buf[4]); //  header
+			memcpy(&ypr, fbuf, sizeof(ypr));
 			// uint32_t * tmsg = (uint32_t*)(&buf[4+4*3]);
 			kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
 		}
@@ -149,6 +151,14 @@ void vectornav_gpt_end_cb(GPTDriver * gptp)
 		// @TODO: assert?
 		break;
 	}
+}
+
+//-----------------------------------------------------------------------------
+void kbv_getYPR(float * y, float * p, float * r)
+{
+	if ( y ) *y = ypr[0];
+	if ( p ) *p = ypr[1];
+	if ( r ) *r = ypr[2];
 }
 
 //-----------------------------------------------------------------------------

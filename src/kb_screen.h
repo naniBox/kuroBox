@@ -24,7 +24,7 @@
 #define _naniBox_kuroBox_screen
 
 #include <ch.h>
-#include <kb_time.h>
+#include "kb_time.h"
 
 //-----------------------------------------------------------------------------
 int kuroBoxScreenInit(void);

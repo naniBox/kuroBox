@@ -113,6 +113,7 @@ CSRC = $(PORTSRC) \
         ./src/kb_buttons.c \
         ./src/kb_config.c \
         ./src/kb_debug.c \
+        ./src/kb_featureA.c \
         ./src/kb_gpio.c \
         ./src/kb_gps.c \
         ./src/kb_logger.c \

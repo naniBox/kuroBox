@@ -62,6 +62,8 @@ int kuroBoxSerialStop(void)
 {
 	sdStop(&Serial2);
 	sdStop(&Serial1);
+	kbg_setSerial1Pwr(0);
+	kbg_setSerial2Pwr(0);
 
 	return KB_OK;
 }
@@ -95,7 +97,7 @@ int kbse_getPower(int which)
 }
 
 //-----------------------------------------------------------------------------
-int kbse_getBaud(int which)
+int32_t kbse_getBaud(int which)
 {
 	switch ( which )
 	{
@@ -140,10 +142,52 @@ int kbse_changeBaud(int which)
 	default:  return KB_ERR_VALUE;
 	}
 
-	//chSysLock();
 	sdStop(drv);
 	sdStart(drv, cfg);
-	//chSysUnlock();
+
+	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+int kbse_setBaud(int which, int32_t baud)
+{
+	SerialConfig * cfg = NULL;
+	SerialDriver * drv = NULL;
+	switch ( which )
+	{
+	case 1:
+		{
+			cfg = serial1_cfg;
+			drv = &Serial1;
+		} break;
+	case 2:
+		{
+			cfg = serial2_cfg;
+			drv = &Serial2;
+		} break;
+	default: return KB_ERR_VALUE;
+	}
+
+	switch( baud )
+	{
+	case 300:
+	case 1200:
+	case 9600:
+	case 19200:
+	case 38400:
+	case 57600:
+	case 115200:
+	case 230400:
+	case 460800:
+	case 921600:
+		cfg->speed = baud;
+		break;
+	default:
+		cfg->speed = 9600;
+	}
+
+	sdStop(drv);
+	sdStart(drv, cfg);
 
 	return KB_OK;
 }

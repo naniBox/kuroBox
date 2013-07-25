@@ -25,6 +25,7 @@
 #include "kb_screen.h"
 #include "kb_util.h"
 #include "ff.h"
+#include "kb_gpio.h"
 #include <hal.h>
 #include <memstreams.h>
 #include <chprintf.h>
@@ -406,6 +407,7 @@ thWriter(void *arg)
 {
 	chDbgAssert(LS_INIT == logger_state, "thWriter, 1", "logger_state is not LS_INIT");
 	(void)arg;
+
 	chRegSetThreadName("Writer");
 
 	current_msg.preamble = LOGGER_PREAMBLE;
@@ -431,9 +433,10 @@ thWriter(void *arg)
 			break;
 		}
 	}
-	return 0;
+
+	return KB_OK;
 }
-	
+
 //-----------------------------------------------------------------------------
 static WORKING_AREA(waLogger, 1024*1);
 static msg_t
@@ -506,7 +509,7 @@ thLogger(void *arg)
 			current_idx = -1;
 		}
 	}
-	return 0;
+	return KB_OK;
 }
 
 
@@ -528,8 +531,17 @@ int kuroBoxLoggerInit(void)
 int kuroBoxLoggerStop(void)
 {
 	chThdTerminate(loggerThread);
-	chThdWait(loggerThread);
 	chThdTerminate(writerThread);
+	chThdWait(loggerThread);
+	if (writerThreadForSleep)
+	{
+		chSysLock();
+		writerThreadForSleep->p_u.rdymsg = (msg_t)10;
+		chSchReadyI(writerThreadForSleep);
+		writerThreadForSleep = NULL;
+		chSysUnlock();
+	}
+
 	chThdWait(writerThread);
 
 	return KB_OK;

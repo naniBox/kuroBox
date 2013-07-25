@@ -57,13 +57,17 @@ int kbse_getPower(int which);
 #define kbse_getPowerSerial2() 			kbse_getPower(2)
 
 //-----------------------------------------------------------------------------
-int kbse_getBaud(int which);
+int32_t kbse_getBaud(int which);
+int kbse_setBaud(int which, int32_t baud);
 int kbse_changeBaud(int which);
 
-#define kbse_getSerial1Baud()			kbse_getBaud(1)
-#define kbse_getSerial2Baud()			kbse_getBaud(2)
+#define kbse_getBaudSerial1()			kbse_getBaud(1)
+#define kbse_getBaudSerial2()			kbse_getBaud(2)
 
-#define kbse_changeSerial1Baud()		kbse_changeBaud(1)
-#define kbse_changeSerial2Baud()		kbse_changeBaud(2)
+#define kbse_setBaudSerial1(baud)		kbse_setBaud(1, baud)
+#define kbse_setBaudSerial2(baud)		kbse_setBaud(2, baud)
+
+#define kbse_changeBaudSerial1()		kbse_changeBaud(1)
+#define kbse_changeBaudSerial2()		kbse_changeBaud(2)
 
 #endif // _naniBox_kuroBox_serial

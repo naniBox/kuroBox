@@ -99,6 +99,9 @@ struct VectorNavDriver
 extern VectorNavDriver VND1;
 
 //-----------------------------------------------------------------------------
+void kbv_getYPR(float * y, float * p, float * r);
+
+//-----------------------------------------------------------------------------
 void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel);
 int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg);
 int kuroBoxVectorNavStop(VectorNavDriver * nvp);
