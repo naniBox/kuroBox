@@ -150,10 +150,9 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 
 
 //-----------------------------------------------------------------------------
-void kbt_getLTC(struct smpte_timecode_t * ltc)
+const struct smpte_timecode_t * kbt_getLTC(void)
 {
-	if ( ltc )
-		memcpy(ltc, &ltc_timecode, sizeof(*ltc));
+	return &ltc_timecode;
 }
 
 //-----------------------------------------------------------------------------

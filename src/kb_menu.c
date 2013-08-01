@@ -26,14 +26,18 @@
 #include "kb_config.h"
 #include "kb_featureA.h"
 #include "kb_gpio.h"
+#include "kb_gps.h"
+#include "kb_time.h"
 #include "ST7565.h"
 #include <memstreams.h>
 #include <chprintf.h>
 #include <string.h>
+#include <time.h>
+#include <chrtclib.h>
 
 //-----------------------------------------------------------------------------
 #define REFRESH_SLEEP 				50
-#define MENU_ITEMS_COUNT 			9
+#define MENU_ITEMS_COUNT 			11
 bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
@@ -141,10 +145,40 @@ static void mi_lcd_backlight(void * data)
 }
 
 //-----------------------------------------------------------------------------
+static void mi_time_from_gps(void * data)
+{
+	(void)data;
+	const struct ubx_nav_sol_t * nav_sol = kbg_getUbxNavSol();
+	struct tm timp;
+	rtcGetTimeTm(&RTCD1, &timp);
+	uint32_t secs_today = (nav_sol->itow/1000) % (60*60*24);
+	timp.tm_hour = secs_today/3600;
+	timp.tm_min = (secs_today%3600)/60;
+	timp.tm_sec = secs_today%60;
+	rtcSetTimeTm(&RTCD1, &timp);
+	mi_exit(NULL);
+}
+
+//-----------------------------------------------------------------------------
+static void mi_time_from_ltc(void * data)
+{
+	(void)data;
+	const struct smpte_timecode_t * ltc = kbt_getLTC();
+	struct tm timp;
+	rtcGetTimeTm(&RTCD1, &timp);
+	timp.tm_hour = ltc->hours;
+	timp.tm_min = ltc->minutes;
+	timp.tm_sec = ltc->seconds;
+	rtcSetTimeTm(&RTCD1, &timp);
+	mi_exit(NULL);
+}
+
+//-----------------------------------------------------------------------------
 static void mi_standby(void * data)
 {
 	(void)data;
 	kuroBox_request_standby = 1;
+	mi_exit(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -157,6 +191,8 @@ menu_item_t menu_items [MENU_ITEMS_COUNT] =
 		{ "Serial2 Baud", 		1,		1, 		mi_serial2_baud, 	mi_serial2_getbaud, NULL },
 		{ "LED 3", 				1,		1, 		mi_led3, 			NULL, NULL },
 		{ "LCD Backlight", 		1,		1, 		mi_lcd_backlight, 	NULL, NULL },
+		{ "Set time from LTC", 	1,		1, 		mi_time_from_ltc, 	NULL, NULL },
+		{ "Set time from GPS", 	1,		1, 		mi_time_from_gps, 	NULL, NULL },
 		{ "Power OFF", 			1,		0, 		mi_standby, 		NULL, NULL },
 		{ "Exit Menu", 			1,		0, 		mi_exit, 			NULL, NULL },
 };

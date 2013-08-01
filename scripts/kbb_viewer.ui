@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>728</width>
-    <height>600</height>
+    <width>808</width>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
         <widget class="QPlainTextEdit" name="hex_view">
          <property name="minimumSize">
           <size>
-           <width>450</width>
+           <width>480</width>
            <height>0</height>
           </size>
          </property>
@@ -381,6 +381,82 @@
            </widget>
           </item>
           <item>
+           <widget class="QGroupBox" name="vnav_gb">
+            <property name="title">
+             <string>VectorNav</string>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="margin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QWidget" name="widget_5" native="true">
+               <layout class="QFormLayout" name="formLayout_4">
+                <property name="horizontalSpacing">
+                 <number>0</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>0</number>
+                </property>
+                <property name="margin">
+                 <number>0</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_18">
+                  <property name="text">
+                   <string>Yaw</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="vnav_ypr_y"/>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_19">
+                  <property name="text">
+                   <string>Pitch</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_20">
+                  <property name="text">
+                   <string>Rolls</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_21">
+                  <property name="text">
+                   <string>YPR_ts</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLineEdit" name="vnav_ypr_p"/>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QLineEdit" name="vnav_ypr_r"/>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QLineEdit" name="vnav_ypr_ts"/>
+                </item>
+               </layout>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -448,7 +524,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>728</width>
+     <width>808</width>
      <height>21</height>
     </rect>
    </property>

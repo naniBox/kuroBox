@@ -62,11 +62,6 @@ static kuroBoxState_t global_state;
 extern bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
-static ADCConfig adc_cfg = {
-	0
-};
-
-//-----------------------------------------------------------------------------
 static const SDCConfig sdio_cfg = {
 	0
 };
@@ -135,7 +130,7 @@ thBlinker(void *arg)
 	chRegSetThreadName("Blinker");
 	while( !chThdShouldTerminate() )
 	{
-		palTogglePad(GPIOB, GPIOB_LED1);
+		//palTogglePad(GPIOB, GPIOB_LED1);
 		//palTogglePad(GPIOD, GPIOD_SERIAL1_PWR);
 		chThdSleepMilliseconds(1000);
 	}
@@ -234,12 +229,8 @@ kuroBoxInit(void)
 
 	// Serial
 	kuroBoxSerialInit(NULL, NULL);
-	chprintf(DEBG, "%s\n\r\n\r", BOARD_NAME);
 
 	// ACD to monitor voltage levels.
-	adcStart(&ADCD1, &adc_cfg);
-	adcSTM32EnableTSVREFE();
-	adcSTM32EnableVBATE();
 
 	// start the SPI bus, just use the LCD's SPI config since
 	// it's shared with the eeprom
@@ -288,6 +279,7 @@ kuroBoxInit(void)
 	kuroBoxFeatureAInit();
 
 	// indicate we're ready
+	chprintf(DEBG, "%s\n\r\n\r", BOARD_NAME);
 	chThdSleepMilliseconds(100);
 	kbg_setLED1(0);
 	kbg_setLED2(0);
@@ -322,7 +314,7 @@ kuroBoxStop(void)
 	chThdWait(blinkerThread);
 	sdcStop(&SDCD1);
 	spiStop(&SPID1);
-	adcStop(&ADCD1);
+
 	kuroBoxSerialStop();
 	chSysDisable();
 

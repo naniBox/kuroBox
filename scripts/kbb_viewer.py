@@ -9,7 +9,7 @@ KBB.DBG = 0
 
 def fmt_h32(x):		return "0x%08X"%x
 def fmt_i(x):		return "%i"%x
-def fmt_f(x,d):		fmt="%."+"%d"%d+"f";return fmt%x
+def fmt_f(x,d=5):	fmt="%."+"%d"%d+"f";return fmt%x
 def fmt_h8(x):		return "0x%02x"%x
 
 def fmt_preamble(kbb):return "%s / %s"%(fmt_h32(kbb.header.preamble),struct.pack("<I",kbb.header.preamble))
@@ -44,7 +44,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 	def loadFile(self,fname):
 		self.fname = fname
 		self.kbb = KBB.KBB_factory(fname)
-		self.packet_count = os.stat(self.fname).st_size / 512
+		self.packet_count = self.kbb.total_msg_count
 		self.rangeSlider.setMaximum(self.packet_count)
 		self.rangeSpinBox.setMaximum(self.packet_count)
 		self.setWindowTitle("KBB_Viewer: %s"%self.fname)
@@ -103,6 +103,11 @@ class KBB_Viewer(QtGui.QMainWindow):
 		#	self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
 		#	self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
 
+		self.vnav_ypr_y.setText(fmt_f(self.kbb.vnav.y))
+		self.vnav_ypr_p.setText(fmt_f(self.kbb.vnav.p))
+		self.vnav_ypr_r.setText(fmt_f(self.kbb.vnav.r))
+		self.vnav_ypr_ts.setText(fmt_i(self.kbb.vnav.ypr_ts))
+
 		# text area
 		self.formatHex()
 		
@@ -113,6 +118,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 		offset = self.kbb.get_index()*self.kbb.SIZE
 		for sidx in range(512/16):
 			s += "%08X : "%(offset+sidx*16)
+			s += "%04X : "%(sidx*16)
 			for i in range(16):
 				s += "%02x "%ord(self.kbb.msg[sidx*16+i])
 

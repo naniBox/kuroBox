@@ -101,6 +101,13 @@ class KBB_V11_ltc():
 		self.minutes = minute_units+minute_tens*10
 		self.hours = hour_units+hour_tens*10
 
+	def __str__(self):
+		return "%02d:%02d:%02d.%02d"%(self.hours,self.minutes,self.seconds,self.frames)
+
+	def __repr__(self):
+		return self.__str__()
+
+
 class KBB_V11_rtc():
 	"""
 	struct tm
@@ -119,6 +126,12 @@ class KBB_V11_rtc():
 	def __init__(self,msg):
 		self.sec,self.min,self.hour,self.mday,self.mon,self.year,self.wday,self.yday,self.isdst = \
 			struct.unpack("<IIIIIIIII",msg[26:62])
+
+	def __str__(self):
+		return "%04d-%02d-%02d %02d:%02d:%02d"%(self.year+1900, self.mon+1, self.mday, self.hour,self.min,self.sec)
+
+	def __repr__(self):
+		return self.__str__()
 
 class KBB_V11_nav_sol():
 	"""
@@ -156,8 +169,11 @@ class KBB_V11_nav_sol():
 			self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
 			struct.unpack("<IHHHIihBBiiiIiiiIHBBIH", msg[62:126])
 		self.calc_cs = calc_checksum_16(msg[68:124])
+		self.calculatedLLA = False
 
 	def calculateLLA(self):
+		if self.calculatedLLA:
+			return
 		import math
 		# Constants (WGS ellipsoid)
 		a = 6378137.0
@@ -176,6 +192,33 @@ class KBB_V11_nav_sol():
 		self.alt = p/math.cos(self.lat)-n
 		self.lat = (self.lat*180.0)/math.pi
 		self.lon = (self.lon*180.0)/math.pi
+		self.calculatedLLA = True
+
+	def __str__(self):
+		self.calculateLLA()
+		return "%3.7f, %3.7f, %3.7f"%(self.lat, self.lon, self.alt)
+
+	def __repr__(self):
+		return self.__str__()
+
+class KBB_V11_vnav():
+	"""
+	struct tm
+	{
+	  float 	ypr[3];
+	  uint32_t	ypr_ts;
+	};
+	"""
+	def __init__(self,msg):
+		self.y,self.p,self.r,self.ypr_ts = struct.unpack("<fffI",msg[126:142])
+
+	def __str__(self):
+		self.calculateLLA()
+		return "%4.1f, %4.1f, %4.1f"%(self.y, self.p, self.r)
+
+	def __repr__(self):
+		return self.__str__()
+
 
 class KBB_V11(object):	
 
@@ -187,6 +230,7 @@ class KBB_V11(object):
 		self.fin = file(self.fname,"rb")
 		self.msg_count = 0
 		self.msg_num_prev = None
+		self.total_msg_count = os.stat(self.fname).st_size / 512
 		self.set_index(0)
 
 	def set_index(self,idx):
@@ -236,6 +280,7 @@ class KBB_V11(object):
 		self.ltc = KBB_V11_ltc(self.msg)
 		return self.ltc
 
+#---------------------------------------------------------------
 	def parse_rtc(self):
 		self.rtc = KBB_V11_rtc(self.msg)
 		return self.rtc
@@ -251,11 +296,17 @@ class KBB_V11(object):
 			if DBG>2:print "NAV_SOL cs mismatch:",self.nav_sol.cs,self.nav_sol.calc_cs
 
 #---------------------------------------------------------------
+	def parse_vnav(self):
+		self.vnav = KBB_V11_vnav(self.msg)
+		return self.vnav
+
+#---------------------------------------------------------------
 	def parse_all(self):
 		self.parse_header()
 		self.parse_ltc()
 		self.parse_rtc()
 		self.parse_nav_sol()
+		self.parse_vnav()
 
 	def check_all(self):
 		self.check_header()

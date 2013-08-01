@@ -43,7 +43,7 @@ thFeatureA(void *arg)
 {
 	(void)arg;
 	chRegSetThreadName("FeatureA");
-	struct smpte_timecode_t ltc;
+
 	float ypr[3];
 	ypr[0] = ypr[1] = ypr[2] = 0.0f;
 	while( !chThdShouldTerminate() )
@@ -52,29 +52,40 @@ thFeatureA(void *arg)
 		{
 		case 0:
 			{
-				kbt_getLTC(&ltc);
+				const struct smpte_timecode_t * ltc = kbt_getLTC();
 				sdWrite(&Serial1, (uint8_t*)LTC_PREFIX, 4);
-				chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d", ltc.seconds, ltc.frames);
+				chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d", ltc->seconds, ltc->frames);
 			}
 			break;
 		case 1:
+			{
+				const struct smpte_timecode_t * ltc = kbt_getLTC();
+				sdWrite(&Serial1, (uint8_t*)LTC_PREFIX, 4);
+				if ( ltc->seconds&0x01 )
+					chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d", ltc->seconds, ltc->frames);
+				else
+					chprintf(((BaseSequentialStream *)&Serial1), "%.2d%.2d", ltc->hours, ltc->minutes);
+			}
+			break;
+		case 2:
 			{
 				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
 				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr[0]);
 			} break;
-		case 2:
+		case 3:
 			{
 				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
 				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr[1]);
 			} break;
-		case 3:
+		case 4:
 			{
 				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
 				chprintf(((BaseSequentialStream *)&Serial1),  "%.4d", (int)ypr[2]);
 			} break;
+		case 5:
 		default:
 			{
 				sdWrite(&Serial1, (uint8_t*)BLANK_PREFIX, 3);
@@ -94,7 +105,7 @@ int kbfa_getFeature()
 //-----------------------------------------------------------------------------
 void kbfa_setFeature(int feature)
 {
-	if ( feature >= 0 && feature <= 4 )
+	if ( feature >= 0 && feature <= 5 )
 		current_feature = feature;
 }
 
@@ -107,7 +118,8 @@ int kbfa_changeFeature()
 	case 1: current_feature = 2; break;
 	case 2: current_feature = 3; break;
 	case 3: current_feature = 4; break;
-	case 4: current_feature = 0; break;
+	case 4: current_feature = 5; break;
+	case 5: current_feature = 0; break;
 	default: current_feature = 0; break;
 	}
 

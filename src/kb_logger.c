@@ -73,7 +73,10 @@ struct __PACKED__ log_msg_v01_t
 	struct ubx_nav_sol_t nav_sol;		// 60
 										// = 64 for GPS block
 
-	uint8_t __pad[512 - (16 + 46 + 64)];
+	vnav_data_t vnav;					// 4*3+4 = 16
+										// 16 for the VNAV block
+
+	uint8_t __pad[512 - (16 + 46 + 64 + 16)];
 };
 STATIC_ASSERT(sizeof(struct log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
@@ -563,4 +566,10 @@ void kbl_incPPS(void)
 void kbl_setGpsNavSol(struct ubx_nav_sol_t * nav_sol)
 {
 	memcpy(&current_msg.nav_sol, nav_sol, sizeof(current_msg.nav_sol));
+}
+
+//-----------------------------------------------------------------------------
+void kbl_setVNav(vnav_data_t * vnav)
+{
+	memcpy(&current_msg.vnav, vnav, sizeof(current_msg.vnav));
 }

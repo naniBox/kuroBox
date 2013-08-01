@@ -24,6 +24,7 @@
 #include "kb_vectornav.h"
 #include "kb_util.h"
 #include "kb_screen.h"
+#include "kb_logger.h"
 #include <string.h>
 
 
@@ -66,7 +67,7 @@ struct async_vn_msg_t
 //-----------------------------------------------------------------------------
 VectorNavDriver VND1;
 static struct async_vn_msg_t async_vn_msg;
-float ypr[3];
+struct vnav_data_t vnav_data;
 
 //-----------------------------------------------------------------------------
 void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
@@ -79,9 +80,10 @@ void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 		{
 			// data return is good, proceed
 			float * fbuf = (float*)(&buf[4]); //  header
-			memcpy(&ypr, fbuf, sizeof(ypr));
+			memcpy(&vnav_data.ypr, fbuf, sizeof(vnav_data.ypr));
 			// uint32_t * tmsg = (uint32_t*)(&buf[4+4*3]);
 			kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
+			kbl_setVNav(&vnav_data);
 		}
 		break;
 	default:
@@ -156,9 +158,9 @@ void vectornav_gpt_end_cb(GPTDriver * gptp)
 //-----------------------------------------------------------------------------
 void kbv_getYPR(float * y, float * p, float * r)
 {
-	if ( y ) *y = ypr[0];
-	if ( p ) *p = ypr[1];
-	if ( r ) *r = ypr[2];
+	if ( y ) *y = vnav_data.ypr[0];
+	if ( p ) *p = vnav_data.ypr[1];
+	if ( r ) *r = vnav_data.ypr[2];
 }
 
 //-----------------------------------------------------------------------------

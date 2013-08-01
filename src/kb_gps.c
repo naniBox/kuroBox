@@ -33,6 +33,7 @@
 #define UBX_NAV_SOL_ID 			0x0601 //  little endian
 uint8_t ubx_nav_sol_buffer[UBX_NAV_SOL_SIZE];
 uint8_t ubx_nav_sol_idx;
+struct ubx_nav_sol_t ubx_nav_sol_valid;
 
 //-----------------------------------------------------------------------------
 static SerialConfig gps_cfg = {
@@ -75,6 +76,7 @@ parse_and_store_nav_sol(void)
 			{
 				// valid packet!
 				chSysLock();
+					memcpy(&ubx_nav_sol_valid, nav_sol, sizeof(ubx_nav_sol_valid));
 					kbs_setGpsEcef(nav_sol->ecefX, nav_sol->ecefY, nav_sol->ecefZ);
 					kbl_setGpsNavSol(nav_sol);
 				chSysUnlock();
@@ -146,4 +148,10 @@ int kuroBoxGPSStop(void)
 	gpsThread = NULL;
 
 	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+const struct ubx_nav_sol_t * kbg_getUbxNavSol(void)
+{
+	return &ubx_nav_sol_valid;
 }

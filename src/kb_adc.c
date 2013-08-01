@@ -34,6 +34,11 @@ static adcsample_t adc_samples[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
 static VirtualTimer adc_trigger;
 
 //-----------------------------------------------------------------------------
+static ADCConfig adc_cfg = {
+	0
+};
+
+//-----------------------------------------------------------------------------
 static const ADCConversionGroup adc_grp_cfg =
 {
 	FALSE,						// circular
@@ -97,6 +102,10 @@ void adc_trigger_cb(void * p)
 //-----------------------------------------------------------------------------
 int kuroBoxADCInit(void)
 {
+	adcStart(&ADCD1, &adc_cfg);
+	adcSTM32EnableTSVREFE();
+	adcSTM32EnableVBATE();
+
 	chSysLock();
 	chVTSetI(&adc_trigger, MS2ST(200), adc_trigger_cb, &adc_trigger);
 	chSysUnlock();
@@ -107,5 +116,8 @@ int kuroBoxADCInit(void)
 //-----------------------------------------------------------------------------
 int kuroBoxADCStop(void)
 {
+	chVTReset(&adc_trigger);
+	adcStopConversion(&ADCD1);
+	adcStop(&ADCD1);
 	return KB_OK;
 }

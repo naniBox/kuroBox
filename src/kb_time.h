@@ -70,7 +70,7 @@ struct __PACKED__ smpte_timecode_t
 };
 
 //-----------------------------------------------------------------------------
-void kbt_getLTC(struct smpte_timecode_t * ltc);
+const struct smpte_timecode_t * kbt_getLTC(void);
 
 //-----------------------------------------------------------------------------
 int kuroBoxTimeInit(void);

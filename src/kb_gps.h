@@ -63,6 +63,6 @@ int kuroBoxGPSStop(void);
 //-----------------------------------------------------------------------------
 void gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel);
 void ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt);
-
+const struct ubx_nav_sol_t * kbg_getUbxNavSol(void);
 
 #endif // _naniBox_kuroBox_gps
