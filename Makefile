@@ -3,7 +3,7 @@
 # NOTE: Can be overridden externally.
 #
 
-DEBUG_BUILD = yes
+#DEBUG_BUILD = yes
 
 # Compiler options here.
 ifeq ($(USE_OPT),)

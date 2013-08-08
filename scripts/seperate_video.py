@@ -9,6 +9,8 @@ def do_main(arg):
 	print "VIDEO IN   : ", arg
 	print "DIR OUT    : ", dirname
 	print "FILES OUT  : ", fout_pattern
+	print "-"*80
+	print ""
 
 	outdir = os.path.join(basedir,dirname)
 	if not os.path.exists(outdir):
@@ -16,7 +18,10 @@ def do_main(arg):
 
 	outpath = os.path.join(basedir,dirname,fout_pattern)
 
-	cmd = "ffmpeg -i \"%s\" -s 853x480 -an \"%s\""%(vidname, outpath)
+	vres = 720
+	hres = int(16.0/9.0*vres)
+
+	cmd = "ffmpeg -i \"%s\" -s %dx%d -an \"%s\""%(vidname, hres, vres, outpath)
 	print cmd
 	os.system(cmd)
 

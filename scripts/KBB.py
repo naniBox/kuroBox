@@ -210,11 +210,11 @@ class KBB_V11_vnav():
 	};
 	"""
 	def __init__(self,msg):
-		self.y,self.p,self.r,self.ypr_ts = struct.unpack("<fffI",msg[126:142])
+		self.yaw,self.pitch,self.roll,self.ypr_ts = struct.unpack("<fffI",msg[126:142])
 
 	def __str__(self):
 		self.calculateLLA()
-		return "%4.1f, %4.1f, %4.1f"%(self.y, self.p, self.r)
+		return "%4.1f, %4.1f, %4.1f"%(self.yaw,self.pitch,self.roll)
 
 	def __repr__(self):
 		return self.__str__()

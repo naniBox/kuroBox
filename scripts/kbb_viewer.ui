@@ -418,7 +418,7 @@
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QLineEdit" name="vnav_ypr_y"/>
+                 <widget class="QLineEdit" name="vnav_ypr_yaw"/>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_19">
@@ -442,13 +442,13 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QLineEdit" name="vnav_ypr_p"/>
+                 <widget class="QLineEdit" name="vnav_ypr_pitch"/>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QLineEdit" name="vnav_ypr_r"/>
+                 <widget class="QLineEdit" name="vnav_ypr_roll"/>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QLineEdit" name="vnav_ypr_ts"/>
+                 <widget class="QLineEdit" name="vnav_ypr_timestamp"/>
                 </item>
                </layout>
               </widget>

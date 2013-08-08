@@ -103,10 +103,10 @@ class KBB_Viewer(QtGui.QMainWindow):
 		#	self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
 		#	self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
 
-		self.vnav_ypr_y.setText(fmt_f(self.kbb.vnav.y))
-		self.vnav_ypr_p.setText(fmt_f(self.kbb.vnav.p))
-		self.vnav_ypr_r.setText(fmt_f(self.kbb.vnav.r))
-		self.vnav_ypr_ts.setText(fmt_i(self.kbb.vnav.ypr_ts))
+		self.vnav_ypr_yaw.setText(fmt_f(self.kbb.vnav.yaw))
+		self.vnav_ypr_pitch.setText(fmt_f(self.kbb.vnav.pitch))
+		self.vnav_ypr_roll.setText(fmt_f(self.kbb.vnav.roll))
+		self.vnav_ypr_timestamp.setText(fmt_i(self.kbb.vnav.ypr_ts))
 
 		# text area
 		self.formatHex()
