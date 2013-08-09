@@ -70,6 +70,7 @@ setAttr cam_timecodeShape.text -type \"string\" $tc;
     return kb_node, yaw_node, pitch_node, roll_node
 
 def is_sane(v):
+    #return True
     return v<=360.0 and v>=-360.0
 
 def animateCam(kb_node, yaw_node, pitch_node, roll_node, kbb_file):
@@ -84,18 +85,26 @@ def animateCam(kb_node, yaw_node, pitch_node, roll_node, kbb_file):
     print "First TC index:", first_tc_idx, kbb.ltc
     skip_item = None
     frame = 1
+    ypr = []
     while kbb.read_next():
-        if skip_item != kbb.ltc.frames:
-            print kbb.header.msg_num, kbb.ltc, frame
+        if kbb.ltc.frames != skip_item:
+            if frame%100==0:
+                print kbb.header.msg_num, kbb.ltc, frame
             skip_item = kbb.ltc.frames
             mc.setKeyframe(kb_node, attribute='tc_h', time=frame, value=kbb.ltc.hours)
             mc.setKeyframe(kb_node, attribute='tc_m', time=frame, value=kbb.ltc.minutes)
             mc.setKeyframe(kb_node, attribute='tc_s', time=frame, value=kbb.ltc.seconds)
             mc.setKeyframe(kb_node, attribute='tc_f', time=frame, value=kbb.ltc.frames)
-            if is_sane(kbb.vnav.yaw): mc.setKeyframe(yaw_node, attribute='ry', time=frame, value=-kbb.vnav.yaw)
-            if is_sane(kbb.vnav.pitch): mc.setKeyframe(pitch_node, attribute='rx', time=frame, value=kbb.vnav.pitch)
-            if is_sane(kbb.vnav.roll): mc.setKeyframe(roll_node, attribute='rz', time=frame, value=180.0-kbb.vnav.roll)
+            for i in range(len(ypr)):
+                sub_frame = float(i+1) / (float(len(ypr))) + (frame - 1)
+                #print "\t", kbb.header.msg_num, kbb.ltc, frame, sub_frame
+                if is_sane(ypr[i].yaw): mc.setKeyframe(yaw_node, attribute='ry', time=sub_frame, value=-ypr[i].yaw)
+                if is_sane(ypr[i].pitch): mc.setKeyframe(pitch_node, attribute='rx', time=sub_frame, value=ypr[i].pitch)
+                if is_sane(ypr[i].roll): mc.setKeyframe(roll_node, attribute='rz', time=sub_frame, value=180.0-ypr[i].roll)
+            ypr = []
             frame += 1
+        else:
+            ypr.append(kbb.vnav)
 
     # get rid of the full-path using mc.ls()
     mc.filterCurve("%s_rotateY"%mc.ls(yaw_node)[0])
@@ -119,21 +128,16 @@ def mkScene():
     mc.hyperShade(assign=shader)
 
 """
+import sys
+import maya.cmds as mc
+if "c:/ChibiStudio/workspace/kuroBox/scripts/" not in sys.path:
+    sys.path.append("c:/ChibiStudio/workspace/kuroBox/scripts/")
+import maya_tools
+maya_tools = reload(maya_tools)
+
 mc.file( force=True, new=True )
 maya_tools.mkScene()
-kb_node, yaw_node, pitch_node, roll_node=maya_tools.mkCam("cam","C:/ChibiStudio/workspace/KUROBOX_TEST_DATA/DSCN7168/DSCN7168.00001.jpg")
-maya_tools.animateCam(kb_node, yaw_node, pitch_node, roll_node,"C:/ChibiStudio/workspace/KUROBOX_TEST_DATA/DSCN7168/KURO0028.KBB")
-
-
-top=maya_tools.mkCam("cam","C:/ChibiStudio/workspace/KUROBOX_TEST_DATA/DSCN7165/DSCN7165.00001.jpg")
-maya_tools.animateCam(top,"C:/ChibiStudio/workspace/KUROBOX_TEST_DATA/KURO0025.KBB")
-print top
-skydome = mc.polySphere(name="skydome", r=100)
-shader = mc.shadingNode('blinn', asShader=True)
-checker = mc.shadingNode("file", asTexture=True)
-mc.setAttr("%s.fileTextureName"%checker,"c:/ChibiStudio/workspace/kuroBox/scripts/UV.png",type="string")
-mc.connectAttr("%s.outColor"%checker, "%s.color"%shader, force=True)
-mc.select(skydome)
-mc.sets(e=True, forceElement=shader)
-mc.hyperShade(assign=shader)
+kb_node, yaw_node, pitch_node, roll_node=maya_tools.mkCam("cam","c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-08/MVI_7892/out/MVI_7892.00001.jpg")
+maya_tools.animateCam(kb_node, yaw_node, pitch_node, roll_node,"c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-08/MVI_7892/KURO0046.KBB")
+mc.setAttr("cam_imagePlaneShape.frameOffset", -253)
 """

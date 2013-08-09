@@ -39,7 +39,7 @@ static const VectorNavConfig default_vectornav_config =
 		vectornav_spi_end_cb,
 		GPIOD,
 		GPIOD_L1_VN_NSS,
-		SPI_CR1_CPOL | SPI_CR1_CPHA
+		SPI_CR1_BR_0 | SPI_CR1_CPOL | SPI_CR1_CPHA
 	},
 	{	// GPT config
 		1000000, // 1MHz should be fine enough to get a 50us timeout
@@ -82,7 +82,10 @@ void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 			float * fbuf = (float*)(&buf[4]); //  header
 			memcpy(&vnav_data.ypr, fbuf, sizeof(vnav_data.ypr));
 			// uint32_t * tmsg = (uint32_t*)(&buf[4+4*3]);
-			kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
+/*			if (fbuf[0] > 360.0 || fbuf[0] < -360.0 ||
+				fbuf[1] > 360.0 || fbuf[1] < -360.0 ||
+				fbuf[2] > 360.0 || fbuf[2] < -360.0)
+*/				kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
 			kbl_setVNav(&vnav_data);
 		}
 		break;
