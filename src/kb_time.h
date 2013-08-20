@@ -28,6 +28,7 @@
 #include "kb_util.h"
 
 //-----------------------------------------------------------------------------
+typedef struct ltc_frame_t ltc_frame_t;
 struct __PACKED__ ltc_frame_t
 {
 	uint8_t frame_units:4;
@@ -58,9 +59,10 @@ struct __PACKED__ ltc_frame_t
 
 	uint16_t sync_word:16;
 };
-STATIC_ASSERT(sizeof(struct ltc_frame_t)==10, LTC_FRAME_SIZE); // 80bits
+STATIC_ASSERT(sizeof(ltc_frame_t)==10, LTC_FRAME_SIZE); // 80bits
 
 //-----------------------------------------------------------------------------
+typedef struct smpte_timecode_t smpte_timecode_t;
 struct __PACKED__ smpte_timecode_t
 {
 	uint8_t hours;
@@ -70,7 +72,7 @@ struct __PACKED__ smpte_timecode_t
 };
 
 //-----------------------------------------------------------------------------
-const struct smpte_timecode_t * kbt_getLTC(void);
+const smpte_timecode_t * kbt_getLTC(void);
 
 //-----------------------------------------------------------------------------
 int kuroBoxTimeInit(void);

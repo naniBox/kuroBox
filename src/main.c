@@ -35,12 +35,12 @@
 #include "kb_featureA.h"
 #include "kb_gpio.h"
 #include "kb_gps.h"
-#include "kb_logger.h"
 #include "kb_menu.h"
 #include "kb_screen.h"
 #include "kb_serial.h"
 #include "kb_time.h"
 #include "kb_vectornav.h"
+#include "kb_writer.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
@@ -267,7 +267,7 @@ kuroBoxInit(void)
 	kuroBoxVectorNavInit(&VND1, NULL); // use the defaults
 
 	// the actual logging thread
-	kuroBoxLoggerInit();
+	kuroBoxWriterInit();
 
 	kuroBoxMenuInit();
 
@@ -303,7 +303,7 @@ kuroBoxStop(void)
 
 	kuroBoxConfigStop();
 	kuroBoxMenuStop();
-	kuroBoxLoggerStop();
+	kuroBoxWriterStop();
 	kuroBoxVectorNavStop(&VND1);
 	kuroBoxTimeStop();
 	kuroBoxGPSStop();

@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 """
-    kuroBox / naniBox
-    Copyright (c) 2013
-    david morris-oliveros // naniBox.com
+	kuroBox / naniBox
+	Copyright (c) 2013
+	david morris-oliveros // naniBox.com
 
     This file is part of kuroBox / naniBox.
 
@@ -21,20 +21,18 @@
 
 """
 
-import sys
-import os
-import struct
-import KBB
+def calc_checksum_8(buf):
+	xor = 0
+	for c in buf:
+		xor ^= ord(c)
+		xor = xor % 256
+	return xor
 
-    
-def main():
-    for fname in sys.argv[1:]:
-        kbb = KBB.KBB_factory(fname)
-        if kbb is None:
-            print "Can't parse '%s'"%fname
-        while kbb.read_next():
-            kbb.check_all()
-        kbb.print_errors()
-
-if __name__ == '__main__':
-    main()
+def calc_checksum_16(buf):
+	a,b = 0,0
+	for c in buf:
+		a += ord(c)
+		a = a%256
+		b += a
+		b = b%256
+	return b*256+a

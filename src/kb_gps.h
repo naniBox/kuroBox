@@ -28,6 +28,7 @@
 
 //-----------------------------------------------------------------------------
 #define UBX_NAV_SOL_SIZE						60
+typedef struct ubx_nav_sol_t ubx_nav_sol_t;
 struct __PACKED__ ubx_nav_sol_t
 {
 	uint16_t header;
@@ -54,7 +55,7 @@ struct __PACKED__ ubx_nav_sol_t
 
 	uint16_t cs;
 };
-STATIC_ASSERT(sizeof(struct ubx_nav_sol_t)==UBX_NAV_SOL_SIZE, UBX_NAV_SOL_SIZE);
+STATIC_ASSERT(sizeof(ubx_nav_sol_t)==UBX_NAV_SOL_SIZE, UBX_NAV_SOL_SIZE);
 
 //-----------------------------------------------------------------------------
 int kuroBoxGPSInit(void);
@@ -63,6 +64,6 @@ int kuroBoxGPSStop(void);
 //-----------------------------------------------------------------------------
 void gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel);
 void ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt);
-const struct ubx_nav_sol_t * kbg_getUbxNavSol(void);
+const ubx_nav_sol_t * kbg_getUbxNavSol(void);
 
 #endif // _naniBox_kuroBox_gps

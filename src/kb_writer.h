@@ -28,14 +28,17 @@
 #include "kb_gps.h"
 #include "kb_vectornav.h"
 
-//-----------------------------------------------------------------------------
-int kuroBoxLoggerInit(void);
-int kuroBoxLoggerStop(void);
 
 //-----------------------------------------------------------------------------
-void kbl_setLTC(struct ltc_frame_t * ltc_frame);
-void kbl_incPPS(void);
-void kbl_setGpsNavSol(struct ubx_nav_sol_t * nav_sol);
-void kbl_setVNav(vnav_data_t * vnav);
+int kuroBoxWriterInit(void);
+int kuroBoxWriterStop(void);
+
+//-----------------------------------------------------------------------------
+void kbw_setLTC(ltc_frame_t * ltc_frame);
+void kbw_incPPS(void);
+void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol);
+void kbw_setVNav(vnav_data_t * vnav);
+
+void kbw_header_vnav(uint8_t * data);
 
 #endif // _naniBox_kuroBox_logger

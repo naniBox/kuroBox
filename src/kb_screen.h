@@ -33,7 +33,7 @@ int kuroBoxScreenStop(void);
 //-----------------------------------------------------------------------------
 void kbs_setVoltage(uint16_t volts);	// in volts*10
 void kbs_setTemperature(int16_t temperature);	// in C
-void kbs_setLTC(struct smpte_timecode_t * ltc);
+void kbs_setLTC(smpte_timecode_t * ltc);
 
 void kbs_setWriteCount(uint32_t write_count);
 void kbs_setWriteErrors(uint32_t write_errors);

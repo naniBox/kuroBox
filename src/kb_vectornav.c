@@ -24,7 +24,7 @@
 #include "kb_vectornav.h"
 #include "kb_util.h"
 #include "kb_screen.h"
-#include "kb_logger.h"
+#include "kb_writer.h"
 #include <string.h>
 
 
@@ -39,6 +39,8 @@ static const VectorNavConfig default_vectornav_config =
 		vectornav_spi_end_cb,
 		GPIOD,
 		GPIOD_L1_VN_NSS,
+
+		// lets put it down to 10.5MHz
 		SPI_CR1_BR_0 | SPI_CR1_CPOL | SPI_CR1_CPHA
 	},
 	{	// GPT config
@@ -86,7 +88,7 @@ void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 				fbuf[1] > 360.0 || fbuf[1] < -360.0 ||
 				fbuf[2] > 360.0 || fbuf[2] < -360.0)
 */				kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
-			kbl_setVNav(&vnav_data);
+			kbw_setVNav(&vnav_data);
 		}
 		break;
 	default:
@@ -194,6 +196,32 @@ int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
 
 	spiStart(nvp->spip, &nvp->cfgp->spicfg);
 	gptStart(nvp->gpdp, &nvp->cfgp->gptcfg);
+
+	uint8_t header_data[VN100_REG_USER_TAG_SIZE+
+	                    VN100_REG_MODEL_SIZE+
+	                    VN100_REG_HWREV_SIZE+
+	                    VN100_REG_SN_SIZE+
+	                    VN100_REG_FWVER_SIZE];
+
+	uint8_t * header_data_ptr = header_data;
+
+	kbv_readRegister(nvp, VN100_REG_USER_TAG, VN100_REG_USER_TAG_SIZE, header_data_ptr);
+	header_data_ptr += VN100_REG_USER_TAG_SIZE;
+
+	kbv_readRegister(nvp, VN100_REG_MODEL, VN100_REG_MODEL_SIZE, header_data_ptr);
+	header_data_ptr += VN100_REG_MODEL_SIZE;
+
+	kbv_readRegister(nvp, VN100_REG_HWREV, VN100_REG_HWREV_SIZE, header_data_ptr);
+	header_data_ptr += VN100_REG_HWREV_SIZE;
+
+	kbv_readRegister(nvp, VN100_REG_SN, VN100_REG_SN_SIZE, header_data_ptr);
+	header_data_ptr += VN100_REG_SN_SIZE;
+
+	kbv_readRegister(nvp, VN100_REG_FWVER, VN100_REG_FWVER_SIZE, header_data_ptr);
+	header_data_ptr += VN100_REG_FWVER_SIZE;
+
+	kbw_header_vnav(header_data);
+
 	return KB_OK;
 }
 

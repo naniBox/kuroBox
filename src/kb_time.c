@@ -26,7 +26,7 @@
 #include <chprintf.h>
 #include "kb_time.h"
 #include "kb_screen.h"
-#include "kb_logger.h"
+#include "kb_writer.h"
 #include "kb_util.h"
 
 //-----------------------------------------------------------------------------
@@ -58,11 +58,11 @@
 //-----------------------------------------------------------------------------
 static uint32_t last_edge_time;
 static bool_t was_last_edge_short;
-static struct ltc_frame_t ltc_frame;
-static struct smpte_timecode_t ltc_timecode;
+static ltc_frame_t ltc_frame;
+static smpte_timecode_t ltc_timecode;
 
 //-----------------------------------------------------------------------------
-static void frame_to_time(struct smpte_timecode_t * smpte_timecode, struct ltc_frame_t * ltc_frame)
+static void frame_to_time(smpte_timecode_t * smpte_timecode, ltc_frame_t * ltc_frame)
 {
 	smpte_timecode->hours = ltc_frame->hours_units + ltc_frame->hours_tens*10;
 	smpte_timecode->minutes  = ltc_frame->minutes_units  + ltc_frame->minutes_tens*10;
@@ -99,7 +99,7 @@ static void ltc_store(uint8_t bit_set)
 		chSysLockFromIsr();
 		frame_to_time(&ltc_timecode, &ltc_frame);
 		kbs_setLTC(&ltc_timecode);
-		kbl_setLTC(&ltc_frame);
+		kbw_setLTC(&ltc_frame);
 		chSysUnlockFromIsr();
 	}
 }
@@ -150,7 +150,7 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 
 
 //-----------------------------------------------------------------------------
-const struct smpte_timecode_t * kbt_getLTC(void)
+const smpte_timecode_t * kbt_getLTC(void)
 {
 	return &ltc_timecode;
 }

@@ -70,6 +70,7 @@
 #define     VN100_REG_HWREV_SIZE     	4
 #define     VN100_REG_SN_SIZE        	12
 #define     VN100_REG_FWVER_SIZE     	4
+										// 64 bytes for all that data
 
 #define     VN100_REG_YPR_SIZE       	(3*4)
 

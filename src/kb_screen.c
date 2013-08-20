@@ -42,7 +42,7 @@
 typedef struct kuroBoxScreen kuroBoxScreen;
 struct kuroBoxScreen
 {
-	struct smpte_timecode_t ltc;
+	smpte_timecode_t ltc;
 	uint16_t voltage;
 	int16_t temperature;
 	int32_t sdc_free;
@@ -232,7 +232,7 @@ void kbs_setTemperature(int16_t temperature)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setLTC(struct smpte_timecode_t * ltc)
+void kbs_setLTC(smpte_timecode_t * ltc)
 {
 	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
 }

@@ -1,3 +1,26 @@
+#!/usr/bin/env python2
+"""
+    kuroBox / naniBox
+    Copyright (c) 2013
+    david morris-oliveros // naniBox.com
+
+    This file is part of kuroBox / naniBox.
+
+    kuroBox / naniBox is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    kuroBox / naniBox is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import sys
 if "c:/ChibiStudio/workspace/kuroBox/scripts/" not in sys.path:
     sys.path.append("c:/ChibiStudio/workspace/kuroBox/scripts/")
@@ -16,7 +39,6 @@ def mkCam(name=None, img_plane_imgs=None, *args, **kwds):
     img_plane_node = mc.listRelatives(img_plane_node, shapes=True, fullPath=True)[0]
     annotate_node = mc.annotate("%s_cam"%name, text="tc=...", point=(0, -3, -10))
     annotate_node = mc.rename(mc.listRelatives(annotate_node, parent=True, fullPath=True), "%s_timecode"%name)
-    kb_node = mkNode("%s_kuroBox"%name,"locator")
 
     if img_plane_imgs:
         mc.setAttr( "%s.imageName" % img_plane_node, img_plane_imgs, type="string")
@@ -24,22 +46,22 @@ def mkCam(name=None, img_plane_imgs=None, *args, **kwds):
     # you'd think that this was the default, to actually use frameOffset, but nooooooo....
     mc.expression(s="%s.frameExtension=frame+%s.frameOffset"%(img_plane_node,img_plane_node))
 
-    mc.setAttr("%s.rotateOrder"%kb_node, 3)
-    mc.setAttr("%s.focalLength"%camera_node, 50.0)
+    mc.setAttr("%s.rotateOrder"%camera_node, 3)
+    mc.setAttr("%s.focalLength"%camera_node, 28.0)
     mc.setAttr("%s.alphaGain"%img_plane_node, 0.85)
     mc.setAttr("%s.useFrameExtension"%img_plane_node, 1)
 
-    mc.addAttr(kb_node, longName="tc_h", attributeType="byte")
-    mc.addAttr(kb_node, longName="tc_m", attributeType="byte")
-    mc.addAttr(kb_node, longName="tc_s", attributeType="byte")
-    mc.addAttr(kb_node, longName="tc_f", attributeType="byte")
-    mc.parent(annotate_node, img_plane_node, camera_node, kb_node, relative=True)
+    mc.addAttr(camera_node, longName="tc_h", attributeType="byte")
+    mc.addAttr(camera_node, longName="tc_m", attributeType="byte")
+    mc.addAttr(camera_node, longName="tc_s", attributeType="byte")
+    mc.addAttr(camera_node, longName="tc_f", attributeType="byte")
+    mc.parent(annotate_node, img_plane_node, camera_node, relative=True)
 
     script="""string $tc = "";
-string $h = $$NAME$$_kuroBox.tc_h;
-string $m = $$NAME$$_kuroBox.tc_m;
-string $s = $$NAME$$_kuroBox.tc_s;
-string $f = $$NAME$$_kuroBox.tc_f;
+string $h = $$NAME$$_cam.tc_h;
+string $m = $$NAME$$_cam.tc_m;
+string $s = $$NAME$$_cam.tc_s;
+string $f = $$NAME$$_cam.tc_f;
 if (size($h)==1) $h = "0" + $h;
 if (size($m)==1) $m = "0" + $m;
 if (size($s)==1) $s = "0" + $s;
@@ -49,20 +71,20 @@ setAttr $$NAME$$_timecodeShape.text -type \"string\" $tc;
 """.replace("$$NAME$$",name)
     mc.expression(name="%s_tc_update"%annotate_node, object=annotate_node, string=script)
 
-    mc.select(kb_node)
+    mc.select(camera_node)
 
-    return kb_node
+    return camera_node
 
 def is_sane(v):
     #return True
     return v<=360.0 and v>=-360.0
 
-def animateCam(kb_node, kbb_file, frame_rate=24):
+def animateCam(kb_node, kbb_file, frame_rate=30):
     if frame_rate == 24:
         mc.currentUnit(time="film")
     elif frame_rate == 25:
         mc.currentUnit(time="pal")
-    elif frame_rate == 25:
+    elif frame_rate == 30:
         mc.currentUnit(time="ntsc")
     else:
         print "Warning, unsupported frame_rate", frame_rate
@@ -114,7 +136,7 @@ def mkScene():
     shader = mc.shadingNode("blinn", asShader=True)
     checker = mc.shadingNode("file", asTexture=True)
     mc.setAttr("%s.fileTextureName"%checker,"c:/ChibiStudio/workspace/kuroBox/scripts/UV.png",type="string")
-    mc.setAttr("%s.repeatUV"%checker, 5, 5)
+    mc.setAttr("%s.repeatUV"%checker, 10, 10)
     mc.connectAttr("%s.outColor"%checker, "%s.color"%shader, force=True)
     mc.select(skydome)
     mc.hyperShade(assign=shader)

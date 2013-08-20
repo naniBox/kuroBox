@@ -24,6 +24,7 @@ def do_main(arg):
 	cmd = "ffmpeg -i \"%s\" -s %dx%d -an \"%s\""%(vidname, hres, vres, outpath)
 	print cmd
 	os.system(cmd)
+	os.rename(vidname, os.path.join(dirname, vidname))
 
 def main():
 	for arg in sys.argv[1:]:

@@ -24,7 +24,7 @@
 #include "kb_gps.h"
 #include "kb_screen.h"
 #include "kb_util.h"
-#include "kb_logger.h"
+#include "kb_writer.h"
 #include <string.h>
 #include <math.h>
 
@@ -33,7 +33,7 @@
 #define UBX_NAV_SOL_ID 			0x0601 //  little endian
 uint8_t ubx_nav_sol_buffer[UBX_NAV_SOL_SIZE];
 uint8_t ubx_nav_sol_idx;
-struct ubx_nav_sol_t ubx_nav_sol_valid;
+ubx_nav_sol_t ubx_nav_sol_valid;
 
 //-----------------------------------------------------------------------------
 static SerialConfig gps_cfg = {
@@ -65,7 +65,7 @@ ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * a
 static void
 parse_and_store_nav_sol(void)
 {
-	struct ubx_nav_sol_t * nav_sol = (struct ubx_nav_sol_t*) ubx_nav_sol_buffer;
+	ubx_nav_sol_t * nav_sol = (ubx_nav_sol_t*) ubx_nav_sol_buffer;
 
 	if ( nav_sol->header == UBX_HEADER )
 	{
@@ -78,7 +78,7 @@ parse_and_store_nav_sol(void)
 				chSysLock();
 					memcpy(&ubx_nav_sol_valid, nav_sol, sizeof(ubx_nav_sol_valid));
 					kbs_setGpsEcef(nav_sol->ecefX, nav_sol->ecefY, nav_sol->ecefZ);
-					kbl_setGpsNavSol(nav_sol);
+					kbw_setGpsNavSol(nav_sol);
 				chSysUnlock();
 			}
 		}
@@ -126,7 +126,7 @@ gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
 	(void)channel;
 
 	chSysLockFromIsr();
-		kbl_incPPS();
+		kbw_incPPS();
 		kbs_PPS();
 	chSysUnlockFromIsr();
 }
@@ -151,7 +151,7 @@ int kuroBoxGPSStop(void)
 }
 
 //-----------------------------------------------------------------------------
-const struct ubx_nav_sol_t * kbg_getUbxNavSol(void)
+const ubx_nav_sol_t * kbg_getUbxNavSol(void)
 {
 	return &ubx_nav_sol_valid;
 }

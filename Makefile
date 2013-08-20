@@ -3,7 +3,7 @@
 # NOTE: Can be overridden externally.
 #
 
-#DEBUG_BUILD = yes
+DEBUG_BUILD = yes
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
@@ -116,13 +116,13 @@ CSRC = $(PORTSRC) \
         ./src/kb_featureA.c \
         ./src/kb_gpio.c \
         ./src/kb_gps.c \
-        ./src/kb_logger.c \
         ./src/kb_menu.c \
         ./src/kb_screen.c \
         ./src/kb_serial.c \
         ./src/kb_time.c \
         ./src/kb_util.c \
         ./src/kb_vectornav.c \
+        ./src/kb_writer.c \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
