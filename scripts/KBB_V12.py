@@ -28,76 +28,41 @@ import KBB_util
 
 DBG = 3
 
-class KBB_V12_header():
+class KBB_V12_HEADER():
+	def __init__(self,msg):
+		assert len(msg) == 512
+		self.msg = msg
+		self.preamble,self.checksum,self.version,self.msg_type,self.msg_size = \
+			struct.unpack("<IHBBH",msg[0:10])
+
+		self.vnav_user_tag,self.vnav_model,self.vnav_hwrev,\
+			self.vnav_sn_a,self.vnav_sn_b,self.vnav_sn_c,\
+			self.vnav_fwver_major,self.vnav_fwver_minor,self.vnav_fwver_build,self.vnav_fwver_rev = \
+			struct.unpack("<20s24sI3I4B",msg[10:10+64])
+
+
+class KBB_V12_MSG_header():
 	START_BYTE = 0
 	LENGTH = 18
 	def __init__(self,msg):
 		self.preamble,self.checksum,self.version,self.msg_type,self.msg_size,self.msg_num,self.write_errors = \
-			struct.unpack("<IHBBHII",msg[KBB_V12_header.START_BYTE:KBB_V12_header.START_BYTE+KBB_V12_header.LENGTH])
+			struct.unpack("<IHBBHII",msg[KBB_V12_MSG_header.START_BYTE:KBB_V12_MSG_header.START_BYTE+KBB_V12_MSG_header.LENGTH])
 
-class KBB_V12_ltc():
-	START_BYTE = 16
+class KBB_V12_MSG_ltc(KBB_util.LTC):
+	START_BYTE = 18
 	LENGTH = 10
-	"""
-		struct __PACKED__ ltc_frame_t
-		{
-			uint8_t frame_units:4;
-			uint8_t user_bits_1:4;
-			uint8_t frame_tens:2;
-			uint8_t drop_frame_flag:1;
-			uint8_t color_frame_flag:1;
-			uint8_t user_bits_2:4;
 
-			uint8_t seconds_units:4;
-			uint8_t user_bits_3:4;
-			uint8_t seconds_tens:3;
-			uint8_t even_parity_bit:1;
-			uint8_t user_bits_4:4;
-
-			uint8_t minutes_units:4;
-			uint8_t user_bits_5:4;
-			uint8_t minutes_tens:3;
-			uint8_t binary_group_flag_1:1;
-			uint8_t user_bits_6:4;
-
-			uint8_t hours_units:4;
-			uint8_t user_bits_7:4;
-			uint8_t hours_tens:2;
-			uint8_t reserved:1;
-			uint8_t binary_group_flag_2:1;
-			uint8_t user_bits_8:4;
-
-			uint16_t sync_word:16;
-		};
-	"""
 	def __init__(self,msg):
-		bytes = struct.unpack("<BBBBBBBBBB",msg[KBB_V12_ltc.START_BYTE:KBB_V12_ltc.START_BYTE+KBB_V12_ltc.LENGTH])
-		
-		frame_units = bytes[0]&0x0f
-		frame_tens = bytes[1]&0x03
-		
-		second_units = bytes[2]&0xf
-		second_tens = bytes[3]&0x07
-
-		minute_units = bytes[4]&0xf
-		minute_tens = bytes[5]&0x07
-
-		hour_units = bytes[6]&0xf
-		hour_tens = bytes[7]&0x03
-
-		self.frames = frame_units+frame_tens*10
-		self.seconds = second_units+second_tens*10
-		self.minutes = minute_units+minute_tens*10
-		self.hours = hour_units+hour_tens*10
+		bytes = struct.unpack("<BBBBBBBBBB",msg[KBB_V12_MSG_ltc.START_BYTE:KBB_V12_MSG_ltc.START_BYTE+KBB_V12_MSG_ltc.LENGTH])
+		KBB_util.LTC.parse(self, bytes)		
 
 	def __str__(self):
 		return "%02d:%02d:%02d.%02d"%(self.hours,self.minutes,self.seconds,self.frames)
-
 	def __repr__(self):
 		return self.__str__()
 
 
-class KBB_V12_rtc():
+class KBB_V12_MSG_rtc():
 	START_BYTE = 28
 	LENGTH = 36
 	"""
@@ -116,7 +81,7 @@ class KBB_V12_rtc():
 	"""
 	def __init__(self,msg):
 		self.sec,self.min,self.hour,self.mday,self.mon,self.year,self.wday,self.yday,self.isdst = \
-			struct.unpack("<IIIIIIIII",msg[KBB_V12_rtc.START_BYTE:KBB_V12_rtc.START_BYTE+KBB_V12_rtc.LENGTH])
+			struct.unpack("<IIIIIIIII",msg[KBB_V12_MSG_rtc.START_BYTE:KBB_V12_MSG_rtc.START_BYTE+KBB_V12_MSG_rtc.LENGTH])
 
 	def __str__(self):
 		return "%04d-%02d-%02d %02d:%02d:%02d"%(self.year+1900, self.mon+1, self.mday, self.hour,self.min,self.sec)
@@ -124,7 +89,7 @@ class KBB_V12_rtc():
 	def __repr__(self):
 		return self.__str__()
 
-class KBB_V12_nav_sol():
+class KBB_V12_MSG_nav_sol():
 	START_BYTE = 64
 	LENGTH = 64
 	"""
@@ -160,8 +125,8 @@ class KBB_V12_nav_sol():
 		self.pps,self.header,self.msg_id,self.msg_len,self.itow,self.ftow,self.week,self.gpsfix,self.flags, \
 			self.ecefX,self.ecefY,self.ecefZ,self.pAcc,self.ecefVX,self.ecefVY,self.ecefVZ, \
 			self.sAcc,self.pdop,self.reserved1,self.numSV,self.reserved2,self.cs = \
-			struct.unpack("<IHHHIihBBiiiIiiiIHBBIH", msg[KBB_V12_nav_sol.START_BYTE:KBB_V12_nav_sol.START_BYTE+KBB_V12_nav_sol.LENGTH])
-		self.calc_cs = KBB_util.calc_checksum_16(msg[KBB_V12_nav_sol.START_BYTE+6:KBB_V12_nav_sol.START_BYTE+KBB_V12_nav_sol.LENGTH-2])
+			struct.unpack("<IHHHIihBBiiiIiiiIHBBIH", msg[KBB_V12_MSG_nav_sol.START_BYTE:KBB_V12_MSG_nav_sol.START_BYTE+KBB_V12_MSG_nav_sol.LENGTH])
+		self.calc_cs = KBB_util.calc_checksum_16(msg[KBB_V12_MSG_nav_sol.START_BYTE+6:KBB_V12_MSG_nav_sol.START_BYTE+KBB_V12_MSG_nav_sol.LENGTH-2])
 		self.calculatedLLA = False
 
 	def calculateLLA(self):
@@ -194,7 +159,7 @@ class KBB_V12_nav_sol():
 	def __repr__(self):
 		return self.__str__()
 
-class KBB_V12_vnav():
+class KBB_V12_MSG_vnav():
 	START_BYTE = 128
 	LENGTH = 16
 	"""
@@ -205,7 +170,7 @@ class KBB_V12_vnav():
 	};
 	"""
 	def __init__(self,msg):
-		self.yaw,self.pitch,self.roll,self.ypr_ts = struct.unpack("<fffI",msg[KBB_V12_vnav.START_BYTE:KBB_V12_vnav.START_BYTE+KBB_V12_vnav.LENGTH])
+		self.yaw,self.pitch,self.roll,self.ypr_ts = struct.unpack("<fffI",msg[KBB_V12_MSG_vnav.START_BYTE:KBB_V12_MSG_vnav.START_BYTE+KBB_V12_MSG_vnav.LENGTH])
 
 	def __str__(self):
 		self.calculateLLA()
@@ -226,6 +191,7 @@ class KBB_V12(object):
 		self.msg_count = 0
 		self.msg_num_prev = None
 		self.total_msg_count = os.stat(self.fname).st_size / 512
+		self.HEADER = KBB_V12_HEADER(self.fin.read(512))
 		self.set_index(0)
 
 	def set_index(self,idx):
@@ -247,7 +213,7 @@ class KBB_V12(object):
 
 #---------------------------------------------------------------
 	def parse_header(self):
-		self.header = KBB_V12_header(self.msg)
+		self.header = KBB_V12_MSG_header(self.msg)
 		return self.header
 		
 	def check_header(self):
@@ -272,17 +238,17 @@ class KBB_V12(object):
 		
 #---------------------------------------------------------------
 	def parse_ltc(self):
-		self.ltc = KBB_V12_ltc(self.msg)
+		self.ltc = KBB_V12_MSG_ltc(self.msg)
 		return self.ltc
 
 #---------------------------------------------------------------
 	def parse_rtc(self):
-		self.rtc = KBB_V12_rtc(self.msg)
+		self.rtc = KBB_V12_MSG_rtc(self.msg)
 		return self.rtc
 
 #---------------------------------------------------------------
 	def parse_nav_sol(self):
-		self.nav_sol = KBB_V12_nav_sol(self.msg)
+		self.nav_sol = KBB_V12_MSG_nav_sol(self.msg)
 		return self.nav_sol
 
 	def check_nav_sol(self):
@@ -292,7 +258,7 @@ class KBB_V12(object):
 
 #---------------------------------------------------------------
 	def parse_vnav(self):
-		self.vnav = KBB_V12_vnav(self.msg)
+		self.vnav = KBB_V12_MSG_vnav(self.msg)
 		return self.vnav
 
 #---------------------------------------------------------------

@@ -72,10 +72,10 @@ thScreen(void *arg)
 	
 	// let the splash screen get some glory, but not 
 	// in debug, gotta get work DONE!
-#ifdef NDEBUG
-	chThdSleepMilliseconds(2000);
-#else
+#ifdef _DEBUG
 	chThdSleepMilliseconds(500);
+#else
+	chThdSleepMilliseconds(4000);
 #endif
 	st7565_clear(&ST7565D1);
 	st7565_display(&ST7565D1);
@@ -141,11 +141,16 @@ thScreen(void *arg)
 			st7565_drawstring(&ST7565D1, 0, 2, "A");
 			st7565_drawstring(&ST7565D1, C2P(1)+2, 2, charbuf);
 
+			INIT_CBUF();
+			chprintf(bss,"%iC", (int)screen.temperature);
+			st7565_drawstring(&ST7565D1, C2P(-3), 2, charbuf);
+
 	//----------------------------------------------------------------------------
 			float lat,lon,alt;
 			lat=lon=alt=0.0f;
 			ecef_to_lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
 					&lat, &lon, &alt);
+
 			INIT_CBUF();
 			chprintf(bss,"%3f/%3f/%3f",
 					lat, lon, alt);
@@ -155,9 +160,11 @@ thScreen(void *arg)
 	//----------------------------------------------------------------------------
 			// @OTODO: remove these, they are just for show!
 			//
-			// from here
+			// v--  from here  --v
 			//
 			//
+#ifdef _DEBUG
+
 			/*
 			INIT_CBUF();
 			chprintf(bss,"C/E %d/%d",
@@ -173,10 +180,11 @@ thScreen(void *arg)
 			INIT_CBUF();
 			uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
 			chprintf(bss,"%d", idle_time);
-			st7565_drawstring(&ST7565D1, C2P(-2), 2, charbuf);
+			st7565_drawstring(&ST7565D1, C2P(-6), 0, charbuf);
+#endif
 			//
 			//
-			// to here
+			// ^-- to here  --^
 			//
 	//----------------------------------------------------------------------------
 

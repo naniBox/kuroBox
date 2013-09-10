@@ -50,6 +50,8 @@
 #define kbg_setSerial2Pwr(on)		kbg_setGPIO(!on, GPIOD, GPIOD_SERIAL2_PWR)
 #define kbg_getSerial2Pwr()			(!kbg_getGPIO(GPIOD, GPIOD_SERIAL2_PWR))
 
-
+#define kbg_setL1Power(on)			kbg_setGPIO(!on, GPIOB, GPIOB_L1_PWR)
+#define kbg_setL1PowerOn()			kbg_setL1Power(1)
+#define kbg_setL1PowerOff()			kbg_setL1Power(0)
 
 #endif // _naniBox_kuroBox_gpio

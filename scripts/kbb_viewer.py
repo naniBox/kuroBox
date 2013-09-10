@@ -18,6 +18,13 @@ def fmt_checksum(kbb):return "%s / %s"%(fmt_h8(kbb.header.checksum),"valid"if kb
 def fmt_3xi(a,b,c): return "%s, %s, %s"%(fmt_i(a),fmt_i(b),fmt_i(c))
 def fmt_3xf(a,b,c,d=5): return "%s, %s, %s"%(fmt_f(a,d),fmt_f(b,d),fmt_f(c,d))
 def fmt_2xi(a,b): return "%s, %s"%(fmt_i(a),fmt_i(b))
+def fmt_s_safe(s): 
+	r = ""
+	for c in s:
+		if ord(c)<32:
+			c = " "
+		r += c
+	return r
 
 class KBB_Viewer(QtGui.QMainWindow):
 	def __init__(self):
@@ -49,7 +56,9 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.rangeSpinBox.setMaximum(self.packet_count)
 		self.setWindowTitle("KBB_Viewer: %s"%self.fname)
 		self.packetCountEdit.setText("%d"%self.packet_count)
-		self.setPos(0)
+		if self.kbb.HEADER:
+			self.formatHeader(self.kbb.HEADER)
+		#self.setPos(0)
 
 	@QtCore.pyqtSlot()
 	def next(self):
@@ -76,7 +85,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.header_write_errors.setText(fmt_i(self.kbb.header.write_errors))
 
 		# LTC
-		ltc = "%02d:%02d:%02d.%02d"%(self.kbb.ltc.hours,self.kbb.ltc.minutes,self.kbb.ltc.seconds,self.kbb.ltc.frames)
+		ltc = "%s / %d / %s"%(self.kbb.ltc, self.kbb.ltc.frame_number(30), "DF" if self.kbb.ltc.drop_frame_flag else "NDF")
 		self.ltc_ltc.setText(ltc)
 
 		# RTC
@@ -109,24 +118,48 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.vnav_ypr_timestamp.setText(fmt_i(self.kbb.vnav.ypr_ts))
 
 		# text area
-		self.formatHex()
+		self.formatHex(self.kbb.msg)
 		
 		print "Setting position of KBB file to", pos
 
-	def formatHex(self):
+	def formatHex(self, msg):
 		s = ""
 		offset = self.kbb.get_index()*self.kbb.SIZE
 		for sidx in range(512/16):
 			s += "%08X : "%(offset+sidx*16)
 			s += "%04X : "%(sidx*16)
 			for i in range(16):
-				s += "%02x "%ord(self.kbb.msg[sidx*16+i])
+				s += "%02x "%ord(msg[sidx*16+i])
 
 			s += "\n"
 
 		self.hex_view.setPlainText(s)
 
 
+	def formatHeader(self, header):
+		"""
+				self.preamble,self.checksum,self.version,self.msg_type,self.msg_size = \
+					struct.unpack("<IHBBH",msg[0:10])
+
+				self.vnav_user_tag,self.vnav_model,self.vnav_hwrev,\
+					self.vnav_sn_a,self.vnav_sn_b,self.vnav_sn_c,\
+					self.vnav_fwver_major,self.vnav_fwver_minor,self.vnav_fwver_build,self.vnav_fwver_rev = 
+		"""
+		s = "Header \n"
+		s += "preamble: %s\n"%fmt_h32(header.preamble)
+		s += "checksum: %s\n"%fmt_h32(header.checksum)
+		s += "version:  %s\n"%fmt_i(header.version)
+		s += "msg_type: %s\n"%fmt_i(header.msg_type)
+		s += "msg_size: %s\n"%fmt_i(header.msg_size)
+		s += "\n"
+		s += "VectorNav \n"
+		s += "user_tag:   '%s'\n"%fmt_s_safe(header.vnav_user_tag)
+		s += "vnav_model: '%s'\n"%fmt_s_safe(header.vnav_model)
+		s += "vnav_hwrev: '%s'\n"%fmt_h32(header.vnav_hwrev)
+		s += "vnav_sn:    %s %s %s\n"%(fmt_h32(header.vnav_sn_a), fmt_h32(header.vnav_sn_b), fmt_h32(header.vnav_sn_c))
+		s += "vnav_fwver: %d.%d.%d.%d\n"%(header.vnav_fwver_major,header.vnav_fwver_minor,header.vnav_fwver_build,header.vnav_fwver_rev)
+
+		self.hex_view.setPlainText(s)
 
 app = QtGui.QApplication(sys.argv)
 print sys.argv

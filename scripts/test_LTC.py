@@ -1,4 +1,5 @@
-/*
+#!/usr/bin/env python2
+"""
 	kuroBox / naniBox
 	Copyright (c) 2013
 	david morris-oliveros // naniBox.com
@@ -18,27 +19,27 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-*/
+"""
 
-#ifndef _naniBox_kuroBox_logger
-#define _naniBox_kuroBox_logger
+import KBB
+import KBB_util
 
-#include <ch.h>
-#include "kb_time.h"
-#include "kb_gps.h"
-#include "kb_vectornav.h"
+def test_LTC(t, fps=30):
+    l1 = KBB_util.LTC(t)
+    l2 = KBB_util.LTC(t)
+    l1.drop_frame_flag = True
+    l2.drop_frame_flag = False
+    print t
+    print l1, l1.frame_number(fps), l1.drop_frame_flag 
+    print l2, l2.frame_number(fps), l2.drop_frame_flag 
+    print
 
-//-----------------------------------------------------------------------------
-int kuroBoxWriterInit(void);
-int kuroBoxWriterStop(void);
+def main():
+    test_LTC("00:05:32:14")
+    test_LTC("00:00:32:14")
 
-//-----------------------------------------------------------------------------
-void kbw_setLTC(ltc_frame_t * ltc_frame);
-void kbw_incPPS(void);
-void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol);
-void kbw_setVNav(vnav_data_t * vnav);
-void kbw_setAltitude(float alt, float tem);
+    test_LTC("00:05:32:14", 24)
+    test_LTC("00:00:32:14", 24)
 
-void kbw_header_vnav(uint8_t * data);
-
-#endif // _naniBox_kuroBox_logger
+if __name__ == '__main__':
+    main()

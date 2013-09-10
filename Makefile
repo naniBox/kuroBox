@@ -4,6 +4,7 @@
 #
 
 DEBUG_BUILD = yes
+#USE_RELOCATED_FLASH = yes
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
@@ -110,6 +111,7 @@ CSRC = $(PORTSRC) \
         $(FATFSSRC) \
         ./src/glcdfont.c \
         ./src/kb_adc.c \
+        ./src/kb_altimeter.c \
         ./src/kb_buttons.c \
         ./src/kb_config.c \
         ./src/kb_debug.c \

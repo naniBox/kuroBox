@@ -84,7 +84,7 @@
 #define GPIOB_USART1_TX             6
 #define GPIOB_USART1_RX             7
 #define GPIOB__B08                  8
-#define GPIOB__B09                  9
+#define GPIOB_L1_PWR                9
 #define GPIOB_L1_I2C2_SCL           10
 #define GPIOB_L1_I2C2_SDA           11
 #define GPIOB__B12                  12
@@ -379,7 +379,7 @@
                                      PIN_MODE_ALTERNATE(GPIOB_USART1_TX) |  \
                                      PIN_MODE_ALTERNATE(GPIOB_USART1_RX) |  \
                                      PIN_MODE_INPUT(GPIOB__B08) |           \
-                                     PIN_MODE_INPUT(GPIOB__B09) |           \
+                                     PIN_MODE_OUTPUT(GPIOB_L1_PWR) |           \
                                      PIN_MODE_ALTERNATE(GPIOB_L1_I2C2_SCL) |\
                                      PIN_MODE_ALTERNATE(GPIOB_L1_I2C2_SDA) |\
                                      PIN_MODE_INPUT(GPIOB__B12) |           \
@@ -395,7 +395,7 @@
                                      PIN_OTYPE_PUSHPULL(GPIOB_USART1_TX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB_USART1_RX) |  \
                                      PIN_OTYPE_PUSHPULL(GPIOB__B08) |       \
-                                     PIN_OTYPE_PUSHPULL(GPIOB__B09) |       \
+                                     PIN_OTYPE_PUSHPULL(GPIOB_L1_PWR) |       \
                                      PIN_OTYPE_OPENDRAIN(GPIOB_L1_I2C2_SCL) |\
                                      PIN_OTYPE_OPENDRAIN(GPIOB_L1_I2C2_SDA) |\
                                      PIN_OTYPE_PUSHPULL(GPIOB__B12) |       \
@@ -411,7 +411,7 @@
                                      PIN_OSPEED_100M(GPIOB_USART1_TX) |     \
                                      PIN_OSPEED_100M(GPIOB_USART1_RX) |     \
                                      PIN_OSPEED_2M(GPIOB__B08) |            \
-                                     PIN_OSPEED_2M(GPIOB__B09) |            \
+                                     PIN_OSPEED_2M(GPIOB_L1_PWR) |            \
                                      PIN_OSPEED_100M(GPIOB_L1_I2C2_SCL) |   \
                                      PIN_OSPEED_100M(GPIOB_L1_I2C2_SDA) |   \
                                      PIN_OSPEED_2M(GPIOB__B12) |            \
@@ -427,7 +427,7 @@
                                      PIN_PUPDR_PULLUP(GPIOB_USART1_TX) |    \
                                      PIN_PUPDR_PULLUP(GPIOB_USART1_RX) |    \
                                      PIN_PUPDR_PULLUP(GPIOB__B08) |         \
-                                     PIN_PUPDR_PULLUP(GPIOB__B09) |         \
+                                     PIN_PUPDR_PULLUP(GPIOB_L1_PWR) |         \
                                      PIN_PUPDR_PULLUP(GPIOB_L1_I2C2_SCL) |  \
                                      PIN_PUPDR_PULLUP(GPIOB_L1_I2C2_SDA) |  \
                                      PIN_PUPDR_PULLUP(GPIOB__B12) |         \
@@ -443,7 +443,7 @@
                                      PIN_ODR_HIGH(GPIOB_USART1_TX) |        \
                                      PIN_ODR_HIGH(GPIOB_USART1_RX) |        \
                                      PIN_ODR_HIGH(GPIOB__B08) |             \
-                                     PIN_ODR_HIGH(GPIOB__B09) |             \
+                                     PIN_ODR_HIGH(GPIOB_L1_PWR) |             \
                                      PIN_ODR_HIGH(GPIOB_L1_I2C2_SCL) |      \
                                      PIN_ODR_HIGH(GPIOB_L1_I2C2_SDA) |      \
                                      PIN_ODR_HIGH(GPIOB__B12) |             \
@@ -459,7 +459,7 @@
                                      PIN_AFIO_AF(GPIOB_USART1_TX, 7) |      \
                                      PIN_AFIO_AF(GPIOB_USART1_RX, 7))
 #define VAL_GPIOB_AFRH              (PIN_AFIO_AF(GPIOB__B08, 0) |           \
-                                     PIN_AFIO_AF(GPIOB__B09, 0) |           \
+                                     PIN_AFIO_AF(GPIOB_L1_PWR, 0) |           \
                                      PIN_AFIO_AF(GPIOB_L1_I2C2_SCL, 4) |    \
                                      PIN_AFIO_AF(GPIOB_L1_I2C2_SDA, 4) |    \
                                      PIN_AFIO_AF(GPIOB__B12, 0) |           \

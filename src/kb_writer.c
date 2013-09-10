@@ -53,13 +53,11 @@ struct __PACKED__ writer_header_t
 	uint8_t version;					// 1
 	uint8_t msg_type;					// 1
 	uint16_t msg_size;					// 2
-	uint32_t msg_num;					// 4
-	uint32_t write_errors;				// 4
-										// = 18 for HEADER block
+										// = 10 for HEADER block
 
 	uint8_t vnav_header[64];			// vnav stuff, dumped in here
 
-	uint8_t __pad[512 - (18 + 64)];		// 430 left
+	uint8_t __pad[512 - (10 + 64)];		// 438 left
 };
 
 STATIC_ASSERT(sizeof(writer_header_t)==512, 512);
@@ -103,7 +101,11 @@ struct __PACKED__ log_msg_v01_t
 	vnav_data_t vnav;					// 4*3+4 = 16
 										// 16 for the VNAV block
 
-	uint8_t __pad[512 - (18 + 46 + 64 + 16)];
+	float altitude;						// 4
+	float temperature;					// 4
+										// 8 for the altimeter block
+
+	uint8_t __pad[512 - (18 + 46 + 64 + 16 + 8)];
 };
 STATIC_ASSERT(sizeof(log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
@@ -494,8 +496,6 @@ thWriter(void *arg)
 	writer_header.version = LOGGER_VERSION;
 	writer_header.msg_type = LOGGER_HEADER_MSG_TYPE;
 	writer_header.msg_size = LOGGER_MESSAGE_SIZE;
-	writer_header.msg_num = 0;
-	writer_header.write_errors = 0;
 
 	uint8_t * buf = (uint8_t*) &writer_header;
 	writer_header.checksum = calc_checksum_16(buf+LOGGER_MSG_START_OF_CHECKSUM,
@@ -657,6 +657,13 @@ void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol)
 void kbw_setVNav(vnav_data_t * vnav)
 {
 	memcpy(&current_msg.vnav, vnav, sizeof(current_msg.vnav));
+}
+
+//-----------------------------------------------------------------------------
+void kbw_setAltitude(float alt, float tem)
+{
+	current_msg.altitude = alt;
+	current_msg.temperature = tem;
 }
 
 //-----------------------------------------------------------------------------

@@ -120,6 +120,12 @@ static const EXTConfig extcfg = {
   }
 };
 
+// I2C interface #2, this lives on Layer1's expansion board
+static const I2CConfig i2cfg2 = {
+    OPMODE_I2C,
+    400000,
+    FAST_DUTY_CYCLE_2,
+};
 
 //-----------------------------------------------------------------------------
 static WORKING_AREA(waBlinker, 128);
@@ -256,18 +262,30 @@ kuroBoxInit(void)
 	// init the screen, this will spawn a thread to keep it updated
 	kuroBoxScreenInit();
 
+	// LTC's, interrupt driven, very quick now
+	kuroBoxTimeInit();
+
+	// the actual logging thread
+	kuroBoxWriterInit();
+
+	// this turns on Layer 1 power, this turns on the mosfets controlling the
+	// VCC rail. After this, we can start GPS, VectorNav and altimeter
+	kbg_setL1PowerOn();
+	// wait for it to stabilise before continuing
+	chThdSleepMilliseconds(500);
+
 	// gps uart
 	kuroBoxGPSInit();
 
-	// LTC's, interrupt driven, very quick now
-	kuroBoxTimeInit();
-	
 	VND1.spip = &SPID2;
 	VND1.gpdp = &GPTD14;
 	kuroBoxVectorNavInit(&VND1, NULL); // use the defaults
 
-	// the actual logging thread
-	kuroBoxWriterInit();
+	// start I2C here, since it's potentially a shared bus
+	i2cStart(&I2CD2, &i2cfg2);
+
+	// and the altimeter, also spawns a thread.
+	kuroBoxAltimeterInit();
 
 	kuroBoxMenuInit();
 

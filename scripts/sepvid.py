@@ -1,4 +1,4 @@
-import os,sys
+import os,sys,glob
 
 def do_main(arg):
 	vidname = arg
@@ -28,7 +28,8 @@ def do_main(arg):
 
 def main():
 	for arg in sys.argv[1:]:
-		do_main(arg)
+		for g in glob.glob(arg):
+			do_main(g)
 
 if __name__ == '__main__':
 	main()
