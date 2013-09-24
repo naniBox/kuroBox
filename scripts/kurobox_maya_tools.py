@@ -21,10 +21,36 @@
 
 """
 
+"""
+Usage: 
+
+Make sure that the scripts/ directory is in your PYTHONPATH. You can do this 
+manually by running this command in your maya python script window:
+
+##-------------------------------------------
+import sys
+sys.path.append("<PATH_TO_SCRIPTS>")
+##-------------------------------------------
+
+Then execute the following in maya python script window:
+
+##-------------------------------------------
+import kurobox_maya_tools as kb
+
+kb.setRoot("c:/Data/Engine/001/")
+kb.mkScene("UV.png")
+kb_node = kb.mkCam("engine_test","DSC_0124/DSC_0124.00001.jpg")
+kb.animateCam(kb_node,"KURO0010.KBB", frame_rate=30, start_from="00:00:00:00", total_frames=-1)
+##-------------------------------------------
+
+The "frame_rate" parameter is optional, but uses 30(NTSC) as default. The start_from & total_frames are
+also optional, and if left out will just import and create a track for the entire KBB file - which may
+be hours long, so beware!
+
+"""
+
 import sys
 import os
-if "c:/ChibiStudio/workspace/kuroBox/scripts/" not in sys.path:
-    sys.path.append("c:/ChibiStudio/workspace/kuroBox/scripts/")
 
 import maya.cmds as mc
 import KBB
@@ -101,6 +127,9 @@ def animateCam(kb_node, kbb_file, frame_rate=30, start_from=None, total_frames=N
     else:
         print "Warning, unsupported frame_rate", frame_rate
 
+    if total_frames == -1:
+        total_frames = None
+
     start_ltc = KBB_util.LTC()
     if start_from is not None:
         start_ltc = KBB_util.LTC(start_from)
@@ -113,6 +142,7 @@ def animateCam(kb_node, kbb_file, frame_rate=30, start_from=None, total_frames=N
         kbb = KBB.KBB_factory(kbb_file)
     except IOError:
         print "ERROR, couldn't open file '%s'"%kbb_file
+        return
     print kbb
     kbb.set_index(0)
     first_tc_idx = 0
@@ -126,16 +156,20 @@ def animateCam(kb_node, kbb_file, frame_rate=30, start_from=None, total_frames=N
     skipping = True
     start_frame = kbb.ltc.frame_number(frame_rate)
     frame_count = 0
+    first_frame = None
     while kbb.read_next():
         if KBB_util.LTC_LT(kbb.ltc, start_ltc):
             continue
+
+        if first_frame is None:
+            first_frame = kbb.ltc.frame_number(frame_rate)
         skipping = False
         #print kbb.header.msg_num, kbb.ltc, frame, frames
         if kbb.ltc.frames != skip_item:
             if frame_count%100==0:
                 print kbb.header.msg_num, kbb.ltc, frame_count
             skip_item = kbb.ltc.frames
-            frame = kbb.ltc.frame_number(frame_rate)
+            frame = kbb.ltc.frame_number(frame_rate) - first_frame + 1
             mc.setKeyframe(kb_node, attribute="tc_h", time=frame, value=kbb.ltc.hours)
             mc.setKeyframe(kb_node, attribute="tc_m", time=frame, value=kbb.ltc.minutes)
             mc.setKeyframe(kb_node, attribute="tc_s", time=frame, value=kbb.ltc.seconds)
@@ -164,11 +198,12 @@ def animateCam(kb_node, kbb_file, frame_rate=30, start_from=None, total_frames=N
     mc.keyTangent("%s_rotateX"%mc.ls(kb_node)[0], outTangentType="linear")
     mc.keyTangent("%s_rotateZ"%mc.ls(kb_node)[0], outTangentType="linear")
 
-    mc.playbackOptions(minTime=0,maxTime=end_frame)
-#    mc.playbackOptions(minTime=start_frame,maxTime=end_frame)
+    mc.playbackOptions(minTime=0,maxTime=(end_frame-first_frame+1))
 
 
-def mkScene(teximg="c:/ChibiStudio/workspace/kuroBox/scripts/UV.png"):
+def mkScene(teximg):
+    if ROOT_DIR is not None:
+        teximg = os.path.join(ROOT_DIR,teximg)
     skydome = mc.polySphere(name="skydome", r=1000)
     shader = mc.shadingNode("blinn", asShader=True)
     checker = mc.shadingNode("file", asTexture=True)
@@ -195,45 +230,3 @@ def dupK(oldname,newname,img_plane_imgs):
     imgPlane = mc.ls("%s*imagePlane"%newname)[0]
     mc.setAttr( "%s.imageName" % imgPlane, img_plane_imgs, type="string")
     return newnode
-
-
-"""
-import sys
-import maya.cmds as mc
-if "c:/ChibiStudio/workspace/kuroBox/scripts/" not in sys.path:
-    sys.path.append("c:/ChibiStudio/workspace/kuroBox/scripts/")
-
-import maya_tools
-maya_tools = reload(maya_tools)
-
-mc.file( force=True, new=True )
-maya_tools.mkScene()
-kb_node = maya_tools.mkK("DSC_0018","c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-21/DSC_0018/DSC_0018.00001.jpg",\
-    "c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-21/KURO0019.KBB")
-for i in ["DSC_0020","DSC_0022","DSC_0025","DSC_0026","DSC_0028","DSC_0029","DSC_0030","DSCN7309","DSCN7310","DSCN7311","DSCN7312","DSCN7313"]:
-    maya_tools.dupK(kb_node, i,"c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-21/%s/%s.00001.jpg"%(i,i)
-
-
--------------------------------------------------
-
-
-mc.setAttr("%s_imagePlaneShape.frameOffset"%name, -252)
-
-
--------------------------------------------------
-
-import sys
-import maya.cmds as mc
-if "c:/ChibiStudio/workspace/kuroBox/scripts/" not in sys.path:
-    sys.path.append("c:/ChibiStudio/workspace/kuroBox/scripts/")
-
-import maya_tools
-maya_tools = reload(maya_tools)
-
-mc.file( force=True, new=True )
-maya_tools.mkScene()
-
-kb_node = maya_tools.mkCam("DSC_0018","c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-21/DSC_0018/DSC_0018.00001.jpg")
-maya_tools.animateCam(kb_node,"c:/ChibiStudio/workspace/KUROBOX_TEST_DATA/2013-08-21/KURO0019.KBB",start_from="00:31:00:00")
-
-"""

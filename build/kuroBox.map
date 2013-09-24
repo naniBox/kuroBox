@@ -3292,7 +3292,7 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .comment       0x00000000       0x71 build/obj/spiEEPROM.o
  .comment       0x00000000       0x71 build/obj/ST7565.o
 
-.debug_info     0x00000000    0x2c6aa
+.debug_info     0x00000000    0x2c695
  .debug_info    0x00000000      0x2a3 build/obj/crt0.o
  .debug_info    0x000002a3      0x1f0 build/obj/vectors.o
  .debug_info    0x00000493       0x9a build/obj/chcore.o
@@ -3358,11 +3358,11 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_info    0x00025755      0x169 build/obj/kb_util.o
  .debug_info    0x000258be     0x1250 build/obj/kb_vectornav.o
  .debug_info    0x00026b0e     0x2016 build/obj/kb_writer.o
- .debug_info    0x00028b24     0x1f99 build/obj/main.o
- .debug_info    0x0002aabd      0xbd6 build/obj/spiEEPROM.o
- .debug_info    0x0002b693     0x1017 build/obj/ST7565.o
+ .debug_info    0x00028b24     0x1f84 build/obj/main.o
+ .debug_info    0x0002aaa8      0xbd6 build/obj/spiEEPROM.o
+ .debug_info    0x0002b67e     0x1017 build/obj/ST7565.o
 
-.debug_abbrev   0x00000000     0x73c3
+.debug_abbrev   0x00000000     0x73ab
  .debug_abbrev  0x00000000       0xaf build/obj/crt0.o
  .debug_abbrev  0x000000af       0xb1 build/obj/vectors.o
  .debug_abbrev  0x00000160       0x44 build/obj/chcore.o
@@ -3428,9 +3428,9 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_abbrev  0x0000674f       0xa3 build/obj/kb_util.o
  .debug_abbrev  0x000067f2      0x220 build/obj/kb_vectornav.o
  .debug_abbrev  0x00006a12      0x31f build/obj/kb_writer.o
- .debug_abbrev  0x00006d31      0x25f build/obj/main.o
- .debug_abbrev  0x00006f90      0x1dc build/obj/spiEEPROM.o
- .debug_abbrev  0x0000716c      0x257 build/obj/ST7565.o
+ .debug_abbrev  0x00006d31      0x247 build/obj/main.o
+ .debug_abbrev  0x00006f78      0x1dc build/obj/spiEEPROM.o
+ .debug_abbrev  0x00007154      0x257 build/obj/ST7565.o
 
 .debug_aranges  0x00000000     0x19a8
  .debug_aranges
@@ -3841,7 +3841,7 @@ OUTPUT(build/kuroBox.elf elf32-littlearm)
  .debug_str     0x00004f93      0x305 build/obj/kb_writer.o
                                 0xe81 (size before relaxing)
  .debug_str     0x00005298       0xff build/obj/main.o
-                                0xd21 (size before relaxing)
+                                0xd0c (size before relaxing)
  .debug_str     0x00005397       0xa1 build/obj/spiEEPROM.o
                                 0x569 (size before relaxing)
  .debug_str     0x00005438      0x148 build/obj/ST7565.o

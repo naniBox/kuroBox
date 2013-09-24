@@ -41,6 +41,7 @@
 #include "kb_time.h"
 #include "kb_vectornav.h"
 #include "kb_writer.h"
+#include "kb_altimeter.h"
 
 //-----------------------------------------------------------------------------
 // types and stuff
