@@ -20,6 +20,7 @@
 
 */
 
+//-----------------------------------------------------------------------------
 #include <ch.h>
 #include <hal.h>
 #include <string.h>
@@ -41,6 +42,11 @@
   	30*80*1 = 2400Hz (416.7us)
   	24*80*1 = 1920Hz (520.8us)
   Given this, we should be able to detect quite well the long and short pulses.
+
+  @TODO: implement some type of tracking algorithm, that can track the short &
+  		 long pulses. Note, the current algorithm works fine for realtime
+  		 playback of LTC, the only time we will need tracking is for when LTC
+  		 is sped up or slowed down
 
  */
 
@@ -105,7 +111,7 @@ static void ltc_store(uint8_t bit_set)
 }
 
 //-----------------------------------------------------------------------------
-void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
+void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
@@ -150,20 +156,23 @@ void ltc_exti_cb(EXTDriver *extp, expchannel_t channel)
 
 
 //-----------------------------------------------------------------------------
-const smpte_timecode_t * kbt_getLTC(void)
+const smpte_timecode_t * 
+kbt_getLTC(void)
 {
 	return &ltc_timecode;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxTimeInit(void)
+int 
+kuroBoxTimeInit(void)
 {
 	memset(&ltc_frame,0,sizeof(ltc_frame));
 	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxTimeStop(void)
+int 
+kuroBoxTimeStop(void)
 {
 	return KB_OK;
 }

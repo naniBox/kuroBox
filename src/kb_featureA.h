@@ -20,18 +20,21 @@
 
 */
 
+//-----------------------------------------------------------------------------
 #ifndef _naniBox_kuroBox_featureA
 #define _naniBox_kuroBox_featureA
 
+//-----------------------------------------------------------------------------
 #include "kb_util.h"
 
 //-----------------------------------------------------------------------------
 int kuroBoxFeatureAInit(void);
 int kuroBoxFeatureAStop(void);
 
+//-----------------------------------------------------------------------------
 int kbfa_getFeature(void);
 void kbfa_setFeature(int feature);
 int kbfa_changeFeature(void);
 
-
+//-----------------------------------------------------------------------------
 #endif // _naniBox_kuroBox_featureA

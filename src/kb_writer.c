@@ -21,6 +21,48 @@
 */
 
 //-----------------------------------------------------------------------------
+    /*
+
+	This file is important, so please listen up, this is how it works.
+
+	There are 2 threads spawned in here, the Logger & Writer. There is also
+	a buffer structure that stores the data. There are currently 2 buffers, both
+	initially empty. 
+
+	External data sources notify of new data via the kbw_setXXX() functions. That
+	data gets copied into the "current_msg" struct. This means that data can
+	change whenever, but whatever is in the "current_msg" struct is a snapshot
+	of the system at any given point.
+
+	The logger thread is triggered every 5ms (200Hz), it copies the contents of 
+	the "current_msg" struct into a spare slot in the current buffer. If, for
+	whatever reason, the thread can't copy the data in time, the "write_errors"
+	count is increased (this is reset on every file), so that at least it is
+	known when it happened.
+
+	Once the current write buffer is full (currently 48 slots), the writer thread
+	is woken. This thread just gets a writer buffer and writes it out to SD, then
+	it returns that buffer to the pool, and goes back to sleep.
+
+	It is important to have the buffers as big as possible, so that we can
+	aim for maximum throughput with minimum interrups and therefore fewer drops.
+
+	When the writer thread is trying to write out data, but the SD card is 
+	blocking the write (because of internal SD Flash delay), the 2x48 slot buffers
+	will fill up before the write finishes - meaning that we will start dropping
+	data and accumilating write errors. 
+
+	This, at some point, is unavoidable until I make kuroBox have at least 
+	1MB of SRAM that can buffer up to 10 seconds of	data. Currently, with 48kB,
+	we buffer about 400ms worth of data, and 64kB would give us ~600ms. 
+	One possible improvement in this field is to try to put all stack data 
+	into CCM to free up normal SRAM, but bigger buffer == better.
+
+    */
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 #include "kb_writer.h"
 #include "kb_screen.h"
 #include "kb_util.h"
@@ -110,30 +152,44 @@ struct __PACKED__ log_msg_v01_t
 STATIC_ASSERT(sizeof(log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
 //-----------------------------------------------------------------------------
+// threads and states. 
+// Threads should only be woken if they're asleep, so we use the thread pointer
+// for that. We also need to clean up on shutdown, and that's what the other 
+// pointers are for
 static Thread * loggerThread;
 static Thread * writerThread;
 static Thread * writerThreadForSleep;
-
 static uint8_t logger_state;
 
 //-----------------------------------------------------------------------------
+// specifics for FatFS
 static uint8_t fs_ready;
 static uint8_t fs_write_protected;
 static FATFS SDC_FS;
+static FIL kbfile;
 uint32_t cardsize_MB;
 
 //-----------------------------------------------------------------------------
+// this is our logging message - things get memcpy'd into this when the data
+// is available, and this is copied into the write buffer at the specified
+// timeslot
 static log_msg_v01_t current_msg;
 
+//-----------------------------------------------------------------------------
+// we have 2 buffers of 48 messages each: 24kB each (512bytes * 48), for a total
+// usage of 48kB. This should be the largest possible - any free SRAM should be
+// dedicated to this, so we have the least number of writes, increasing throughput
+// and write latencies and possible skips
 #define BUFFER_COUNT		2
 #define BUFFER_SIZE			48		// size in "log_msg_v01_t" units
+typedef struct write_buffer_t write_buffer_t;
 struct write_buffer_t
 {
 	struct log_msg_v01_t buffer[BUFFER_SIZE];
 	int8_t current_idx;
 };
 static Semaphore 				write_buffer_semaphore;
-static struct write_buffer_t 	write_buffers[BUFFER_COUNT];
+static write_buffer_t 			write_buffers[BUFFER_COUNT];
 
 #define NANIBOX_DNAME "/nanibox"
 #define KUROBOX_FNAME_STEM "kuro"
@@ -146,9 +202,17 @@ static struct write_buffer_t 	write_buffers[BUFFER_COUNT];
 #define KUROBOX_ERR3 "<load \\>"
 #define KUROBOX_ERR4 "<load |>"
 #define KUROBOX_ERR5 "<load />"
-FIL kbfile;
+
 
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Buffers and stuff
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// when the logger thread needs a new buffer, we call this - it's semaphore 
+// protected
 static int8_t
 new_write_buffer_idx_to_fill(void)
 {
@@ -173,18 +237,20 @@ new_write_buffer_idx_to_fill(void)
 }
 
 //-----------------------------------------------------------------------------
+// when the logger thread finishes with a buffer, we notify the writer thread,
+// if it's sleeping
 static void
 return_write_buffer_idx_after_filling(int8_t idx)
 {
-	// if there's a thread waiting on filled buffers, then we need to notify it
+	// lets lock the system before checking just in case
+	chSysLock();
 	if (writerThreadForSleep)
 	{
-		chSysLock();
 		writerThreadForSleep->p_u.rdymsg = (msg_t)idx+1;
 		chSchReadyI(writerThreadForSleep);
 		writerThreadForSleep = NULL;
-		chSysUnlock();
 	}
+	chSysUnlock();
 }
 
 //-----------------------------------------------------------------------------
@@ -213,12 +279,16 @@ static void
 return_write_buffer_idx_after_writing(int8_t idx)
 {
 	chSemWait(&write_buffer_semaphore);
+	// @TODO: optional? Do we really need to memset it? we ARE going to be
+	// overwriting it
 	memset(&write_buffers[idx],0,sizeof(write_buffers[idx]));
+	// if the current idx is -1, then we can assume it's good to go
 	write_buffers[idx].current_idx = -1;
 	chSemSignal(&write_buffer_semaphore);
 }
 
 //-----------------------------------------------------------------------------
+// new file scenario / etc. 
 static void
 flush_write_buffers(void)
 {
@@ -233,61 +303,84 @@ flush_write_buffers(void)
 	chSemSignal(&write_buffer_semaphore);
 }
 
+
 //-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// FatFS related stuff
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// If there's no "nanibox" directory, create it, doesn't do anything if it 
+// exists
 static uint8_t
 make_dirs(void)
 {
-	FRESULT err;
+	FRESULT stat;
 	DIR naniBox_dir;
-	err = f_opendir(&naniBox_dir, NANIBOX_DNAME);
-	if (FR_NO_PATH == err)
+	stat = f_opendir(&naniBox_dir, NANIBOX_DNAME);
+	if (FR_NO_PATH == stat)
 	{
-		err = f_mkdir(NANIBOX_DNAME);
+		stat = f_mkdir(NANIBOX_DNAME);
 	}
-	return err;
+	return stat;
 }
 
 //-----------------------------------------------------------------------------
+// This function kinda sucks, but it's understandable.
+// We sequentially try to create files called KUROxxxx.KBB, where xxxx 0->0999,
+// with the flags set to only open if file doesn't exists. So if the file
+// does exists, we get a FR_EXIST return value, and try the next.
 static uint8_t
 new_file(void)
 {
 	char charbuf[64];
 	MemoryStream msb;
-	FRESULT err = FR_OK;
+	FRESULT stat = FR_OK;
 	uint16_t fnum = 0;
 	for( ; fnum < 1000 ; fnum++ )
 	{
+		// the joys of doing an sprintf();
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
 		chprintf((BaseSequentialStream *)&msb, "%s/%s%.4d%s", NANIBOX_DNAME,
 				KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
-		err = f_open(&kbfile, charbuf, FA_WRITE|FA_CREATE_NEW);
+		stat = f_open(&kbfile, charbuf, FA_WRITE|FA_CREATE_NEW);
+
+		// make sure that changes are flushed out to disk
 		f_sync(&kbfile);
-		if (err == FR_EXIST)
+
+		if (stat == FR_EXIST)
+			// it exists, just try the next
 			continue;
-		else if (err != FR_OK)
-			return err;
+		else if (stat != FR_OK)
+			// we got a return code that's not FR_EXIST or FR_OK, which means
+			// a different type of error, return from this.
+			return stat;
 		else
+			// new file created, lets break from loop
 			break;
 	}
 
 	// we can only get an OK if we opened the file
-	if (err == FR_OK)
+	if (stat == FR_OK)
 	{
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
 		chprintf((BaseSequentialStream *)&msb, "%s%.4d", KUROBOX_FNAME_STEM, fnum);
+		// since we don't want the full path or the extension, lets do that here
 		kbs_setFName(charbuf);
 	}
 
-	return err;
+	return stat;
 }
 
 //-----------------------------------------------------------------------------
+// the SD card has been inserted, do the necessary steps to get a sane system
 static int
 on_insert(void)
 {
-	FRESULT err;
+	FRESULT stat;
 
 	kbs_setFName(KUROBOX_LOADING_NAME);
 	if (sdcConnect(&SDCD1) != CH_SUCCESS)
@@ -295,8 +388,9 @@ on_insert(void)
 		kbs_setFName(KUROBOX_ERR1);
 		return KB_NOT_OK;
 	}
-	err = f_mount(0, &SDC_FS);
-	if (err != FR_OK)
+
+	stat = f_mount(0, &SDC_FS);
+	if (stat != FR_OK)
 	{
 		kbs_setFName(KUROBOX_ERR2);
 		sdcDisconnect(&SDCD1);
@@ -305,9 +399,9 @@ on_insert(void)
 
 	chThdSleepMilliseconds(100);
 	uint32_t clusters;
-	FATFS *fsp;
-	err = f_getfree("/", &clusters, &fsp);
-	if (err != FR_OK)
+	FATFS * fsp = NULL;
+	stat = f_getfree("/", &clusters, &fsp);
+	if (stat != FR_OK)
 	{
 		kbs_setFName(KUROBOX_ERR3);
 		sdcDisconnect(&SDCD1);
@@ -316,25 +410,27 @@ on_insert(void)
 	uint64_t cardsize = clusters * (((uint32_t)fsp->csize * (uint32_t)MMCSD_BLOCK_SIZE) / 1024);
 	cardsize_MB = cardsize / 1024;
 
+	// @TODO: this can be moved to above the check for free space
 	fs_write_protected = sdc_lld_is_write_protected(&SDCD1);
 	if ( fs_write_protected )
 	{
+		// -1 means that it's write protected, display that
 		kbs_setSDCFree(-1);
 		kbs_setFName(KUROBOX_WP_NAME);
 		return KB_NOT_OK;
 	}
 	kbs_setSDCFree(cardsize_MB);
 
-	err = make_dirs();
-	if (err != FR_OK)
+	stat = make_dirs();
+	if (stat != FR_OK)
 	{
 		kbs_setFName(KUROBOX_ERR4);
 		sdcDisconnect(&SDCD1);
 		return KB_NOT_OK;
 	}
 
-	err = new_file();
-	if (err != FR_OK)
+	stat = new_file();
+	if (stat != FR_OK)
 	{
 		kbs_setFName(KUROBOX_ERR5);
 		sdcDisconnect(&SDCD1);
@@ -344,11 +440,12 @@ on_insert(void)
 	// here we write out the header to the file
 	uint8_t * buf = (uint8_t*) &writer_header;
 	UINT bytes_written = 0;
-	err = f_write(&kbfile, buf, writer_header.msg_size, &bytes_written);
-	if (bytes_written != sizeof(writer_header.msg_size) || err != FR_OK)
+	stat = f_write(&kbfile, buf, writer_header.msg_size, &bytes_written);
+	if (bytes_written != sizeof(writer_header.msg_size) || stat != FR_OK)
 		current_msg.write_errors++;
-	err = f_sync(&kbfile);
-	if (err != FR_OK)
+
+	stat = f_sync(&kbfile);
+	if (stat != FR_OK)
 		current_msg.write_errors++;
 
 	fs_ready = TRUE;
@@ -358,6 +455,8 @@ on_insert(void)
 }
 
 //-----------------------------------------------------------------------------
+// usually alreay too late to actually disconnect, but it's good to have
+// things in a known state
 static void
 on_remove(void)
 {
@@ -368,6 +467,10 @@ on_remove(void)
 }
 
 //-----------------------------------------------------------------------------
+// This is called by the writer thread, and doesn't return until the SD
+// is in a known state, the inital header is written out, and all is ready to
+// go for normal writing. It will exit if we have requested the thread should
+// terminate (for shutdown)
 static uint8_t
 wait_for_sd(void)
 {
@@ -406,6 +509,8 @@ wait_for_sd(void)
 }
 
 //-----------------------------------------------------------------------------
+// just checks up on the current status, and if there's no card, makes sure
+// on_remove() is called
 static uint8_t
 sd_card_status(void)
 {
@@ -423,6 +528,9 @@ sd_card_status(void)
 }
 
 //-----------------------------------------------------------------------------
+// main writer thread function - is called when SD card is ready and we're just
+// going to keep writing until SD card is ejected.
+// @TODO: when file exceeds 1GB, start a new file
 static uint8_t
 writing_run(void)
 {
@@ -453,17 +561,21 @@ writing_run(void)
 			continue;
 		}
 
-		struct write_buffer_t * buf = &write_buffers[idx];
+		// here we have a full buffer ready to write
+		write_buffer_t * buf = &write_buffers[idx];
 
 		UINT bytes_written = 0;
-		FRESULT err = FR_OK;
-		err = f_write(&kbfile, buf->buffer, sizeof(buf->buffer), &bytes_written);
-		if (bytes_written != sizeof(buf->buffer) || err != FR_OK)
+		FRESULT stat = FR_OK;
+		stat = f_write(&kbfile, buf->buffer, sizeof(buf->buffer), &bytes_written);
+
+		if (bytes_written != sizeof(buf->buffer) || stat != FR_OK)
 			current_msg.write_errors++;
-		err = f_sync(&kbfile);
-		if (err != FR_OK)
+		
+		stat = f_sync(&kbfile);
+		if (stat != FR_OK)
 			current_msg.write_errors++;
 
+		// we're done, return it
 		return_write_buffer_idx_after_writing(idx);
 
 		kbs_setWriteCount(current_msg.msg_num);
@@ -478,15 +590,19 @@ writing_run(void)
 }
 
 //-----------------------------------------------------------------------------
+// The writer thread run function, only returns on shutdown. It gets the SD card
+// ready, and then just goes to sleep until there's something to write
+// @TODO: reduce the working area size to its reasonable limit
 static WORKING_AREA(waWriter, 1024*8);
 static msg_t 
 thWriter(void *arg)
 {
-	chDbgAssert(LS_INIT == logger_state, "thWriter, 1", "logger_state is not LS_INIT");
+	ASSERT(LS_INIT == logger_state, "thWriter, 1", "logger_state is not LS_INIT");
 	(void)arg;
 
 	chRegSetThreadName("Writer");
 
+	// this data never changes, until we start added in new message types
 	current_msg.preamble = LOGGER_PREAMBLE;
 	current_msg.version = LOGGER_VERSION;
 	current_msg.msg_type = LOGGER_DATA_MSG_TYPE;
@@ -524,11 +640,20 @@ thWriter(void *arg)
 }
 
 //-----------------------------------------------------------------------------
+// The logger thread run function. 
+// This thread copies the "current_msg" to the write buffer every 5ms. If a
+// time slot is missed, it is noted and will try again next slot.
 static WORKING_AREA(waLogger, 1024*1);
 static msg_t
 thLogger(void *arg)
 {
 	(void)arg;
+
+	// These nested while() loops require some explanation.
+	// If the current state is running, we should be in the inner loop
+	// always - just storing, etc. But if the SD is not ready yet,
+	// we will be in the outer loop, flushing buffers, and signalling
+	// 
 
 	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
 	{
@@ -550,7 +675,7 @@ thLogger(void *arg)
 			}
 
 			// here we'll have a good buffer to fill up until it's all full!
-			struct write_buffer_t * wb = &write_buffers[current_idx];
+			write_buffer_t * wb = &write_buffers[current_idx];
 			{
 				log_msg_v01_t * lm = &wb->buffer[wb->current_idx];
 
@@ -568,7 +693,7 @@ thLogger(void *arg)
 			}
 
 			// chTimeNow() will roll over every ~49 days
-			// @TODO: make this code handle that (or not)
+			// @TODO: make this code handle that (or not, 49 days is a lot!!)
 			while ( sleep_until < chTimeNow() )
 			{
 				// this code handles for when we skipped a writing-slot
@@ -602,9 +727,10 @@ thLogger(void *arg)
 
 
 //-----------------------------------------------------------------------------
-int kuroBoxWriterInit(void)
+int
+kuroBoxWriterInit(void)
 {
-	chDbgAssert(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
+	ASSERT(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
 
 	chSemInit(&write_buffer_semaphore, 1);
 	kbs_setFName(KUROBOX_BLANK_FNAME);
@@ -616,7 +742,8 @@ int kuroBoxWriterInit(void)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxWriterStop(void)
+int
+kuroBoxWriterStop(void)
 {
 	chThdTerminate(loggerThread);
 	chThdTerminate(writerThread);
@@ -636,38 +763,45 @@ int kuroBoxWriterStop(void)
 }
 
 //-----------------------------------------------------------------------------
-void kbw_setLTC(ltc_frame_t * ltc_frame)
+void
+kbw_setLTC(ltc_frame_t * ltc_frame)
 {
 	memcpy(&current_msg.ltc_frame, ltc_frame, sizeof(current_msg.ltc_frame));
 }
 
 //-----------------------------------------------------------------------------
-void kbw_incPPS(void)
+void
+kbw_incPPS(void)
 {
 	current_msg.pps++;
 }
 
 //-----------------------------------------------------------------------------
-void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol)
+void
+kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol)
 {
 	memcpy(&current_msg.nav_sol, nav_sol, sizeof(current_msg.nav_sol));
 }
 
 //-----------------------------------------------------------------------------
-void kbw_setVNav(vnav_data_t * vnav)
+void
+kbw_setVNav(vnav_data_t * vnav)
 {
 	memcpy(&current_msg.vnav, vnav, sizeof(current_msg.vnav));
 }
 
 //-----------------------------------------------------------------------------
-void kbw_setAltitude(float alt, float tem)
+void
+kbw_setAltitude(float altitude, float temperature)
 {
-	current_msg.altitude = alt;
-	current_msg.temperature = tem;
+	current_msg.altitude = altitude;
+	current_msg.temperature = temperature;
 }
 
 //-----------------------------------------------------------------------------
-void kbw_header_vnav(uint8_t * data)
+void 
+kbwh_setVNav(uint8_t * data, uint16_t length)
 {
+	ASSERT(sizeof(writer_header.vnav_header) == length, "kbw_header_vnav", "Length of vnav_header does not match");
 	memcpy(&writer_header.vnav_header, data, sizeof(writer_header.vnav_header));
 }

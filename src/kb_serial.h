@@ -44,14 +44,15 @@ int kuroBoxSerialStop(void);
 int kbse_setPower(int which, int on);
 int kbse_getPower(int which);
 
+//----------------------------------------------------------------------------
 #define kbse_setPowerSerial1(on) 		kbse_setPower(1,on)
 #define kbse_setPowerSerial2(on) 		kbse_setPower(2,on)
 
-#define kbse_setPowerSerial1On() 		kbse_setPower(1,1)
-#define kbse_setPowerSerial1Off() 		kbse_setPower(1,0)
+#define kbse_setPowerSerial1On() 		kbse_setPowerSerial1(1)
+#define kbse_setPowerSerial1Off() 		kbse_setPowerSerial1(0)
 
-#define kbse_setPowerSerial2On() 		kbse_setPower(2,1)
-#define kbse_setPowerSerial2Off() 		kbse_setPower(2,0)
+#define kbse_setPowerSerial2On() 		kbse_setPowerSerial2(1)
+#define kbse_setPowerSerial2Off() 		kbse_setPowerSerial2(0)
 
 #define kbse_getPowerSerial1() 			kbse_getPower(1)
 #define kbse_getPowerSerial2() 			kbse_getPower(2)

@@ -46,10 +46,11 @@ static SerialConfig * serial1_cfg;
 static SerialConfig * serial2_cfg;
 
 //-----------------------------------------------------------------------------
-int kuroBoxSerialInit(SerialConfig  * s1_cfg, SerialConfig * s2_cfg)
+int 
+kuroBoxSerialInit(SerialConfig  * s1_cfg, SerialConfig * s2_cfg)
 {
-	if ( !s1_cfg ) serial1_cfg = &serial1_default_cfg;
-	if ( !s2_cfg ) serial2_cfg = &serial2_default_cfg;
+	serial1_cfg = s1_cfg? s1_cfg : &serial1_default_cfg;
+	serial2_cfg = s2_cfg? s2_cfg : &serial2_default_cfg;
 
 	sdStart(&Serial1, serial1_cfg);
 	sdStart(&Serial2, serial2_cfg);
@@ -58,7 +59,8 @@ int kuroBoxSerialInit(SerialConfig  * s1_cfg, SerialConfig * s2_cfg)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxSerialStop(void)
+int 
+kuroBoxSerialStop(void)
 {
 	sdStop(&Serial2);
 	sdStop(&Serial1);
@@ -69,7 +71,8 @@ int kuroBoxSerialStop(void)
 }
 
 //-----------------------------------------------------------------------------
-int kbse_setPower(int which, int on)
+int 
+kbse_setPower(int which, int on)
 {
 	switch ( which )
 	{
@@ -86,7 +89,8 @@ int kbse_setPower(int which, int on)
 }
 
 //-----------------------------------------------------------------------------
-int kbse_getPower(int which)
+int 
+kbse_getPower(int which)
 {
 	switch ( which )
 	{
@@ -97,7 +101,8 @@ int kbse_getPower(int which)
 }
 
 //-----------------------------------------------------------------------------
-int32_t kbse_getBaud(int which)
+int32_t 
+kbse_getBaud(int which)
 {
 	switch ( which )
 	{
@@ -108,7 +113,8 @@ int32_t kbse_getBaud(int which)
 }
 
 //-----------------------------------------------------------------------------
-int kbse_changeBaud(int which)
+int 
+kbse_changeBaud(int which)
 {
 	SerialConfig * cfg = NULL;
 	SerialDriver * drv = NULL;
@@ -149,7 +155,8 @@ int kbse_changeBaud(int which)
 }
 
 //-----------------------------------------------------------------------------
-int kbse_setBaud(int which, int32_t baud)
+int 
+kbse_setBaud(int which, int32_t baud)
 {
 	SerialConfig * cfg = NULL;
 	SerialDriver * drv = NULL;

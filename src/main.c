@@ -44,14 +44,6 @@
 #include "kb_altimeter.h"
 
 //-----------------------------------------------------------------------------
-// types and stuff
-#define GS_INIT 		0
-#define GS_WAIT_ON_SD	1
-#define GS_RUNNING		2
-#define GS_ERROR		3
-typedef uint32_t kuroBoxState_t;
-
-//-----------------------------------------------------------------------------
 // forward declarations
 int kuroBoxStop(void);
 
@@ -59,7 +51,6 @@ int kuroBoxStop(void);
 // static data
 static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
 static Thread * blinkerThread;
-static kuroBoxState_t global_state;
 extern bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
@@ -94,19 +85,19 @@ static const ST7565Config lcd_cfg =
 //-----------------------------------------------------------------------------
 static const EXTConfig extcfg = {
   {
-	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_0_exti_cb},	// 0
-	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, btn_1_exti_cb},	// 1
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, kbbtn_0ExtiCB},	// 0
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, kbbtn_1ExtiCB},	// 1
 
     {EXT_CH_MODE_DISABLED, NULL},	// 2
-	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, gps_timepulse_exti_cb},	// 3
+	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOC, kbg_timepulseExtiCB},	// 3
     {EXT_CH_MODE_DISABLED, NULL},	// 4
     {EXT_CH_MODE_DISABLED, NULL},	// 5
     {EXT_CH_MODE_DISABLED, NULL},	// 6
     {EXT_CH_MODE_DISABLED, NULL},	// 7
     {EXT_CH_MODE_DISABLED, NULL},	// 8
-	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, ltc_exti_cb},	// 9
+	{EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOA, kbt_pulseExtiCB},	// 9
     {EXT_CH_MODE_DISABLED, NULL},	// 10
-	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, vn_dr_int_exti_cb},	// 11
+	{EXT_CH_MODE_FALLING_EDGE | EXT_CH_MODE_AUTOSTART | EXT_MODE_GPIOE, kbv_drIntExtiCB},	// 11
     {EXT_CH_MODE_DISABLED, NULL},	// 12
     {EXT_CH_MODE_DISABLED, NULL},	// 13
     {EXT_CH_MODE_DISABLED, NULL},	// 14
@@ -121,6 +112,7 @@ static const EXTConfig extcfg = {
   }
 };
 
+//-----------------------------------------------------------------------------
 // I2C interface #2, this lives on Layer1's expansion board
 static const I2CConfig i2cfg2 = {
     OPMODE_I2C,
@@ -148,7 +140,9 @@ thBlinker(void *arg)
 void
 kuroBox_panic(int msg)
 {
-	return;// this function is doing more harm than good...
+	(void)msg;
+// this function is doing more harm than good...
+#if 0 
 	switch( msg )
 	{
 	case unknown_panic:
@@ -157,7 +151,7 @@ kuroBox_panic(int msg)
 			while(1)
 			{
 				palTogglePad(GPIOA, GPIOA_LED3);
-				chThdSleepMilliseconds(50);
+				chThdSleepMilliseconds(50);async_vn_msg_t
 			}			
 		}
 	case no_panic:
@@ -169,6 +163,7 @@ kuroBox_panic(int msg)
 			}			
 		}
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -181,18 +176,24 @@ kuroBox_standby(void)
 
 #define DO_FAKE_STANDBY
 #ifdef DO_FAKE_STANDBY
+
 	while ( !kbg_getBtn0() )
 		;
 
-	__DSB();                                                     /* Ensure all outstanding memory accesses included
-																  buffered write are completed before reset */
+	// Ensure all outstanding memory accesses included buffered write 
+	// are completed before reset
+	__DSB();
+
+	// Keep priority group unchanged
 	SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
 				 (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
-				 SCB_AIRCR_SYSRESETREQ_Msk);                   /* Keep priority group unchanged */
-	__DSB();                                                     /* Ensure completion of memory access */
+				 SCB_AIRCR_SYSRESETREQ_Msk);
+
+	// Ensure completion of memory access
+	__DSB();
 	while(1)
 	  ;
-#else
+#else //  DO_FAKE_STANDBY
 
 #if _DEBUG
 	DBGMCU->CR |= DBGMCU_CR_DBG_STANDBY;
@@ -217,8 +218,7 @@ kuroBox_standby(void)
 		// Request Wait For Interrupt
 		__WFI();
 
-#endif
-
+#endif //  DO_FAKE_STANDBY
 }
 
 //-----------------------------------------------------------------------------
@@ -236,8 +236,6 @@ kuroBoxInit(void)
 
 	// Serial
 	kuroBoxSerialInit(NULL, NULL);
-
-	// ACD to monitor voltage levels.
 
 	// start the SPI bus, just use the LCD's SPI config since
 	// it's shared with the eeprom
@@ -257,6 +255,7 @@ kuroBoxInit(void)
 	// read config goes here
 	// @TODO: add config reading from eeprom
 	
+	// ADC to monitor voltage levels.
 	// start all the ADC stuff!
 	kuroBoxADCInit();
 	
@@ -272,34 +271,38 @@ kuroBoxInit(void)
 	// this turns on Layer 1 power, this turns on the mosfets controlling the
 	// VCC rail. After this, we can start GPS, VectorNav and altimeter
 	kbg_setL1PowerOn();
-	// wait for it to stabilise before continuing
+
+	// wait for it to stabilise, poweron devices, and let them start before continuing
 	chThdSleepMilliseconds(500);
 
 	// gps uart
-	kuroBoxGPSInit();
+	kuroBoxGPSInit(&SD6);
 
 	VND1.spip = &SPID2;
 	VND1.gpdp = &GPTD14;
 	kuroBoxVectorNavInit(&VND1, NULL); // use the defaults
 
-	// start I2C here, since it's potentially a shared bus
+	// start I2C here, since it's a shared bus
 	i2cStart(&I2CD2, &i2cfg2);
 
 	// and the altimeter, also spawns a thread.
 	kuroBoxAltimeterInit();
 
+	// init the menu structure, and thread, if needed
 	kuroBoxMenuInit();
 
 	// set initial button state, AFTER menus!
 	kuroBoxButtonsInit();
 
+	// read all configs from bksram and load them up thoughout the system
 	kuroBoxConfigInit();
 
+	// Feature "A" - just a test feature that sends updates over serial
 	kuroBoxFeatureAInit();
 
 	// indicate we're ready
 	chprintf(DEBG, "%s\n\r\n\r", BOARD_NAME);
-	chThdSleepMilliseconds(100);
+	chThdSleepMilliseconds(50);
 	kbg_setLED1(0);
 	kbg_setLED2(0);
 	kbg_setLED3(0);
@@ -347,22 +350,7 @@ kuroBoxStop(void)
 //-----------------------------------------------------------------------------
 int main(void) 
 {
-
-	/*
-		struct tm timp;
-		timp.tm_sec = 0;
-		timp.tm_min = 18;
-		timp.tm_hour = 0;
-		timp.tm_mday = 25; // -1
-		timp.tm_mon = 5;
-		timp.tm_year = 113;
-		rtcSetTimeTm(&RTCD1, &timp);
-	 */
-
-	if ( KB_OK != kuroBoxInit() )
-		global_state = GS_ERROR;
-	else
-		global_state = GS_WAIT_ON_SD;
+	kuroBoxInit();
 
 	while( 1 )
 	{

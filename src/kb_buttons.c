@@ -61,7 +61,7 @@ int kuroBoxButtonsStop(void)
 }
 
 //-----------------------------------------------------------------------------
-void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
+void kbbtn_0ExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
@@ -72,7 +72,7 @@ void btn_0_exti_cb(EXTDriver *extp, expchannel_t channel)
 }
 
 //-----------------------------------------------------------------------------
-void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
+void kbbtn_1ExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
@@ -83,6 +83,7 @@ void btn_1_exti_cb(EXTDriver *extp, expchannel_t channel)
 }
 
 //-----------------------------------------------------------------------------
+/*
 bool_t is_btn_0_pressed(void)
 {
 	return btn_0_pressed == 0;
@@ -93,3 +94,4 @@ bool_t is_btn_1_pressed(void)
 {
 	return btn_1_pressed == 0;
 }
+*/

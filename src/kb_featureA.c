@@ -31,6 +31,7 @@
 #define FEATURE_A_REFRESH_SLEEP		10
 static int current_feature;
 
+//-----------------------------------------------------------------------------
 #define LTC_PREFIX "\x79\x00\x77\x10"
 #define YPR_PREFIX "\x79\x00\x77\x00"
 #define BLANK_PREFIX "\x76\x77\x04"
@@ -44,8 +45,6 @@ thFeatureA(void *arg)
 	(void)arg;
 	chRegSetThreadName("FeatureA");
 
-	float ypr[3];
-	ypr[0] = ypr[1] = ypr[2] = 0.0f;
 	while( !chThdShouldTerminate() )
 	{
 		switch( current_feature )
@@ -69,21 +68,21 @@ thFeatureA(void *arg)
 			break;
 		case 2:
 			{
-				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
+				const vnav_data_t * ypr = kbv_getYPR();
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
-				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr[0]);
+				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr->ypr[0]);
 			} break;
 		case 3:
 			{
-				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
+				const vnav_data_t * ypr = kbv_getYPR();
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
-				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr[1]);
+				chprintf(((BaseSequentialStream *)&Serial1), "%.4d", (int)ypr->ypr[1]);
 			} break;
 		case 4:
 			{
-				kbv_getYPR(&ypr[0], &ypr[1], &ypr[2]);
+				const vnav_data_t * ypr = kbv_getYPR();
 				sdWrite(&Serial1, (uint8_t*)YPR_PREFIX, 4);
-				chprintf(((BaseSequentialStream *)&Serial1),  "%.4d", (int)ypr[2]);
+				chprintf(((BaseSequentialStream *)&Serial1),  "%.4d", (int)ypr->ypr[2]);
 			} break;
 		case 5:
 		default:
@@ -97,20 +96,23 @@ thFeatureA(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-int kbfa_getFeature()
+int 
+kbfa_getFeature()
 {
 	return current_feature;
 }
 
 //-----------------------------------------------------------------------------
-void kbfa_setFeature(int feature)
+void 
+kbfa_setFeature(int feature)
 {
 	if ( feature >= 0 && feature <= 5 )
 		current_feature = feature;
 }
 
 //-----------------------------------------------------------------------------
-int kbfa_changeFeature()
+int 
+kbfa_changeFeature()
 {
 	switch( current_feature )
 	{
@@ -126,16 +128,17 @@ int kbfa_changeFeature()
 	return 0;
 }
 
-
 //-----------------------------------------------------------------------------
-int kuroBoxFeatureAInit(void)
+int 
+kuroBoxFeatureAInit(void)
 {
 	featureAThread = chThdCreateStatic(waFeatureA, sizeof(waFeatureA), NORMALPRIO, thFeatureA, NULL);
 	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxFeatureAStop(void)
+int 
+kuroBoxFeatureAStop(void)
 {
 	chThdTerminate(featureAThread);
 	chThdWait(featureAThread);

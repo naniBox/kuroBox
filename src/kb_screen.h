@@ -20,9 +20,11 @@
 
 */
 
+//-----------------------------------------------------------------------------
 #ifndef _naniBox_kuroBox_screen
 #define _naniBox_kuroBox_screen
 
+//-----------------------------------------------------------------------------
 #include <ch.h>
 #include "kb_time.h"
 
@@ -48,4 +50,5 @@ void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z);
 
 void kbs_setYPR(float yaw, float pitch, float roll);
 
+//-----------------------------------------------------------------------------
 #endif // _naniBox_kuroBox_screen

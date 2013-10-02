@@ -45,7 +45,7 @@ static SerialConfig gps_cfg = {
 
 //-----------------------------------------------------------------------------
 void
-ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt)
+kbg_ecef2lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt)
 {
     float a = 6378137.0f;
     float e = 8.1819190842622e-2f;
@@ -57,8 +57,8 @@ ecef_to_lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * a
     *lat = atan2((z+ep*ep*b*pow(sin(th),3)), (p-e*e*a*pow(cos(th),3)));
     float n = a/sqrt(1-e*e*pow(sin(*lat),2));
     *alt = p/cos(*lat)-n;
-    *lat = (*lat*180)/M_PI;
-    *lon = (*lon*180)/M_PI;
+    *lat = (*lat*180.0f)/M_PI;
+    *lon = (*lon*180.0f)/M_PI;
 }
 
 //-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ parse_and_store_nav_sol(void)
 			uint16_t cs = calc_checksum_16( ubx_nav_sol_buffer+2, UBX_NAV_SOL_SIZE-4 );
 			if ( nav_sol->cs == cs )
 			{
-				// valid packet!
+				// everything checks out, valid packet!
 				chSysLock();
 					memcpy(&ubx_nav_sol_valid, nav_sol, sizeof(ubx_nav_sol_valid));
 					kbs_setGpsEcef(nav_sol->ecefX, nav_sol->ecefY, nav_sol->ecefZ);
@@ -94,16 +94,34 @@ static WORKING_AREA(waGps, 128);
 static msg_t
 thGps(void *arg)
 {
-	(void)arg;
+	SerialDriver * sd = (SerialDriver *)arg;
 	chRegSetThreadName("Gps");
 
 	memset(ubx_nav_sol_buffer, 0, sizeof(ubx_nav_sol_buffer));
 	while( !chThdShouldTerminate() )
 	{
 		uint8_t c = 0;
-		if ( sdRead(&SD6, &c, 1) != 1 )
+		// read one byte at a time, this function blocks until there's
+		// something to read
+		if ( sdRead(sd, &c, 1) != 1 )
+			// but just in case, if nothing was read, try again
 			continue;
 
+		/*
+			This works this way:
+			- if at idx == 0 and the first byte is the same as the first byte of the header
+			 -or-
+			- if at idx == 1 and the second byte is the same as the second byte of the header
+			 -or-
+			- if at idx >= 2 and idx < size of packet
+
+			THEN:
+				store it, advance idx
+			If not, reset idx and start from the begining.
+			
+
+			@TODO: handle different messages
+		 */
 		if ( ( ubx_nav_sol_idx == 0 && c == (UBX_HEADER&0xff) ) ||
 			 ( ubx_nav_sol_idx == 1 && c == ((UBX_HEADER>>8)&0xff) ) ||
 			 ( ( ubx_nav_sol_idx > 1 ) &&
@@ -120,27 +138,31 @@ thGps(void *arg)
 
 //-----------------------------------------------------------------------------
 void
-gps_timepulse_exti_cb(EXTDriver *extp, expchannel_t channel)
+kbg_timepulseExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
 
 	chSysLockFromIsr();
+		// @TODO: inform VectorNav that this happened
 		kbw_incPPS();
 		kbs_PPS();
 	chSysUnlockFromIsr();
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxGPSInit(void)
+int 
+kuroBoxGPSInit(SerialDriver * sd)
 {
-	sdStart(&SD6, &gps_cfg);
-	gpsThread = chThdCreateStatic(waGps, sizeof(waGps), NORMALPRIO, thGps, NULL);
+	ASSERT(sd != NULL, "kuroBoxGPSInit 1", "SerialDriver is NULL");
+	sdStart(sd, &gps_cfg);
+	gpsThread = chThdCreateStatic(waGps, sizeof(waGps), NORMALPRIO, thGps, &SD6);
 	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxGPSStop(void)
+int 
+kuroBoxGPSStop(void)
 {
 	chThdTerminate(gpsThread);
 	chThdWait(gpsThread);

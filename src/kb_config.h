@@ -20,9 +20,11 @@
 
 */
 
+//-----------------------------------------------------------------------------
 #ifndef _naniBox_kuroBox_config
 #define _naniBox_kuroBox_config
 
+//-----------------------------------------------------------------------------
 #include <ch.h>
 #include <hal.h>
 
@@ -46,5 +48,5 @@ int kbc_write(uint32_t offset, void * data, uint32_t length);
 int kuroBoxConfigInit(void);
 int kuroBoxConfigStop(void);
 
-
+//-----------------------------------------------------------------------------
 #endif // _naniBox_kuroBox_config

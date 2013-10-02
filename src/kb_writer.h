@@ -20,8 +20,8 @@
 
 */
 
-#ifndef _naniBox_kuroBox_logger
-#define _naniBox_kuroBox_logger
+#ifndef _naniBox_kuroBox_writer
+#define _naniBox_kuroBox_writer
 
 #include <ch.h>
 #include "kb_time.h"
@@ -33,12 +33,15 @@ int kuroBoxWriterInit(void);
 int kuroBoxWriterStop(void);
 
 //-----------------------------------------------------------------------------
+// the normal packets to send into the writer
 void kbw_setLTC(ltc_frame_t * ltc_frame);
 void kbw_incPPS(void);
 void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol);
 void kbw_setVNav(vnav_data_t * vnav);
-void kbw_setAltitude(float alt, float tem);
+void kbw_setAltitude(float altitude, float temperature);
 
-void kbw_header_vnav(uint8_t * data);
+//-----------------------------------------------------------------------------
+// these are the header packets - only done once at startup
+void kbwh_setVNav(uint8_t * data, uint16_t length);
 
-#endif // _naniBox_kuroBox_logger
+#endif // _naniBox_kuroBox_writer

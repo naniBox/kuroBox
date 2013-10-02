@@ -21,16 +21,50 @@
 */
 
 //-----------------------------------------------------------------------------
+    /*
+
+	We do a couple of strange things in this file, lets explain them.
+
+	We communicate with the VectorNav in 2 different ways, synchronously and
+	asynchronously. 
+
+	We need to wait 50us between issuing a command and reading its answer, so 
+	the sync calls ("kbv_readRegister()"), will busy wait for responses. This 
+	is great for reading a one-off register, like at startup, we read the 
+	model number, serial number, etc.
+
+	The periodic data comes in every 5ms (200Hz), when the EXTi callback is
+	triggered on the failling edge ("vn_dr_int_exti_cb()"). At that point 
+	we start the async communication. That callback fills in the async_vn_msg_t
+	with what registers need to be read and how big they are.
+
+	Calls go like this:
+
+	Fill async_vn_msg_t
+	Call 1st spiStartSend with Read Register Request
+	On 1st spiStartSend callback, unselect the SPI
+	1st sleep for 50us, asychronously
+	On 1st sleep callback, call 2nd spiStartSend with Read Register
+	On 2nd spiStartSend callback, unselect the SPI
+	Dispatch register
+	2nd sleep for 50us, asynchronously
+	On 2nd sleep callback, clear async_vn_msg_t to indicate we're done and
+		a new async call can start
+
+    */
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 #include "kb_vectornav.h"
 #include "kb_util.h"
 #include "kb_screen.h"
 #include "kb_writer.h"
 #include <string.h>
 
-
 //-----------------------------------------------------------------------------
-void vectornav_spi_end_cb(SPIDriver * spip);
-void vectornav_gpt_end_cb(GPTDriver * spip);
+static void vectornav_spi_end_cb(SPIDriver * spip);
+static void vectornav_gpt_end_cb(GPTDriver * spip);
 
 //-----------------------------------------------------------------------------
 static const VectorNavConfig default_vectornav_config =
@@ -45,10 +79,12 @@ static const VectorNavConfig default_vectornav_config =
 	},
 	{	// GPT config
 		1000000, // 1MHz should be fine enough to get a 50us timeout
-		vectornav_gpt_end_cb
+		vectornav_gpt_end_cb,
+		0 // DIER register
 	}
 };
 
+//-----------------------------------------------------------------------------
 #define VN_ASYNC_INACTIVE				0
 #define VN_ASYNC_1ST_SPI_CB				1
 #define VN_ASYNC_1ST_SLEEP				2
@@ -57,6 +93,7 @@ static const VectorNavConfig default_vectornav_config =
 #define VN_SLEEPTIME					50
 
 //-----------------------------------------------------------------------------
+typedef struct async_vn_msg_t async_vn_msg_t;
 struct async_vn_msg_t
 {
 	uint8_t state;
@@ -68,26 +105,26 @@ struct async_vn_msg_t
 
 //-----------------------------------------------------------------------------
 VectorNavDriver VND1;
-static struct async_vn_msg_t async_vn_msg;
-struct vnav_data_t vnav_data;
+static async_vn_msg_t async_vn_msg;
+static vnav_data_t vnav_data;
 
 //-----------------------------------------------------------------------------
-void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
+static void 
+vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 {
 	switch( reg )
 	{
 	case VN100_REG_YPR:
 		if ( buf[0] == 0x00 && buf[1] == 0x01 &&
-			 buf[2] == reg && buf[3] == 0x00 && buf_size == VN100_REG_YPR_SIZE + VN100_HEADER_SIZE)
+			 buf[2] == reg && buf[3] == 0x00 && 
+			 buf_size == VN100_REG_YPR_SIZE + VN100_HEADER_SIZE)
 		{
 			// data return is good, proceed
 			float * fbuf = (float*)(&buf[4]); //  header
 			memcpy(&vnav_data.ypr, fbuf, sizeof(vnav_data.ypr));
-			// uint32_t * tmsg = (uint32_t*)(&buf[4+4*3]);
-/*			if (fbuf[0] > 360.0 || fbuf[0] < -360.0 ||
-				fbuf[1] > 360.0 || fbuf[1] < -360.0 ||
-				fbuf[2] > 360.0 || fbuf[2] < -360.0)
-*/				kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
+
+			// screen is interested in YPR, the writer in the entire packet	
+			kbs_setYPR(fbuf[0], fbuf[1], fbuf[2]);
 			kbw_setVNav(&vnav_data);
 		}
 		break;
@@ -97,7 +134,8 @@ void vectornav_dispatch_register(uint8_t reg, uint16_t buf_size, uint8_t * buf)
 }
 
 //-----------------------------------------------------------------------------
-void vectornav_spi_end_cb(SPIDriver * spip)
+static void 
+vectornav_spi_end_cb(SPIDriver * spip)
 {
 	(void)spip;
 
@@ -131,7 +169,8 @@ void vectornav_spi_end_cb(SPIDriver * spip)
 }
 
 //-----------------------------------------------------------------------------
-void vectornav_gpt_end_cb(GPTDriver * gptp)
+static void 
+vectornav_gpt_end_cb(GPTDriver * gptp)
 {
 	(void)gptp;
 
@@ -161,15 +200,15 @@ void vectornav_gpt_end_cb(GPTDriver * gptp)
 }
 
 //-----------------------------------------------------------------------------
-void kbv_getYPR(float * y, float * p, float * r)
+const vnav_data_t * 
+kbv_getYPR(void)
 {
-	if ( y ) *y = vnav_data.ypr[0];
-	if ( p ) *p = vnav_data.ypr[1];
-	if ( r ) *r = vnav_data.ypr[2];
+	return &vnav_data;
 }
 
 //-----------------------------------------------------------------------------
-void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel)
+void
+kbv_drIntExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
@@ -177,6 +216,7 @@ void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel)
 	chSysLockFromIsr();
 	memset(&async_vn_msg, 0, sizeof(async_vn_msg));
 	async_vn_msg.reg = VN100_REG_YPR;
+	// ReadReg: [0x01, REG, 0x00, 0x00]
 	async_vn_msg.buf[0] = 1;
 	async_vn_msg.buf[1] = async_vn_msg.reg;
 	async_vn_msg.buf_size = VN100_REG_YPR_SIZE + VN100_HEADER_SIZE;
@@ -187,7 +227,8 @@ void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
+int
+kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
 {
 	if ( cfg )
 		nvp->cfgp = cfg;
@@ -220,14 +261,15 @@ int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg)
 	kbv_readRegister(nvp, VN100_REG_FWVER, VN100_REG_FWVER_SIZE, header_data_ptr);
 	header_data_ptr += VN100_REG_FWVER_SIZE;
 
-	kbw_header_vnav(header_data);
+	kbwh_setVNav(header_data, header_data_ptr-header_data);
 
 	return KB_OK;
 }
 
 
 //-----------------------------------------------------------------------------
-int kuroBoxVectorNavStop(VectorNavDriver * nvp)
+int
+kuroBoxVectorNavStop(VectorNavDriver * nvp)
 {
 	spiStop(nvp->spip);
 	gptStop(nvp->gpdp);
@@ -235,6 +277,7 @@ int kuroBoxVectorNavStop(VectorNavDriver * nvp)
 }
 
 //-----------------------------------------------------------------------------
+// polled read of a register
 uint8_t
 kbv_readRegister(VectorNavDriver * nvp, uint8_t reg, uint8_t size, uint8_t * buf)
 {

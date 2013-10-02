@@ -87,7 +87,7 @@ include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(KUROBOX)/src/fatfs/fatfs.mk
-include $(KUROBOX)/src/cfg/board.mk
+include $(KUROBOX)/src/board/board.mk
 
 # Define linker script file here
 ifeq ($(USE_RELOCATED_FLASH),yes)
@@ -119,6 +119,7 @@ CSRC = $(PORTSRC) \
         ./src/kb_gpio.c \
         ./src/kb_gps.c \
         ./src/kb_menu.c \
+        ./src/kb_menu_items.c \
         ./src/kb_screen.c \
         ./src/kb_serial.c \
         ./src/kb_time.c \

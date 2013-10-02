@@ -1,17 +1,37 @@
 /*
- * naniBox // kuroBox // spiEEPROM
- * dmo@nanibox.com
- * example at the bottom of the file
- */
+	kuroBox / naniBox
+	Copyright (c) 2013
+	david morris-oliveros // naniBox.com
 
+    This file is part of kuroBox / naniBox.
+
+    kuroBox / naniBox is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    kuroBox / naniBox is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+//----------------------------------------------------------------------------
 #ifndef _naniBox_kuroBox_spiEEPROM
 #define _naniBox_kuroBox_spiEEPROM
 
+//----------------------------------------------------------------------------
 #include "ch.h"
 #include "hal.h"
 
+//----------------------------------------------------------------------------
 #define SPIEEPROM_24BIT_ADDRESS
 
+//----------------------------------------------------------------------------
 #ifdef SPIEEPROM_16BIT_ADDRESS
 	#define SPIEEPROM_PAGE_SIZE			32
 	#define SPIEEPROM_PAGE_SIZE_SHIFT 	5
@@ -26,6 +46,7 @@
 	#error No defined address space
 #endif
 
+//----------------------------------------------------------------------------
 #define SR_SRWD			(1<<7)	// Status Register Write Protect
 #define SR_BP1			(1<<3)	// Block Protect 1
 #define SR_BP0			(1<<2)	// Block Protect 0
@@ -68,28 +89,3 @@ void spiEepromWriteSR(spiEepromDriver * sedp, uint8_t sr);
 #define spiEepromWEL(sedp)	(spiEepromReadSR(sedp)&SR_WEL)
 
 #endif // _naniBox_kuroBox_spiEEPROM
-
-/*
-	Usage example:
-
-	uint8_t eeprombuf[SPIEEPROM_PAGE_SIZE];
-	while( spiEepromWip(&spiEepromD1) )
-	{}
-	spiEepromReadPage(&spiEepromD1, 0, eeprombuf);
-	for ( uint8_t idx = 0 ; idx < SPIEEPROM_PAGE_SIZE ; ++idx )
-		chprintf((BaseSequentialStream *)&SD2, "Byte: %2d : 0x%02x\n\r", idx, eeprombuf[idx]);
-
-	for ( uint8_t idx = 0 ; idx < SPIEEPROM_PAGE_SIZE ; ++idx )
-		eeprombuf[idx] += idx;
-	spiEepromWritePage(&spiEepromD1, 0, eeprombuf);
-
-	volatile uint32_t count = 0;
-	while( spiEepromWip(&spiEepromD1) )
-	{count++;}
-	chprintf((BaseSequentialStream *)&SD2, "Count: %d\n\r", count);
-
-	spiEepromReadPage(&spiEepromD1, 0, eeprombuf);
-	for ( uint8_t idx = 0 ; idx < SPIEEPROM_PAGE_SIZE ; ++idx )
-		chprintf((BaseSequentialStream *)&SD2, "Byte: %2d : 0x%02x\n\r", idx, eeprombuf[idx]);
-
-*/

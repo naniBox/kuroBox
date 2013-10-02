@@ -20,6 +20,7 @@
 
 */
 
+//-----------------------------------------------------------------------------
 #include "kb_screen.h"
 #include "kb_util.h"
 #include "kb_gps.h"
@@ -46,7 +47,7 @@ struct kuroBoxScreen
 	uint16_t voltage;
 	int16_t temperature;
 	int32_t sdc_free;
-	char sdc_fname[23]; // we can fit 128/26=21.3 chars per line, i think
+	char sdc_fname[23]; // we can fit 128/6=21.3 chars per line
 	uint32_t write_count;
 	uint32_t write_errors;
 	uint8_t btn0;
@@ -87,6 +88,7 @@ thScreen(void *arg)
 	BaseSequentialStream * bss = (BaseSequentialStream *)&msb;
 	while( !chThdShouldTerminate() )
 	{
+		// are we displaying the menu?
 		if ( !kbm_display() )
 		{
 			struct tm timp;
@@ -148,7 +150,7 @@ thScreen(void *arg)
 	//----------------------------------------------------------------------------
 			float lat,lon,alt;
 			lat=lon=alt=0.0f;
-			ecef_to_lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
+			kbg_ecef2lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
 					&lat, &lon, &alt);
 
 			INIT_CBUF();
@@ -210,7 +212,8 @@ thScreen(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxScreenInit(void)
+int 
+kuroBoxScreenInit(void)
 {
 	memset(&screen, 0, sizeof(screen));
 	screenThread = chThdCreateStatic(waScreen, sizeof(waScreen), NORMALPRIO, thScreen, NULL);
@@ -218,7 +221,8 @@ int kuroBoxScreenInit(void)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxScreenStop(void)
+int 
+kuroBoxScreenStop(void)
 {
 	chThdTerminate(screenThread);
 	chThdWait(screenThread);
@@ -228,67 +232,78 @@ int kuroBoxScreenStop(void)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setVoltage(uint16_t volts)
+void 
+kbs_setVoltage(uint16_t volts)
 {
 	screen.voltage = volts;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setTemperature(int16_t temperature)
+void 
+kbs_setTemperature(int16_t temperature)
 {
 	screen.temperature = temperature;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setLTC(smpte_timecode_t * ltc)
+void 
+kbs_setLTC(smpte_timecode_t * ltc)
 {
 	memcpy(&screen.ltc, ltc, sizeof(screen.ltc));
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setWriteCount(uint32_t write_count)
+void 
+kbs_setWriteCount(uint32_t write_count)
 {
 	screen.write_count = write_count;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setWriteErrors(uint32_t write_errors)
+void 
+kbs_setWriteErrors(uint32_t write_errors)
 {
 	screen.write_errors = write_errors;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setSDCFree(int32_t sdc_free)
+void 
+kbs_setSDCFree(int32_t sdc_free)
 {
 	screen.sdc_free = sdc_free;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setFName(const char * fname)
+void 
+kbs_setFName(const char * fname)
 {
 	strcpy(screen.sdc_fname, fname);
 }
 
 //-----------------------------------------------------------------------------
-void kbs_btn0(uint8_t on)
+void 
+kbs_btn0(uint8_t on)
 {
 	screen.btn0 = on;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_btn1(uint8_t on)
+void 
+kbs_btn1(uint8_t on)
 {
 	screen.btn1 = on;
 }
 
 //-----------------------------------------------------------------------------
-void kbs_PPS(void)
+void 
+kbs_PPS(void)
 {
 	screen.pps = 1000 / (SCREEN_REFRESH_SLEEP*10);
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z)
+void 
+kbs_setGpsEcef(int32_t x, int32_t y, int32_t z)
 {
 	screen.ecef[0] = x;
 	screen.ecef[1] = y;
@@ -296,7 +311,8 @@ void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z)
 }
 
 //-----------------------------------------------------------------------------
-void kbs_setYPR(float yaw, float pitch, float roll)
+void 
+kbs_setYPR(float yaw, float pitch, float roll)
 {
 	screen.ypr[0] = yaw;
 	screen.ypr[1] = pitch;

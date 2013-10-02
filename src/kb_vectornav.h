@@ -20,13 +20,16 @@
 
 */
 
+//----------------------------------------------------------------------------
 #ifndef _naniBox_kuroBox_vectornav
 #define _naniBox_kuroBox_vectornav
 
+//----------------------------------------------------------------------------
 #include <ch.h>
 #include <hal.h>
 
 //----------------------------------------------------------------------------
+// @TODO: Move to the .c?
 #define     VN100_REG_USER_TAG  0
 #define     VN100_REG_MODEL     1
 #define     VN100_REG_HWREV     2
@@ -108,12 +111,13 @@ struct vnav_data_t
 extern VectorNavDriver VND1;
 
 //-----------------------------------------------------------------------------
-void kbv_getYPR(float * y, float * p, float * r);
+const vnav_data_t * kbv_getYPR(void);
 
 //-----------------------------------------------------------------------------
-void vn_dr_int_exti_cb(EXTDriver *extp, expchannel_t channel);
+void kbv_drIntExtiCB(EXTDriver *extp, expchannel_t channel);
 int kuroBoxVectorNavInit(VectorNavDriver * nvp, const VectorNavConfig * cfg);
 int kuroBoxVectorNavStop(VectorNavDriver * nvp);
+
 //-----------------------------------------------------------------------------
 uint8_t kbv_readRegister(VectorNavDriver * nvp, uint8_t reg, uint8_t size, uint8_t * buf);
 
