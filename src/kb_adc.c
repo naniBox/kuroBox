@@ -23,13 +23,18 @@
 #include "kb_adc.h"
 #include "kb_screen.h"
 
-/* Total number of channels to be sampled by a single ADC operation.*/
-#define ADC_NUM_CHANNELS   3
+//-----------------------------------------------------------------------------
+// Total number of channels to be sampled by a single ADC operation.
+#define ADC_NUM_CHANNELS	3
 
-/* Depth of the conversion buffer, channels are sampled four times each.*/
-#define ADC_BUF_DEPTH      2
+//-----------------------------------------------------------------------------
+// Depth of the conversion buffer, channels are sampled four times each.
+#define ADC_BUF_DEPTH		2
 
-void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
+#define SAMPLE_PERIOD		500    // every xxx milliseconds
+
+//-----------------------------------------------------------------------------
+static void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static adcsample_t adc_samples[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
 static VirtualTimer adc_trigger;
 
@@ -71,7 +76,8 @@ adcsample_t adc_make_avg(int channel)
 }
 
 //-----------------------------------------------------------------------------
-void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
+static void 
+adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 {
 	(void) buffer; (void) n;
 	/* Note, only in the ADC_COMPLETE state because the ADC driver fires an
@@ -89,32 +95,37 @@ void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 }
 
 //-----------------------------------------------------------------------------
-void adc_trigger_cb(void * p)
+void 
+adc_trigger_cb(void * p)
 {
 	VirtualTimer * vt = (VirtualTimer *)p;
 	chSysLockFromIsr();
 	adcStartConversionI(&ADCD1, &adc_grp_cfg, adc_samples, ADC_BUF_DEPTH);
-	chVTSetI(vt, MS2ST(200), adc_trigger_cb, vt);
+	chVTSetI(vt, MS2ST(SAMPLE_PERIOD), adc_trigger_cb, vt);
 	chSysUnlockFromIsr();
 }
 
 
 //-----------------------------------------------------------------------------
-int kuroBoxADCInit(void)
+int 
+kuroBoxADCInit(void)
 {
 	adcStart(&ADCD1, &adc_cfg);
 	adcSTM32EnableTSVREFE();
 	adcSTM32EnableVBATE();
 
 	chSysLock();
-	chVTSetI(&adc_trigger, MS2ST(200), adc_trigger_cb, &adc_trigger);
+	// kicks off a callback in "SAMPLE_PERIOD" ms, which will kick off another
+	// callback, going on forever.
+	chVTSetI(&adc_trigger, MS2ST(SAMPLE_PERIOD), adc_trigger_cb, &adc_trigger);
 	chSysUnlock();
 
 	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxADCStop(void)
+int 
+kuroBoxADCStop(void)
 {
 	chVTReset(&adc_trigger);
 	adcStopConversion(&ADCD1);

@@ -44,13 +44,15 @@
 #include "kb_altimeter.h"
 
 //-----------------------------------------------------------------------------
+//#define HAVE_BLINK_THREAD
+
+//-----------------------------------------------------------------------------
 // forward declarations
 int kuroBoxStop(void);
 
 //-----------------------------------------------------------------------------
 // static data
 static uint8_t lcd_buffer[ST7565_BUFFER_SIZE];
-static Thread * blinkerThread;
 extern bool_t kuroBox_request_standby;
 
 //-----------------------------------------------------------------------------
@@ -121,6 +123,8 @@ static const I2CConfig i2cfg2 = {
 };
 
 //-----------------------------------------------------------------------------
+#ifdef HAVE_BLINK_THREAD
+static Thread * blinkerThread;
 static WORKING_AREA(waBlinker, 128);
 static msg_t 
 thBlinker(void *arg) 
@@ -129,12 +133,11 @@ thBlinker(void *arg)
 	chRegSetThreadName("Blinker");
 	while( !chThdShouldTerminate() )
 	{
-		//palTogglePad(GPIOB, GPIOB_LED1);
-		//palTogglePad(GPIOD, GPIOD_SERIAL1_PWR);
 		chThdSleepMilliseconds(1000);
 	}
 	return 0;
 }
+#endif // HAVE_BLINK_THREAD
 
 //-----------------------------------------------------------------------------
 void
@@ -250,7 +253,9 @@ kuroBoxInit(void)
 	sdcStart(&SDCD1, &sdio_cfg);
 	
 	// just blink to indicate we haven't crashed
+#ifdef HAVE_BLINK_THREAD
 	blinkerThread = chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
+#endif // HAVE_BLINK_THREAD
 
 	// read config goes here
 	// @TODO: add config reading from eeprom
@@ -332,8 +337,10 @@ kuroBoxStop(void)
 	kuroBoxButtonsStop();
 	kuroBoxScreenStop();
 	kuroBoxADCStop();
+#ifdef HAVE_BLINK_THREAD
 	chThdTerminate(blinkerThread);
 	chThdWait(blinkerThread);
+#endif // HAVE_BLINK_THREAD
 	sdcStop(&SDCD1);
 	spiStop(&SPID1);
 
@@ -348,12 +355,15 @@ kuroBoxStop(void)
 }
 
 //-----------------------------------------------------------------------------
-int main(void) 
+int
+main(void)
 {
+	// do EVERYTHING here, ok?
 	kuroBoxInit();
 
 	while( 1 )
 	{
+		// we check to see if we need to shutdown
 		chThdSleepMilliseconds(100);
 		if ( kuroBox_request_standby )
 		{

@@ -105,7 +105,8 @@ calc_cs(void)
 }
 
 //-----------------------------------------------------------------------------
-uint8_t kbc_read8(uint32_t offset)
+uint8_t 
+kbc_read8(uint32_t offset)
 {
 	uint8_t data = 0;
 	kbc_read(offset, (uint8_t*)&data, sizeof(data));
@@ -113,7 +114,8 @@ uint8_t kbc_read8(uint32_t offset)
 }
 
 //-----------------------------------------------------------------------------
-uint16_t kbc_read16(uint32_t offset)
+uint16_t 
+kbc_read16(uint32_t offset)
 {
 	uint16_t data = 0;
 	kbc_read(offset, (uint8_t*)&data, sizeof(data));
@@ -121,7 +123,8 @@ uint16_t kbc_read16(uint32_t offset)
 }
 
 //-----------------------------------------------------------------------------
-uint32_t kbc_read32(uint32_t offset)
+uint32_t 
+kbc_read32(uint32_t offset)
 {
 	uint32_t data = 0;
 	kbc_read(offset, (uint8_t*)&data, sizeof(data));
@@ -129,7 +132,8 @@ uint32_t kbc_read32(uint32_t offset)
 }
 
 //-----------------------------------------------------------------------------
-int kbc_read(uint32_t offset, void * data, uint32_t length)
+int 
+kbc_read(uint32_t offset, void * data, uint32_t length)
 {
 	check_offset(offset,length);
 	memcpy(data, (uint8_t*)(BKPSRAM_BASE+offset), length);
@@ -137,25 +141,29 @@ int kbc_read(uint32_t offset, void * data, uint32_t length)
 }
 
 //-----------------------------------------------------------------------------
-int kbc_write8(uint32_t offset, uint8_t data)
+int 
+kbc_write8(uint32_t offset, uint8_t data)
 {
 	return kbc_write(offset, (uint8_t*)&data, sizeof(data));
 }
 
 //-----------------------------------------------------------------------------
-int kbc_write16(uint32_t offset, uint16_t data)
+int 
+kbc_write16(uint32_t offset, uint16_t data)
 {
 	return kbc_write(offset, (uint8_t*)&data, sizeof(data));
 }
 
 //-----------------------------------------------------------------------------
-int kbc_write32(uint32_t offset, uint32_t data)
+int 
+kbc_write32(uint32_t offset, uint32_t data)
 {
 	return kbc_write(offset, (uint8_t*)&data, sizeof(data));
 }
 
 //-----------------------------------------------------------------------------
-int kbc_write(uint32_t offset, void * data, uint32_t length)
+int 
+kbc_write(uint32_t offset, void * data, uint32_t length)
 {
 	check_offset(offset,length);
 	memcpy((uint8_t*)(BKPSRAM_BASE+offset), data, length);
@@ -164,7 +172,8 @@ int kbc_write(uint32_t offset, void * data, uint32_t length)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxConfigInit(void)
+int
+kuroBoxConfigInit(void)
 {
 	if ( ( RTC->BKP0R != BKPREG_MAGIC ) ||
 		 ( RTC->BKP1R != CONFIG_VERSION ) ||
@@ -180,6 +189,7 @@ int kuroBoxConfigInit(void)
 	{
 		// if we wiped memory, don't load it, maybe do a save instead so
 		// it gets put in memory, right?
+		// @TODO: check up on this
 		kbc_load();
 	}
 
@@ -187,8 +197,10 @@ int kuroBoxConfigInit(void)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxConfigStop(void)
+int
+kuroBoxConfigStop(void)
 {
+	// NOTE: no need to save this out on shutdown
 	//kbc_save();
 	return KB_OK;
 }

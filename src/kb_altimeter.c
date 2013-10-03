@@ -86,7 +86,6 @@ thAltimeter(void *arg)
 		status = read_reg(0x01, rxbuf, 5);
 		if ( status == RDY_OK )
 		{
-
 			int m_a,m_t,c_a;
 			float l_a,l_t;
 
@@ -107,14 +106,16 @@ thAltimeter(void *arg)
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxAltimeterInit(void)
+int 
+kuroBoxAltimeterInit(void)
 {
 	altimeterThread = chThdCreateStatic(waAltimeter, sizeof(waAltimeter), NORMALPRIO, thAltimeter, NULL);
 	return KB_OK;
 }
 
 //-----------------------------------------------------------------------------
-int kuroBoxAltimeterStop(void)
+int 
+kuroBoxAltimeterStop(void)
 {
 	chThdTerminate(altimeterThread);
 	chThdWait(altimeterThread);
@@ -122,5 +123,4 @@ int kuroBoxAltimeterStop(void)
 	return KB_OK;
 
 }
-
 

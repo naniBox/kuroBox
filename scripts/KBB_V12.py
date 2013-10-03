@@ -287,4 +287,4 @@ class KBB_V12(object):
 		if DBG>1: 
 			print "Total msgs:", self.msg_count
 			for k in self.errors.keys():
-				print k,self.errors[k]
+				print k,self.errors[k], "%4.2f%%"%(float(self.errors[k]*100)/float(self.msg_count))

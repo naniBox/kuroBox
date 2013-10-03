@@ -38,7 +38,7 @@ static int current_feature;
 
 //-----------------------------------------------------------------------------
 static Thread * featureAThread;
-static WORKING_AREA(waFeatureA, 512);
+static WORKING_AREA(waFeatureA, 256);
 static msg_t
 thFeatureA(void *arg)
 {

@@ -181,7 +181,7 @@ static log_msg_v01_t current_msg;
 // dedicated to this, so we have the least number of writes, increasing throughput
 // and write latencies and possible skips
 #define BUFFER_COUNT		2
-#define BUFFER_SIZE			48		// size in "log_msg_v01_t" units
+#define BUFFER_SIZE			96		// size in "log_msg_v01_t" units
 typedef struct write_buffer_t write_buffer_t;
 struct write_buffer_t
 {
@@ -561,6 +561,10 @@ writing_run(void)
 			continue;
 		}
 
+		//----------------------------------------------------------------------
+		// start of write
+		kbg_setLED1(1);
+
 		// here we have a full buffer ready to write
 		write_buffer_t * buf = &write_buffers[idx];
 
@@ -568,15 +572,35 @@ writing_run(void)
 		FRESULT stat = FR_OK;
 		stat = f_write(&kbfile, buf->buffer, sizeof(buf->buffer), &bytes_written);
 
+		kbg_setLED1(0);
+		// end of write
+		//----------------------------------------------------------------------
+
 		if (bytes_written != sizeof(buf->buffer) || stat != FR_OK)
 			current_msg.write_errors++;
+
+		//----------------------------------------------------------------------
+		// start of flush
+		kbg_setLED2(1);
 		
-		stat = f_sync(&kbfile);
-		if (stat != FR_OK)
-			current_msg.write_errors++;
+		static int count = 0;
+
+		count++;
+		if ( count%32 == 0 )
+		{
+
+			stat = f_sync(&kbfile);
+			if (stat != FR_OK)
+				current_msg.write_errors++;
+			count = 0;
+		}
 
 		// we're done, return it
 		return_write_buffer_idx_after_writing(idx);
+
+		kbg_setLED2(0);
+		// end of flush
+		//----------------------------------------------------------------------
 
 		kbs_setWriteCount(current_msg.msg_num);
 		kbs_setWriteErrors(current_msg.write_errors);
@@ -593,7 +617,7 @@ writing_run(void)
 // The writer thread run function, only returns on shutdown. It gets the SD card
 // ready, and then just goes to sleep until there's something to write
 // @TODO: reduce the working area size to its reasonable limit
-static WORKING_AREA(waWriter, 1024*8);
+static WORKING_AREA(waWriter, 1024);
 static msg_t 
 thWriter(void *arg)
 {
@@ -643,11 +667,13 @@ thWriter(void *arg)
 // The logger thread run function. 
 // This thread copies the "current_msg" to the write buffer every 5ms. If a
 // time slot is missed, it is noted and will try again next slot.
-static WORKING_AREA(waLogger, 1024*1);
+static WORKING_AREA(waLogger, 256);
 static msg_t
 thLogger(void *arg)
 {
 	(void)arg;
+
+	chRegSetThreadName("Logger");
 
 	// These nested while() loops require some explanation.
 	// If the current state is running, we should be in the inner loop

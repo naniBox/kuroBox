@@ -30,5 +30,4 @@
 int kuroBoxAltimeterInit(void);
 int kuroBoxAltimeterStop(void);
 
-
 #endif // _naniBox_kuroBox_altimeter

@@ -33,6 +33,7 @@ int kbc_save(void);
 int kbc_load(void);
 
 //-----------------------------------------------------------------------------
+// the functions that return a datatype just call kbc_read()
 uint8_t kbc_read8(uint32_t offset);
 uint16_t kbc_read16(uint32_t offset);
 uint32_t kbc_read32(uint32_t offset);
