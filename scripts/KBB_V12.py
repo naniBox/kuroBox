@@ -21,13 +21,17 @@
 
 """
 
+#---------------------------------------------------------------
 import sys
 import os
 import struct
 import KBB_util 
 
+#---------------------------------------------------------------
 DBG = 3
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_HEADER():
 	def __init__(self,msg):
 		assert len(msg) == 512
@@ -41,6 +45,8 @@ class KBB_V12_HEADER():
 			struct.unpack("<20s24sI3I4B",msg[10:10+64])
 
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_MSG_header():
 	START_BYTE = 0
 	LENGTH = 18
@@ -48,6 +54,8 @@ class KBB_V12_MSG_header():
 		self.preamble,self.checksum,self.version,self.msg_type,self.msg_size,self.msg_num,self.write_errors = \
 			struct.unpack("<IHBBHII",msg[KBB_V12_MSG_header.START_BYTE:KBB_V12_MSG_header.START_BYTE+KBB_V12_MSG_header.LENGTH])
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_MSG_ltc(KBB_util.LTC):
 	START_BYTE = 18
 	LENGTH = 10
@@ -61,7 +69,8 @@ class KBB_V12_MSG_ltc(KBB_util.LTC):
 	def __repr__(self):
 		return self.__str__()
 
-
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_MSG_rtc():
 	START_BYTE = 28
 	LENGTH = 36
@@ -89,6 +98,8 @@ class KBB_V12_MSG_rtc():
 	def __repr__(self):
 		return self.__str__()
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_MSG_nav_sol():
 	START_BYTE = 64
 	LENGTH = 64
@@ -159,6 +170,8 @@ class KBB_V12_MSG_nav_sol():
 	def __repr__(self):
 		return self.__str__()
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12_MSG_vnav():
 	START_BYTE = 128
 	LENGTH = 16
@@ -179,9 +192,51 @@ class KBB_V12_MSG_vnav():
 	def __repr__(self):
 		return self.__str__()
 
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+class KBB_V12_MSG_altimeter():
+	START_BYTE = 144
+	LENGTH = 8
+	"""
+	struct tm
+	{
+	  float 	altitude
+	  float		temperature;
+	};
+	"""
+	def __init__(self,msg):
+		self.altitude,self.temperature = struct.unpack("<ff",msg[KBB_V12_MSG_altimeter.START_BYTE:KBB_V12_MSG_altimeter.START_BYTE+KBB_V12_MSG_altimeter.LENGTH])
 
+	def __str__(self):
+		self.calculateLLA()
+		return "%4.1f, %4.1f"%(self.altitude,self.temperature)
+
+	def __repr__(self):
+		return self.__str__()
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
+class KBB_V12_MSG_global_counter():
+	START_BYTE = 152
+	LENGTH = 4
+	"""
+	  uint32_t	global_counter;
+	"""
+	def __init__(self,msg):
+		self.global_counter = struct.unpack("<I",msg[KBB_V12_MSG_global_counter.START_BYTE:KBB_V12_MSG_global_counter.START_BYTE+KBB_V12_MSG_global_counter.LENGTH])
+
+	def __str__(self):
+		return "%d"%self.global_counter
+
+	def __repr__(self):
+		return self.__str__()
+
+
+#---------------------------------------------------------------
+#---------------------------------------------------------------
 class KBB_V12(object):	
 
+#---------------------------------------------------------------
 	def __init__(self, arg):
 		super(KBB_V12, self).__init__()
 		KBB_V12.SIZE = 512
@@ -190,22 +245,26 @@ class KBB_V12(object):
 		self.fin = file(self.fname,"rb")
 		self.msg_count = 0
 		self.msg_num_prev = None
-		self.total_msg_count = os.stat(self.fname).st_size / 512
+		self.total_msg_count = os.stat(self.fname).st_size / 512 - 1 # because of header!
 		self.HEADER = KBB_V12_HEADER(self.fin.read(512))
 		self.set_index(0)
 
+#---------------------------------------------------------------
 	def set_index(self,idx):
 		self.fin.seek((idx+1)*KBB_V12.SIZE)
 		self.idx = idx
 
+#---------------------------------------------------------------
 	def get_index(self):
 		return self.idx
 
+#---------------------------------------------------------------
 	def inc_err(self,which,count):
 		if not self.errors.has_key(which):
 			self.errors[which] = 0
 		self.errors[which] = self.errors[which] + count
 
+#---------------------------------------------------------------
 	def get_err(self,which):
 		if not self.errors.has_key(which):
 			return 0
@@ -216,6 +275,7 @@ class KBB_V12(object):
 		self.header = KBB_V12_MSG_header(self.msg)
 		return self.header
 		
+#---------------------------------------------------------------
 	def check_header(self):
 		# check to see if we are missing packets
 		if DBG>3:print self.header.msg_num
@@ -251,6 +311,7 @@ class KBB_V12(object):
 		self.nav_sol = KBB_V12_MSG_nav_sol(self.msg)
 		return self.nav_sol
 
+#---------------------------------------------------------------
 	def check_nav_sol(self):
 		if self.nav_sol.cs != self.nav_sol.calc_cs:
 			self.inc_err("nav_sol_cs",1)
@@ -262,17 +323,31 @@ class KBB_V12(object):
 		return self.vnav
 
 #---------------------------------------------------------------
+	def parse_global_counter(self):
+		self.global_counter = KBB_V12_MSG_global_counter(self.msg)
+		return self.global_counter
+
+#---------------------------------------------------------------
+	def parse_altitude(self):
+		self.altimeter = KBB_V12_MSG_altimeter(self.msg)
+		return self.altimeter
+
+#---------------------------------------------------------------
 	def parse_all(self):
 		self.parse_header()
 		self.parse_ltc()
 		self.parse_rtc()
 		self.parse_nav_sol()
 		self.parse_vnav()
+		self.parse_altitude()
+		self.parse_global_counter()
 
+#---------------------------------------------------------------
 	def check_all(self):
 		self.check_header()
 		self.check_nav_sol()
 
+#---------------------------------------------------------------
 	def read_next(self):
 		self.msg = self.fin.read(512)
 		self.idx += 1
@@ -283,6 +358,7 @@ class KBB_V12(object):
 		self.parse_all()
 		return True
 
+#---------------------------------------------------------------
 	def print_errors(self):
 		if DBG>1: 
 			print "Total msgs:", self.msg_count

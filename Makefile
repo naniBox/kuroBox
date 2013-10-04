@@ -3,8 +3,8 @@
 # NOTE: Can be overridden externally.
 #
 
-#DEBUG_BUILD = yes
-#USE_RELOCATED_FLASH = yes
+DEBUG_BUILD = yes
+USE_RELOCATED_FLASH = yes
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
@@ -74,10 +74,17 @@ endif
 
 # Define project name here
 ifeq ($(USE_RELOCATED_FLASH),yes)
-	PROJECT = kuroBox_relocated
+	PROJECT_NAME = kuroBox_relocated
 else
-	PROJECT = kuroBox
+	PROJECT_NAME = kuroBox
 endif
+
+ifeq ($(DEBUG_BUILD),yes)
+	PROJECT = $(PROJECT_NAME)_d
+else
+	PROJECT = $(PROJECT_NAME)_r
+endif
+
 
 # Imported source files and paths
 CHIBIOS = ../../chibios

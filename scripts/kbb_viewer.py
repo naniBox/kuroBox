@@ -81,7 +81,7 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.header_checksum.setText(fmt_checksum(self.kbb))
 
 		self.header_msg_size.setText(fmt_i(self.kbb.header.msg_size))
-		self.header_msg_num.setText(fmt_i(self.kbb.header.msg_num))
+		self.header_msg_num.setText("%s / %s"%(fmt_i(self.kbb.header.msg_num), fmt_i(self.kbb.global_counter.global_counter)))
 		self.header_write_errors.setText(fmt_i(self.kbb.header.write_errors))
 
 		# LTC

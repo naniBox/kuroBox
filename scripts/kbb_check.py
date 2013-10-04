@@ -25,13 +25,14 @@ import sys
 import os
 import struct
 import KBB
-
+import glob
     
 def main():
-    for fname in sys.argv[1:]:
+    for fname in glob.glob(sys.argv[1]):
+        print "Checking '%s'"%fname
         kbb = KBB.KBB_factory(fname)
         if kbb is None:
-            print "Can't parse '%s'"%fname
+            print "\tCan't parse!"
         while kbb.read_next():
             kbb.check_all()
         kbb.print_errors()

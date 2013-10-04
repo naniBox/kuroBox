@@ -66,6 +66,7 @@
 #include "kb_writer.h"
 #include "kb_screen.h"
 #include "kb_util.h"
+#include "kb_serial.h"
 #include "ff.h"
 #include "kb_gpio.h"
 #include <hal.h>
@@ -74,6 +75,14 @@
 #include <chrtclib.h>
 #include <time.h>
 #include <string.h>
+
+//-----------------------------------------------------------------------------
+//#define DEBG_WRITER_TIME_WRITES
+#ifdef  DEBG_WRITER_TIME_WRITES
+	#define DEBG_WRITER_TIME_WRITES_TIMER(x) uint32_t t##x = halGetCounterValue()
+#else
+	#define DEBG_WRITER_TIME_WRITES_TIMER(x)
+#endif
 
 //-----------------------------------------------------------------------------
 #define LS_INIT					0
@@ -119,6 +128,7 @@ static writer_header_t writer_header;
 #define LOGGER_HEADER_MSG_TYPE			1
 #define LOGGER_DATA_MSG_TYPE			2
 
+
 //-----------------------------------------------------------------------------
 typedef struct log_msg_v01_t log_msg_v01_t;
 struct __PACKED__ log_msg_v01_t
@@ -147,7 +157,9 @@ struct __PACKED__ log_msg_v01_t
 	float temperature;					// 4
 										// 8 for the altimeter block
 
-	uint8_t __pad[512 - (18 + 46 + 64 + 16 + 8)];
+	uint32_t global_count;
+
+	uint8_t __pad[512 - (18 + 46 + 64 + 16 + 8 + 4)];
 };
 STATIC_ASSERT(sizeof(log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
 
@@ -176,17 +188,28 @@ uint32_t cardsize_MB;
 static log_msg_v01_t current_msg;
 
 //-----------------------------------------------------------------------------
-// we have 2 buffers of 48 messages each: 24kB each (512bytes * 48), for a total
-// usage of 48kB. This should be the largest possible - any free SRAM should be
+// we have 2 buffers of 96 messages each: 48kB each (512bytes * 96), for a total
+// usage of 96kB. This should be the largest possible - any free SRAM should be
 // dedicated to this, so we have the least number of writes, increasing throughput
 // and write latencies and possible skips
-#define BUFFER_COUNT		2
-#define BUFFER_SIZE			96		// size in "log_msg_v01_t" units
+#define BUFFER_COUNT			2
+#define BUFFER_SIZE				96		// size in "log_msg_v01_t" units
+
+// 21845 * 48kB is *just* below the 1GB limit, which gives enough space for a
+// header too. Make sure that if you adjust the buffer size, this changes too
+#define MAX_BUFFERS_PER_FILE	21845
+//#define MAX_BUFFERS_PER_FILE	21 // debug value for ~1mb files (1032192 bytes)
+//#define MAX_BUFFERS_PER_FILE	2184 // debug value for ~100mb files
+
 typedef struct write_buffer_t write_buffer_t;
 struct write_buffer_t
 {
 	struct log_msg_v01_t buffer[BUFFER_SIZE];
-	int8_t current_idx;
+
+	// this *HAS* to be 32bit so the the whole struct is 32bit aligned and
+	// packed so that writes happen on 32bit borders, and therefore, FAST
+	// instead of byte-by-byte copying
+	int32_t current_idx;
 };
 static Semaphore 				write_buffer_semaphore;
 static write_buffer_t 			write_buffers[BUFFER_COUNT];
@@ -288,6 +311,15 @@ return_write_buffer_idx_after_writing(int8_t idx)
 }
 
 //-----------------------------------------------------------------------------
+static void
+flush_counters(void)
+{
+	current_msg.msg_num = 0;
+	current_msg.write_errors = 0;
+	current_msg.pps = 0;
+}
+
+//-----------------------------------------------------------------------------
 // new file scenario / etc. 
 static void
 flush_write_buffers(void)
@@ -297,9 +329,8 @@ flush_write_buffers(void)
 	for ( int8_t idx = 0 ; idx < BUFFER_COUNT ; idx++ )
 		write_buffers[idx].current_idx = -1;
 
-	current_msg.msg_num = 0;
-	current_msg.write_errors = 0;
-	current_msg.pps = 0;
+	flush_counters();
+
 	chSemSignal(&write_buffer_semaphore);
 }
 
@@ -337,6 +368,13 @@ new_file(void)
 	char charbuf[64];
 	MemoryStream msb;
 	FRESULT stat = FR_OK;
+
+	if ( kbfile.fs )
+	{
+		// file is open, close it first
+		f_close(&kbfile);
+	}
+
 	uint16_t fnum = 0;
 	for( ; fnum < 1000 ; fnum++ )
 	{
@@ -346,9 +384,6 @@ new_file(void)
 		chprintf((BaseSequentialStream *)&msb, "%s/%s%.4d%s", NANIBOX_DNAME,
 				KUROBOX_FNAME_STEM, fnum, KUROBOX_FNAME_EXT);
 		stat = f_open(&kbfile, charbuf, FA_WRITE|FA_CREATE_NEW);
-
-		// make sure that changes are flushed out to disk
-		f_sync(&kbfile);
 
 		if (stat == FR_EXIST)
 			// it exists, just try the next
@@ -365,11 +400,25 @@ new_file(void)
 	// we can only get an OK if we opened the file
 	if (stat == FR_OK)
 	{
+		// make sure that changes are flushed out to disk
+		f_sync(&kbfile);
+
 		memset(charbuf,0,sizeof(charbuf));
 		msObjectInit(&msb, (uint8_t*)charbuf, sizeof(charbuf), 0);
 		chprintf((BaseSequentialStream *)&msb, "%s%.4d", KUROBOX_FNAME_STEM, fnum);
 		// since we don't want the full path or the extension, lets do that here
 		kbs_setFName(charbuf);
+
+		// here we write out the header to the file
+		uint8_t * buf = (uint8_t*) &writer_header;
+		UINT bytes_written = 0;
+		stat = f_write(&kbfile, buf, writer_header.msg_size, &bytes_written);
+		if (bytes_written != sizeof(writer_header.msg_size) || stat != FR_OK)
+			current_msg.write_errors++;
+
+		stat = f_sync(&kbfile);
+		if (stat != FR_OK)
+			current_msg.write_errors++;
 	}
 
 	return stat;
@@ -436,17 +485,6 @@ on_insert(void)
 		sdcDisconnect(&SDCD1);
 		return KB_NOT_OK;
 	}
-
-	// here we write out the header to the file
-	uint8_t * buf = (uint8_t*) &writer_header;
-	UINT bytes_written = 0;
-	stat = f_write(&kbfile, buf, writer_header.msg_size, &bytes_written);
-	if (bytes_written != sizeof(writer_header.msg_size) || stat != FR_OK)
-		current_msg.write_errors++;
-
-	stat = f_sync(&kbfile);
-	if (stat != FR_OK)
-		current_msg.write_errors++;
 
 	fs_ready = TRUE;
 	logger_state = LS_RUNNING;
@@ -535,6 +573,7 @@ static uint8_t
 writing_run(void)
 {
 	uint8_t ret = 1;
+	uint32_t writer_buffers_written = 0;
 	while(LS_RUNNING == logger_state)
 	{
 		if (chThdShouldTerminate())
@@ -570,7 +609,10 @@ writing_run(void)
 
 		UINT bytes_written = 0;
 		FRESULT stat = FR_OK;
+
+		DEBG_WRITER_TIME_WRITES_TIMER(0);
 		stat = f_write(&kbfile, buf->buffer, sizeof(buf->buffer), &bytes_written);
+		DEBG_WRITER_TIME_WRITES_TIMER(1);
 
 		kbg_setLED1(0);
 		// end of write
@@ -583,17 +625,12 @@ writing_run(void)
 		// start of flush
 		kbg_setLED2(1);
 		
-		static int count = 0;
+		DEBG_WRITER_TIME_WRITES_TIMER(2);
+		stat = f_sync(&kbfile);
+		DEBG_WRITER_TIME_WRITES_TIMER(3);
 
-		count++;
-		if ( count%32 == 0 )
-		{
-
-			stat = f_sync(&kbfile);
-			if (stat != FR_OK)
-				current_msg.write_errors++;
-			count = 0;
-		}
+		if (stat != FR_OK)
+			current_msg.write_errors++;
 
 		// we're done, return it
 		return_write_buffer_idx_after_writing(idx);
@@ -602,8 +639,29 @@ writing_run(void)
 		// end of flush
 		//----------------------------------------------------------------------
 
+#ifdef DEBG_WRITER_TIME_WRITES
+		chprintf(DEBG, "%12f, %12f, %12f, %d, %6d, 0x%.8d\n",
+				(t1-t0) / 168000.0f, (t3-t2) / 168000.0f, (t3-t0) / 168000.0f,
+				idx, bytes_written, buf->buffer);
+#endif // DEBG_WRITER_TIME_WRITES
+
 		kbs_setWriteCount(current_msg.msg_num);
 		kbs_setWriteErrors(current_msg.write_errors);
+
+		// after X buffers, start a new file. this has to be in sync with
+		// the logger thread, so that you both do roll over at the same time
+		writer_buffers_written++;
+		if ( writer_buffers_written > MAX_BUFFERS_PER_FILE )
+		{
+			writer_buffers_written = 0;
+			// we've hit the file size limit, close the old, open a new file
+			if ( new_file() != FR_OK )
+			{
+				// no new file? that's bad!!
+				logger_state = LS_WAIT_FOR_SD;
+				break;
+			}
+		}
 
 		sd_card_status();
 		if (LS_RUNNING != logger_state)
@@ -681,6 +739,9 @@ thLogger(void *arg)
 	// we will be in the outer loop, flushing buffers, and signalling
 	// 
 
+	uint32_t logger_buffers_written = 0;
+	current_msg.global_count = 0;
+
 	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
 	{
 		flush_write_buffers();
@@ -730,7 +791,11 @@ thLogger(void *arg)
 			}
 			chThdSleepUntil(sleep_until);
 			sleep_until += MS2ST(5);            // Next deadline
+
 			current_msg.msg_num++;
+			current_msg.global_count++;
+
+			// @TODO: fix this!
 			if ( current_msg.msg_num%2048 == 0 ) // we write 1MB every 2048 msgs
 			{
 				kbs_setSDCFree(--cardsize_MB);
@@ -744,6 +809,16 @@ thLogger(void *arg)
 
 				// now set it to -1, it will get a new one on next loop
 				current_idx = -1;
+
+				// now we check to see if we need to roll over into a new
+				// file, this has to be in sync with the writer thread!!
+				logger_buffers_written++;
+				if ( logger_buffers_written > MAX_BUFFERS_PER_FILE )
+				{
+					logger_buffers_written = 0;
+					// we've hit the file size limit, restart counters
+					flush_counters();
+				}
 			}
 		}
 		chThdSleepMilliseconds(1);
