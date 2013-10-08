@@ -1,0 +1,8 @@
+device stm32f407vg
+halt
+r
+loadbin build/kuroBox_relocated_r.bin 0x08020000
+verifybin build/kuroBox_relocated_r.bin 0x08020000
+r
+go
+exit

@@ -101,7 +101,8 @@ check_offset(uint16_t offset, uint32_t length)
 static uint16_t
 calc_cs(void)
 {
-	return calc_checksum_16((uint8_t*)(BKPSRAM_BASE), BKPSRAM_SIZE);
+	uint16_t cs = calc_checksum_16((uint8_t*)(BKPSRAM_BASE), BKPSRAM_SIZE);
+	return cs;
 }
 
 //-----------------------------------------------------------------------------

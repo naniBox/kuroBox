@@ -201,8 +201,11 @@ kbm_btn1_dispatch(bool_t pressed)
 
 	if ( menu_items[current_menu_item].callback )
 	{
+		// we grab it first, since the callback can change the
+		// current_menu_item variable!
+		bool_t is_config = menu_items[current_menu_item].is_config;
 		menu_items[current_menu_item].callback(menu_items[current_menu_item].data);
-		if (menu_items[current_menu_item].is_config)
+		if ( is_config )
 			kbc_save();
 	}
 }
