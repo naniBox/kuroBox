@@ -51,4 +51,8 @@ void kbs_setGpsEcef(int32_t x, int32_t y, int32_t z);
 void kbs_setYPR(float yaw, float pitch, float roll);
 
 //-----------------------------------------------------------------------------
+void kbs_err_setSD(bool_t has_sd);
+void kbs_err_setLTC(bool_t has_ltc);
+
+//-----------------------------------------------------------------------------
 #endif // _naniBox_kuroBox_screen

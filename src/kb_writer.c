@@ -226,7 +226,6 @@ static write_buffer_t 			write_buffers[BUFFER_COUNT];
 #define KUROBOX_ERR4 "<load |>"
 #define KUROBOX_ERR5 "<load />"
 
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 // Buffers and stuff
@@ -489,6 +488,8 @@ on_insert(void)
 	fs_ready = TRUE;
 	logger_state = LS_RUNNING;
 
+	kbs_err_setSD(1);
+
 	return KB_OK;
 }
 
@@ -501,6 +502,7 @@ on_remove(void)
 	sdcDisconnect(&SDCD1);
 	kbs_setSDCFree(0);
 	kbs_setFName(KUROBOX_BLANK_FNAME);
+	kbs_err_setSD(0);
 	fs_ready = FALSE;
 }
 
@@ -623,7 +625,7 @@ writing_run(void)
 
 		//----------------------------------------------------------------------
 		// start of flush
-		kbg_setLED2(1);
+		//kbg_setLED2(1);
 		
 		DEBG_WRITER_TIME_WRITES_TIMER(2);
 		stat = f_sync(&kbfile);
@@ -635,7 +637,7 @@ writing_run(void)
 		// we're done, return it
 		return_write_buffer_idx_after_writing(idx);
 
-		kbg_setLED2(0);
+		//kbg_setLED2(0);
 		// end of flush
 		//----------------------------------------------------------------------
 
@@ -826,7 +828,6 @@ thLogger(void *arg)
 	return KB_OK;
 }
 
-
 //-----------------------------------------------------------------------------
 int
 kuroBoxWriterInit(void)
@@ -835,6 +836,9 @@ kuroBoxWriterInit(void)
 
 	chSemInit(&write_buffer_semaphore, 1);
 	kbs_setFName(KUROBOX_BLANK_FNAME);
+	// start with the status set to no SD, just to make sure, on_insert() will
+	// change it
+	kbs_err_setSD(0);
 
 	loggerThread = chThdCreateStatic(waLogger, sizeof(waLogger), NORMALPRIO, thLogger, NULL);
 	writerThread = chThdCreateStatic(waWriter, sizeof(waWriter), HIGHPRIO, thWriter, NULL);
@@ -848,15 +852,17 @@ kuroBoxWriterStop(void)
 {
 	chThdTerminate(loggerThread);
 	chThdTerminate(writerThread);
+
 	chThdWait(loggerThread);
+	// this thread may be in its own sleep
+	chSysLock();
 	if (writerThreadForSleep)
 	{
-		chSysLock();
-		writerThreadForSleep->p_u.rdymsg = (msg_t)10;
+		writerThreadForSleep->p_u.rdymsg = (msg_t)10; // just a random non-0
 		chSchReadyI(writerThreadForSleep);
 		writerThreadForSleep = NULL;
-		chSysUnlock();
 	}
+	chSysUnlock();
 
 	chThdWait(writerThread);
 

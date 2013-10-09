@@ -268,6 +268,7 @@ kuroBoxInit(void)
 	kuroBoxScreenInit();
 
 	// LTC's, interrupt driven, very quick now
+	// Note, this module must be init'd after the screen
 	kuroBoxTimeInit();
 
 	// the actual logging thread

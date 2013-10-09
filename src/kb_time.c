@@ -105,6 +105,7 @@ static void ltc_store(uint8_t bit_set)
 		chSysLockFromIsr();
 		frame_to_time(&ltc_timecode, &ltc_frame);
 		kbs_setLTC(&ltc_timecode);
+		kbs_err_setLTC(1);
 		kbw_setLTC(&ltc_frame);
 		chSysUnlockFromIsr();
 	}
@@ -167,6 +168,7 @@ int
 kuroBoxTimeInit(void)
 {
 	memset(&ltc_frame,0,sizeof(ltc_frame));
+	kbs_err_setLTC(0);
 	return KB_OK;
 }
 
