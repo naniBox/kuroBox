@@ -81,6 +81,7 @@ endif
 
 ifeq ($(DEBUG_BUILD),yes)
 	PROJECT = $(PROJECT_NAME)_d
+	BUILDDIR = build_d
 else
 	PROJECT = $(PROJECT_NAME)_r
 endif

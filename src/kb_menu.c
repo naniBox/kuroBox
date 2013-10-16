@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 #define REFRESH_SLEEP 				50
-#define MENU_ITEMS_COUNT 			11
+#define MENU_ITEMS_COUNT 			8
 
 //-----------------------------------------------------------------------------
 #define BTN_NUM_MSGS				10
@@ -80,9 +80,13 @@ menu_item_t menu_items [MENU_ITEMS_COUNT] =
 		{ "Feature", 			1,		1, 		mi_featureA_change, mi_featureA_getFeature, NULL },
 		{ "Serial1 Pwr", 		1,		1, 		mi_serial1_pwr, 	NULL, NULL },
 		{ "Serial1 Baud", 		1,		1, 		mi_serial1_baud, 	mi_serial1_getbaud, NULL },
+#ifdef KUROBOX_HAS_SERIAL2
 		{ "Serial2 Pwr", 		1,		1, 		mi_serial2_pwr, 	NULL, NULL },
 		{ "Serial2 Baud", 		1,		1, 		mi_serial2_baud, 	mi_serial2_getbaud, NULL },
-		{ "LED 3", 				1,		1, 		mi_led3, 			NULL, NULL },
+#endif // KUROBOX_HAS_SERIAL2
+
+
+		// { "LED 3", 				1,		1, 		mi_led3, 			NULL, NULL },
 		{ "LCD Backlight", 		1,		1, 		mi_lcd_backlight, 	NULL, NULL },
 		{ "Set time from LTC", 	1,		1, 		mi_time_from_ltc, 	NULL, NULL },
 		{ "Set time from GPS", 	1,		1, 		mi_time_from_gps, 	NULL, NULL },
