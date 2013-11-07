@@ -1,3 +1,26 @@
+#!/usr/bin/env python2
+"""
+	kuroBox / naniBox
+	Copyright (c) 2013
+	david morris-oliveros // naniBox.com
+
+    This file is part of kuroBox / naniBox.
+
+    kuroBox / naniBox is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+
+    kuroBox / naniBox is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import sys
 import os
 import struct
@@ -33,7 +56,11 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.connect(self.ui.actionOpen, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('open()'))
 		self.connect(self.ui.actionNext, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('next()'))
 		self.connect(self.ui.actionPrev, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('prev()'))
+		self.connect(self.ui.actionViewHeader, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('viewHeader()'))
+		self.connect(self.ui.action3DView, QtCore.SIGNAL('triggered()'), self, QtCore.SLOT('view3D()'))
 		self.connect(self.ui.rangeSlider, QtCore.SIGNAL('valueChanged(int)'), self.setPos)
+
+		self.viewing3D = None
 
 		self.ui.rangeSlider.setFocus(7)
 		if len(sys.argv)==2:
@@ -56,9 +83,26 @@ class KBB_Viewer(QtGui.QMainWindow):
 		self.rangeSpinBox.setMaximum(self.packet_count)
 		self.setWindowTitle("KBB_Viewer: %s"%self.fname)
 		self.packetCountEdit.setText("%d"%self.packet_count)
+		self.viewHeader()
+		#self.setPos(0)
+
+	@QtCore.pyqtSlot()
+	def viewHeader(self):
 		if self.kbb.HEADER:
 			self.formatHeader(self.kbb.HEADER)
-		#self.setPos(0)
+
+	@QtCore.pyqtSlot()
+	def view3D(self):
+		if self.viewing3D is None:
+			print "Here we go!"
+			import kbb_3dview
+			self.viewing3D = kbb_3dview.KBB_3D_View(self.tabWidget)
+			self.tabWidget.addTab(self.viewing3D, "3D View")
+			self.tabWidget.setCurrentIndex(1)
+			print "Here we went:", self.viewing3D
+		else:
+			print "Already there!"
+		
 
 	@QtCore.pyqtSlot()
 	def next(self):
@@ -119,8 +163,11 @@ class KBB_Viewer(QtGui.QMainWindow):
 
 		# text area
 		self.formatHex(self.kbb.msg)
+
+		if self.viewing3D:
+			self.viewing3D.setYPR(self.kbb.vnav.yaw, self.kbb.vnav.pitch, self.kbb.vnav.roll)
 		
-		print "Setting position of KBB file to", pos
+		#print "Setting position of KBB file to", pos
 
 	def formatHex(self, msg):
 		s = ""

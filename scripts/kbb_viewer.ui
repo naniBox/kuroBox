@@ -19,21 +19,41 @@
      <widget class="QWidget" name="widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QPlainTextEdit" name="hex_view">
-         <property name="minimumSize">
-          <size>
-           <width>480</width>
-           <height>0</height>
-          </size>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <property name="font">
-          <font>
-           <family>Courier New</family>
-          </font>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
+         <widget class="QWidget" name="tabHexView">
+          <attribute name="title">
+           <string>Hex View</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPlainTextEdit" name="hex_view">
+             <property name="minimumSize">
+              <size>
+               <width>480</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Courier New</family>
+              </font>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
        <item>
@@ -146,6 +166,13 @@
                 </item>
                 <item row="5" column="1">
                  <widget class="QLineEdit" name="header_write_errors"/>
+                </item>
+                <item row="6" column="0" colspan="2">
+                 <widget class="QPushButton" name="header_view_header_btn">
+                  <property name="text">
+                   <string>View Header</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>
@@ -278,6 +305,9 @@
                 <item>
                  <widget class="QWidget" name="widget_3" native="true">
                   <layout class="QFormLayout" name="formLayout_2">
+                   <property name="fieldGrowthPolicy">
+                    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                   </property>
                    <property name="horizontalSpacing">
                     <number>0</number>
                    </property>
@@ -314,12 +344,18 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="nav_sol_week"/>
+                   </item>
                    <item row="4" column="0">
                     <widget class="QLabel" name="label_10">
                      <property name="text">
                       <string>gpsFix</string>
                      </property>
                     </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLineEdit" name="nav_sol_gpsfix"/>
                    </item>
                    <item row="5" column="0">
                     <widget class="QLabel" name="label_11">
@@ -328,12 +364,18 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="5" column="1">
+                    <widget class="QLineEdit" name="nav_sol_flags"/>
+                   </item>
                    <item row="6" column="0">
                     <widget class="QLabel" name="label_12">
                      <property name="text">
                       <string>ECEF</string>
                      </property>
                     </widget>
+                   </item>
+                   <item row="6" column="1">
+                    <widget class="QLineEdit" name="nav_sol_ecef"/>
                    </item>
                    <item row="7" column="0">
                     <widget class="QLabel" name="label_13">
@@ -342,6 +384,9 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="7" column="1">
+                    <widget class="QLineEdit" name="nav_sol_ecefv"/>
+                   </item>
                    <item row="8" column="0">
                     <widget class="QLabel" name="label_14">
                      <property name="text">
@@ -349,30 +394,15 @@
                      </property>
                     </widget>
                    </item>
+                   <item row="8" column="1">
+                    <widget class="QLineEdit" name="nav_sol_pacc_sacc"/>
+                   </item>
                    <item row="9" column="0">
                     <widget class="QLabel" name="label_15">
                      <property name="text">
                       <string>pdop/numSv</string>
                      </property>
                     </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QLineEdit" name="nav_sol_week"/>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QLineEdit" name="nav_sol_gpsfix"/>
-                   </item>
-                   <item row="5" column="1">
-                    <widget class="QLineEdit" name="nav_sol_flags"/>
-                   </item>
-                   <item row="6" column="1">
-                    <widget class="QLineEdit" name="nav_sol_ecef"/>
-                   </item>
-                   <item row="7" column="1">
-                    <widget class="QLineEdit" name="nav_sol_ecefv"/>
-                   </item>
-                   <item row="8" column="1">
-                    <widget class="QLineEdit" name="nav_sol_pacc_sacc"/>
                    </item>
                    <item row="9" column="1">
                     <widget class="QLineEdit" name="nav_sol_pdop_numsv"/>
@@ -547,7 +577,15 @@
     <addaction name="actionNext"/>
     <addaction name="actionPrev"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionViewHeader"/>
+    <addaction name="action3DView"/>
+   </widget>
    <addaction name="menuOpen"/>
+   <addaction name="menuView"/>
    <addaction name="menuNavigate"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -573,6 +611,22 @@
    </property>
    <property name="shortcut">
     <string>Left</string>
+   </property>
+  </action>
+  <action name="actionViewHeader">
+   <property name="text">
+    <string>View Header</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="action3DView">
+   <property name="text">
+    <string>3D View</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
    </property>
   </action>
  </widget>
