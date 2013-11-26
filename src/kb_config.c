@@ -25,18 +25,49 @@
 #include "kb_util.h"
 #include <string.h>
 #include <chprintf.h>
+#include "spiEEPROM.h"
+#include "kb_time.h"
 
 // config sources
 #include "kb_serial.h"
 #include "kb_featureA.h"
 #include "kb_gpio.h"
+#include "kb_screen.h"
 
 //-----------------------------------------------------------------------------
+// runtime configuration - stored in Backup Domain
 // #define BKPSRAM_BASE				0x40024000
 #define BKPSRAM_END					0x40024FFF
 #define BKPSRAM_SIZE				(BKPSRAM_END-BKPSRAM_BASE)
 #define BKPREG_MAGIC				0x426b426e	// nBkB ;)
-#define CONFIG_VERSION				0x01010101
+#define BKPREG_VERSION				0x00000001
+
+//-----------------------------------------------------------------------------
+// factory configuration - stored in EEPROM
+#define FACTORY_CONFIG_MAGIC				0x426b426e	// nBkB ;)
+#define FACTORY_CONFIG_VERSION				0x00000001
+#define FACTORY_CONFIG_USER_MAX_LENGTH		32
+#define FACTORY_CONFIG_SIZE					128
+typedef struct factory_config_t factory_config_t;
+struct __PACKED__ factory_config_t
+{
+	uint32_t preamble;
+	uint32_t version;
+	uint32_t serial_number;
+	uint32_t hardware_revision;
+	int32_t tcxo_compensation;
+	int32_t rtc_compensation;
+	int32_t vin_compensation;
+	char user_string[FACTORY_CONFIG_USER_MAX_LENGTH];
+	uint8_t __pad[FACTORY_CONFIG_SIZE - (4+4+2+4+4+4+4+4+FACTORY_CONFIG_USER_MAX_LENGTH)];
+
+	// checksum always at the end, not included in checksum calculations!
+	uint16_t checksum;
+};
+STATIC_ASSERT(sizeof(factory_config_t)==FACTORY_CONFIG_SIZE, FACTORY_CONFIG_SIZE);
+factory_config_t factory_config;
+
+bool_t factory_config_good;
 
 //-----------------------------------------------------------------------------
 typedef struct config_t config_t;
@@ -48,6 +79,7 @@ struct config_t
 	int32_t 		serial2_baud;
 	uint8_t 		lcd_backlight;
 	int32_t			featureA;
+	int32_t			metric_units;
 };
 config_t config;
 
@@ -64,6 +96,7 @@ int kbc_save(void)
 	config.serial2_baud = kbse_getBaudSerial2();
 	config.lcd_backlight = kbg_getLCDBacklight();
 	config.featureA = kbfa_getFeature();
+	config.metric_units = kbs_getMetricUnits();
 
 	return kbc_write(0, &config, sizeof(config));
 }
@@ -81,6 +114,8 @@ int kbc_load(void)
 	kbse_setBaudSerial2(config.serial2_baud);
 	kbg_setLCDBacklight(config.lcd_backlight);
 	kbfa_setFeature(config.featureA);
+	kbs_setMetricUnits(config.metric_units);
+
 	return KB_OK;
 }
 
@@ -177,13 +212,13 @@ int
 kuroBoxConfigInit(void)
 {
 	if ( ( RTC->BKP0R != BKPREG_MAGIC ) ||
-		 ( RTC->BKP1R != CONFIG_VERSION ) ||
+		 ( RTC->BKP1R != BKPREG_VERSION ) ||
 		 ( RTC->BKP2R != calc_cs() ) )
 	{
 		// clear it all
 		memset((uint8_t*)BKPSRAM_BASE, 0, BKPSRAM_SIZE);
 		RTC->BKP0R = BKPREG_MAGIC;
-		RTC->BKP1R = CONFIG_VERSION;
+		RTC->BKP1R = BKPREG_VERSION;
 		RTC->BKP2R = calc_cs();
 	}
 	else
@@ -192,6 +227,34 @@ kuroBoxConfigInit(void)
 		// it gets put in memory, right?
 		// @TODO: check up on this
 		kbc_load();
+	}
+
+	factory_config_good = 0;
+	memset(&factory_config, 0, sizeof(factory_config));
+
+	uint8_t * eeprombuf = (uint8_t*) &factory_config;
+	while( spiEepromWIP(&spiEepromD1) )
+	{}
+	spiEepromReadPage(&spiEepromD1, 0, eeprombuf);
+	if ( factory_config.preamble == FACTORY_CONFIG_MAGIC &&
+		 factory_config.version == FACTORY_CONFIG_VERSION )
+	{
+		uint16_t checksum = calc_checksum_16((uint8_t*)&factory_config,
+				sizeof(factory_config)-sizeof(factory_config.checksum));
+		if ( checksum == factory_config.checksum )
+		{
+			// all good!
+			factory_config_good = 1;
+			kbt_startOneSec(factory_config.tcxo_compensation);
+		}
+		else
+		{
+			// error?
+		}
+	}
+	else
+	{
+		// @TODO: do something here if we don't have config
 	}
 
 	return KB_OK;

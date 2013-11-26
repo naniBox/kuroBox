@@ -31,7 +31,7 @@
 // Depth of the conversion buffer, channels are sampled four times each.
 #define ADC_BUF_DEPTH		2
 
-#define SAMPLE_PERIOD		500    // every xxx milliseconds
+#define SAMPLE_PERIOD		500    // every X milliseconds
 
 //-----------------------------------------------------------------------------
 static void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);

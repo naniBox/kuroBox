@@ -95,56 +95,63 @@
 #define POLLING_DELAY			10
 
 //-----------------------------------------------------------------------------
-// this msg is written at the start of every file
-typedef struct writer_header_t writer_header_t;
-struct __PACKED__ writer_header_t
+////////#define LOGGER_BUFFER_SIZE		4
+#define LOGGER_FSYNC_INTERVAL			128
+
+#define KBB_MSG_SIZE					512
+
+// nBkB  backwards, since this architecture is little-endian, we
+// pre-swizzle the bytes
+#define KBB_PREAMBLE					0x426b426e
+#define KBB_CHECKSUM_START				6
+
+#define KBB_CLASS_HEADER				0x01
+#define KBB_CLASS_DATA					0x10
+
+#define KBB_SUBCLASS_HEADER_01			0x01
+#define KBB_SUBCLASS_DATA_01			0x01
+
+//-----------------------------------------------------------------------------
+//
+typedef struct kbb_header_t kbb_header_t;
+struct __PACKED__ kbb_header_t
 {
 	uint32_t preamble;					// 4
 	uint16_t checksum;					// 2
-	uint8_t version;					// 1
-	uint8_t msg_type;					// 1
+	uint8_t msg_class;					// 1
+	uint8_t msg_subclass;				// 1
 	uint16_t msg_size;					// 2
 										// = 10 for HEADER block
+};
+
+//-----------------------------------------------------------------------------
+// this msg is written at the start of every file
+typedef struct kbb_01_01_t kbb_01_01_t; // the header packet
+struct __PACKED__ kbb_01_01_t
+{
+	kbb_header_t header;				// 10 bytes
 
 	uint8_t vnav_header[64];			// vnav stuff, dumped in here
 
 	uint8_t __pad[512 - (10 + 64)];		// 438 left
 };
 
-STATIC_ASSERT(sizeof(writer_header_t)==512, 512);
-static writer_header_t writer_header;
+STATIC_ASSERT(sizeof(kbb_01_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
-////////#define LOGGER_BUFFER_SIZE		4
-#define LOGGER_MESSAGE_SIZE				512
-#define LOGGER_FSYNC_INTERVAL			128
-
-// nBkB  backwards, since this architecture is little-endian, we
-// pre-swizzle the bytes
-#define LOGGER_PREAMBLE					0x426b426e
-#define LOGGER_VERSION					12
-#define LOGGER_MSG_START_OF_CHECKSUM	6
-
-#define LOGGER_HEADER_MSG_TYPE			1
-#define LOGGER_DATA_MSG_TYPE			2
-
-
-//-----------------------------------------------------------------------------
-typedef struct log_msg_v01_t log_msg_v01_t;
-struct __PACKED__ log_msg_v01_t
+typedef struct kbb_02_01_t kbb_02_01_t;	// the data packet
+struct __PACKED__ kbb_02_01_t
 {
-	uint32_t preamble;					// 4
-	uint16_t checksum;					// 2
-	uint8_t version;					// 1
-	uint8_t msg_type;					// 1
-	uint16_t msg_size;					// 2
+	kbb_header_t header;				// 10 bytes
+
 	uint32_t msg_num;					// 4
 	uint32_t write_errors;				// 4
 										// = 18 for HEADER block
 
 	ltc_frame_t ltc_frame;				// 10
 	struct tm rtc;						// 9*4=36
-										// = 46 for TIME (LTC+RTC) block
+	uint32_t one_sec_pps;				// 4
+										// = 50 for TIME (LTC+RTC) block
 
 	uint32_t pps;						// 4
 	ubx_nav_sol_t nav_sol;				// 60
@@ -159,9 +166,11 @@ struct __PACKED__ log_msg_v01_t
 
 	uint32_t global_count;
 
-	uint8_t __pad[512 - (18 + 46 + 64 + 16 + 8 + 4)];
+	uint8_t __pad[512 - (18 + 50 + 64 + 16 + 8 + 4)];
 };
-STATIC_ASSERT(sizeof(log_msg_v01_t)==LOGGER_MESSAGE_SIZE, LOGGER_MESSAGE_SIZE);
+typedef kbb_02_01_t kbb_current_msg_t;
+STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
+STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
 // threads and states. 
@@ -185,7 +194,8 @@ uint32_t cardsize_MB;
 // this is our logging message - things get memcpy'd into this when the data
 // is available, and this is copied into the write buffer at the specified
 // timeslot
-static log_msg_v01_t current_msg;
+static kbb_current_msg_t current_msg;
+static kbb_01_01_t header_msg;
 
 //-----------------------------------------------------------------------------
 // we have 2 buffers of 96 messages each: 48kB each (512bytes * 96), for a total
@@ -204,7 +214,7 @@ static log_msg_v01_t current_msg;
 typedef struct write_buffer_t write_buffer_t;
 struct write_buffer_t
 {
-	struct log_msg_v01_t buffer[BUFFER_SIZE];
+	kbb_current_msg_t buffer[BUFFER_SIZE];
 
 	// this *HAS* to be 32bit so the the whole struct is 32bit aligned and
 	// packed so that writes happen on 32bit borders, and therefore, FAST
@@ -409,10 +419,13 @@ new_file(void)
 		kbs_setFName(charbuf);
 
 		// here we write out the header to the file
-		uint8_t * buf = (uint8_t*) &writer_header;
+		uint8_t * buf = (uint8_t*) &header_msg;
+		// but first, checksum...
+		header_msg.header.checksum = calc_checksum_16(buf+KBB_CHECKSUM_START,
+									KBB_MSG_SIZE-KBB_CHECKSUM_START);
 		UINT bytes_written = 0;
-		stat = f_write(&kbfile, buf, writer_header.msg_size, &bytes_written);
-		if (bytes_written != sizeof(writer_header.msg_size) || stat != FR_OK)
+		stat = f_write(&kbfile, buf, header_msg.header.msg_size, &bytes_written);
+		if (bytes_written != sizeof(header_msg.header.msg_size) || stat != FR_OK)
 			current_msg.write_errors++;
 
 		stat = f_sync(&kbfile);
@@ -687,19 +700,15 @@ thWriter(void *arg)
 	chRegSetThreadName("Writer");
 
 	// this data never changes, until we start added in new message types
-	current_msg.preamble = LOGGER_PREAMBLE;
-	current_msg.version = LOGGER_VERSION;
-	current_msg.msg_type = LOGGER_DATA_MSG_TYPE;
-	current_msg.msg_size = LOGGER_MESSAGE_SIZE;
+	current_msg.header.preamble = KBB_PREAMBLE;
+	current_msg.header.msg_class = KBB_CLASS_DATA;
+	current_msg.header.msg_subclass = KBB_SUBCLASS_DATA_01;
+	current_msg.header.msg_size = KBB_MSG_SIZE;
 
-	writer_header.preamble = LOGGER_PREAMBLE;
-	writer_header.version = LOGGER_VERSION;
-	writer_header.msg_type = LOGGER_HEADER_MSG_TYPE;
-	writer_header.msg_size = LOGGER_MESSAGE_SIZE;
-
-	uint8_t * buf = (uint8_t*) &writer_header;
-	writer_header.checksum = calc_checksum_16(buf+LOGGER_MSG_START_OF_CHECKSUM,
-								LOGGER_MESSAGE_SIZE-LOGGER_MSG_START_OF_CHECKSUM);
+	header_msg.header.preamble = KBB_PREAMBLE;
+	header_msg.header.msg_class = KBB_CLASS_HEADER;
+	header_msg.header.msg_subclass = KBB_SUBCLASS_HEADER_01;
+	header_msg.header.msg_size = KBB_MSG_SIZE;
 
 	logger_state = LS_WAIT_FOR_SD;
 	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
@@ -766,7 +775,7 @@ thLogger(void *arg)
 			// here we'll have a good buffer to fill up until it's all full!
 			write_buffer_t * wb = &write_buffers[current_idx];
 			{
-				log_msg_v01_t * lm = &wb->buffer[wb->current_idx];
+				kbb_current_msg_t * lm = &wb->buffer[wb->current_idx];
 
 				chSysLock();
 				// make sure that we complete a write uninterrupted
@@ -777,8 +786,8 @@ thLogger(void *arg)
 
 				uint8_t * buf = (uint8_t*) lm;
 				// NOTHING must get written after this, ok?
-				lm->checksum = calc_checksum_16(buf+LOGGER_MSG_START_OF_CHECKSUM,
-						LOGGER_MESSAGE_SIZE-LOGGER_MSG_START_OF_CHECKSUM);
+				lm->header.checksum = calc_checksum_16(buf+KBB_CHECKSUM_START,
+						KBB_MSG_SIZE-KBB_CHECKSUM_START);
 			}
 
 			// chTimeNow() will roll over every ~49 days
@@ -884,6 +893,12 @@ kbw_incPPS(void)
 }
 
 //-----------------------------------------------------------------------------
+void kbw_incOneSecPPS(void)
+{
+	current_msg.one_sec_pps++;
+}
+
+//-----------------------------------------------------------------------------
 void
 kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol)
 {
@@ -909,6 +924,6 @@ kbw_setAltitude(float altitude, float temperature)
 void 
 kbwh_setVNav(uint8_t * data, uint16_t length)
 {
-	ASSERT(sizeof(writer_header.vnav_header) == length, "kbw_header_vnav", "Length of vnav_header does not match");
-	memcpy(&writer_header.vnav_header, data, sizeof(writer_header.vnav_header));
+	ASSERT(sizeof(header_msg.vnav_header) == length, "kbw_header_vnav", "Length of vnav_header does not match");
+	memcpy(&header_msg.vnav_header, data, sizeof(header_msg.vnav_header));
 }

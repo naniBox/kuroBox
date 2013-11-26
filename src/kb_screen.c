@@ -66,6 +66,7 @@ struct __PACKED__ kuroBoxScreen
 	int32_t ecef[3];
 	float ypr[3];
 	int32_t error;
+	int32_t metric_units;
 };
 
 //-----------------------------------------------------------------------------
@@ -131,7 +132,15 @@ draw(void)
 	st7565_drawstring(&ST7565D1, C2P(1)+2, 2, charbuf);
 
 	INIT_CBUF();
-	chprintf(bss,"%iC", (int)screen.temperature);
+	if ( screen.metric_units )
+	{
+		chprintf(bss,"%iC", (int)screen.temperature);
+	}
+	else
+	{
+		float temperature = screen.temperature * 9.0f / 5.0f + 32.0f;
+		chprintf(bss,"%iF", (int)temperature);
+	}
 	st7565_drawstring(&ST7565D1, C2P(-3), 2, charbuf);
 
 //----------------------------------------------------------------------------
@@ -302,6 +311,7 @@ int
 kuroBoxScreenInit(void)
 {
 	memset(&screen, 0, sizeof(screen));
+	screen.metric_units = 1;
 	screenThread = chThdCreateStatic(waScreen, sizeof(waScreen), NORMALPRIO, thScreen, NULL);
 	blinkerThread = chThdCreateStatic(waBlinker, sizeof(waBlinker), NORMALPRIO, thBlinker, NULL);
 	return KB_OK;
@@ -407,6 +417,31 @@ kbs_setYPR(float yaw, float pitch, float roll)
 	screen.ypr[1] = pitch;
 	screen.ypr[2] = roll;
 }
+
+//-----------------------------------------------------------------------------
+uint32_t kbs_getMetricUnits()
+{
+	return screen.metric_units;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_setMetricUnits(uint32_t metric)
+{
+	screen.metric_units = metric;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_changeMetricUnits(void)
+{
+	screen.metric_units = !screen.metric_units;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Error stuff here:
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 void

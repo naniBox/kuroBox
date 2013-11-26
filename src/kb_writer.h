@@ -39,6 +39,7 @@ void kbw_incPPS(void);
 void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol);
 void kbw_setVNav(vnav_data_t * vnav);
 void kbw_setAltitude(float altitude, float temperature);
+void kbw_incOneSecPPS(void);
 
 //-----------------------------------------------------------------------------
 // these are the header packets - only done once at startup

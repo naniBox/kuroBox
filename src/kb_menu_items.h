@@ -36,14 +36,21 @@ typedef int (*menuextra_data_cb)(void);
 
 //-----------------------------------------------------------------------------
 void mi_exit(void * data);
+
 void mi_featureA_change(void * data);
 int mi_featureA_getFeature(void);
+
 void mi_serial1_pwr(void * data);
 void mi_serial1_baud(void * data);
 int mi_serial1_getbaud(void);
+
 void mi_serial2_pwr(void * data);
 void mi_serial2_baud(void * data);
 int mi_serial2_getbaud(void);
+
+void mi_metric_units(void * data);
+int mi_get_metric_units(void);
+
 void mi_led3(void * data);
 void mi_lcd_backlight(void * data);
 void mi_time_from_gps(void * data);

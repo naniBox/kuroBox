@@ -32,6 +32,7 @@
 //-----------------------------------------------------------------------------
 // this is the raw 80bit LTC frame as defined:
 // http://en.wikipedia.org/wiki/Linear_timecode
+#define LTC_FRAME_SIZE 10
 typedef struct ltc_frame_t ltc_frame_t;
 struct __PACKED__ ltc_frame_t
 {
@@ -63,7 +64,7 @@ struct __PACKED__ ltc_frame_t
 
 	uint16_t sync_word:16;
 };
-STATIC_ASSERT(sizeof(ltc_frame_t)==10, LTC_FRAME_SIZE); // 80bits
+STATIC_ASSERT(sizeof(ltc_frame_t)==LTC_FRAME_SIZE, LTC_FRAME_SIZE); // 80bits
 
 //-----------------------------------------------------------------------------
 // interpreted timecode with just HH:MM:SS:FF, none of the userbit intepreted
@@ -85,5 +86,8 @@ int kuroBoxTimeStop(void);
 
 //-----------------------------------------------------------------------------
 void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel);
+
+//-----------------------------------------------------------------------------
+void kbt_startOneSec(int32_t drift_factor);
 
 #endif // _naniBox_kuroBox_time

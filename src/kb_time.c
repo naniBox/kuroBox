@@ -164,6 +164,28 @@ kbt_getLTC(void)
 }
 
 //-----------------------------------------------------------------------------
+// my 1 second precision clock
+
+//-----------------------------------------------------------------------------
+static void
+one_sec_cb(GPTDriver * gptp)
+{
+	(void)gptp;
+
+	chSysLockFromIsr();
+		kbw_incOneSecPPS();
+	chSysUnlockFromIsr();
+}
+
+//-----------------------------------------------------------------------------
+static const GPTConfig one_sec_cfg =
+{
+	84000000,		// max clock!
+	one_sec_cb,
+	0
+};
+
+//-----------------------------------------------------------------------------
 int 
 kuroBoxTimeInit(void)
 {
@@ -177,4 +199,12 @@ int
 kuroBoxTimeStop(void)
 {
 	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+void
+kbt_startOneSec(int32_t drift_factor)
+{
+	gptStart(&GPTD2, &one_sec_cfg);
+	gptStartContinuous(&GPTD2, 84000000-drift_factor);
 }

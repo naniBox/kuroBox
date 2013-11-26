@@ -27,6 +27,7 @@
 #include "kb_gpio.h"
 #include "kb_gps.h"
 #include "kb_time.h"
+#include "kb_screen.h"
 #include <time.h>
 #include <chrtclib.h>
 
@@ -101,6 +102,19 @@ int
 mi_serial2_getbaud(void)
 {
 	return kbse_getBaudSerial2();
+}
+
+//-----------------------------------------------------------------------------
+void mi_metric_units(void * data)
+{
+	(void)data;
+	kbs_changeMetricUnits();
+}
+
+//-----------------------------------------------------------------------------
+int mi_get_metric_units(void)
+{
+	return kbs_getMetricUnits();
 }
 
 //-----------------------------------------------------------------------------

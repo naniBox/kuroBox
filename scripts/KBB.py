@@ -39,5 +39,5 @@ def KBB_factory(fname):
 	if version == 12:
 		import KBB_V12
 		return KBB_V12.KBB_V12(fname)
-	return NULL
+	return None
 

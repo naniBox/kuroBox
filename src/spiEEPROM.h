@@ -76,6 +76,9 @@ void spiEepromStart(spiEepromDriver * sedp,
 					const spiEepromConfig * secp,
 					SPIDriver * spip);
 
+void spiEepromReadBytes(spiEepromDriver * sedp, uint32_t address, uint8_t * buf, uint32_t len);
+void spiEepromWriteBytes(spiEepromDriver * sedp, uint32_t address, const uint8_t * buf, uint32_t len);
+
 void spiEepromReadPage(spiEepromDriver * sedp, uint16_t page, uint8_t * buf);
 void spiEepromWritePage(spiEepromDriver * sedp, uint16_t page, const uint8_t * buf);
 
