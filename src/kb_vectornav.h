@@ -27,6 +27,8 @@
 //----------------------------------------------------------------------------
 #include <ch.h>
 #include <hal.h>
+#include "kb_util.h"
+#include "kbb_types.h"
 
 //----------------------------------------------------------------------------
 // @TODO: Move to the .c?
@@ -97,14 +99,6 @@ struct VectorNavDriver
 	const VectorNavConfig * cfgp;
 	SPIDriver * spip;
 	GPTDriver * gpdp;
-};
-
-//-----------------------------------------------------------------------------
-typedef struct vnav_data_t vnav_data_t;
-struct vnav_data_t
-{
-	float ypr[3];
-	uint32_t ypr_ts;
 };
 
 //-----------------------------------------------------------------------------

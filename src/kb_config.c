@@ -27,6 +27,7 @@
 #include <chprintf.h>
 #include "spiEEPROM.h"
 #include "kb_time.h"
+#include "kbb_types.h"
 
 // config sources
 #include "kb_serial.h"
@@ -46,25 +47,6 @@
 // factory configuration - stored in EEPROM
 #define FACTORY_CONFIG_MAGIC				0x426b426e	// nBkB ;)
 #define FACTORY_CONFIG_VERSION				0x00000001
-#define FACTORY_CONFIG_USER_MAX_LENGTH		32
-#define FACTORY_CONFIG_SIZE					128
-typedef struct factory_config_t factory_config_t;
-struct __PACKED__ factory_config_t
-{
-	uint32_t preamble;
-	uint32_t version;
-	uint32_t serial_number;
-	uint32_t hardware_revision;
-	int32_t tcxo_compensation;
-	int32_t rtc_compensation;
-	int32_t vin_compensation;
-	char user_string[FACTORY_CONFIG_USER_MAX_LENGTH];
-	uint8_t __pad[FACTORY_CONFIG_SIZE - (4+4+2+4+4+4+4+4+FACTORY_CONFIG_USER_MAX_LENGTH)];
-
-	// checksum always at the end, not included in checksum calculations!
-	uint16_t checksum;
-};
-STATIC_ASSERT(sizeof(factory_config_t)==FACTORY_CONFIG_SIZE, FACTORY_CONFIG_SIZE);
 factory_config_t factory_config;
 
 bool_t factory_config_good;

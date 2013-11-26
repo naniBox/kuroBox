@@ -25,6 +25,7 @@
 #include <hal.h>
 #include <string.h>
 #include <chprintf.h>
+#include <chrtclib.h>
 #include "kb_time.h"
 #include "kb_screen.h"
 #include "kb_writer.h"
@@ -207,4 +208,21 @@ kbt_startOneSec(int32_t drift_factor)
 {
 	gptStart(&GPTD2, &one_sec_cfg);
 	gptStartContinuous(&GPTD2, 84000000-drift_factor);
+}
+
+//-----------------------------------------------------------------------------
+void
+kbt_getRTC(rtc_t * rtc)
+{
+	struct tm t;
+	rtcGetTimeTm(&RTCD1, &t);
+	rtc->tm_sec 	= t.tm_sec;
+	rtc->tm_min 	= t.tm_min;
+	rtc->tm_hour 	= t.tm_hour;
+	rtc->tm_mday 	= t.tm_mday;
+	rtc->tm_mon 	= t.tm_mon;
+	rtc->tm_year 	= t.tm_year;
+	rtc->tm_wday 	= t.tm_wday;
+	rtc->tm_yday 	= t.tm_yday;
+	rtc->tm_isdst 	= t.tm_isdst;
 }

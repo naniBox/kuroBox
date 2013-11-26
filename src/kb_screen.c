@@ -29,7 +29,6 @@
 #include "kb_gpio.h"
 #include "ST7565.h"
 #include <memstreams.h>
-#include <chrtclib.h>
 #include <chprintf.h>
 #include <string.h>
 #include <time.h>
@@ -79,8 +78,8 @@ static MemoryStream msb;
 static void
 draw(void)
 {
-	struct tm timp;
-	rtcGetTimeTm(&RTCD1, &timp);
+	rtc_t rtc;
+	kbt_getRTC(&rtc);
 
 	st7565_clear(&ST7565D1);
 
@@ -120,7 +119,7 @@ draw(void)
 			screen.ltc.minutes,
 			screen.ltc.seconds,
 			screen.ltc.frames,
-			timp.tm_hour,timp.tm_min,timp.tm_sec);
+			rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
 	st7565_drawstring(&ST7565D1, 0, 1, "T");
 	st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
 

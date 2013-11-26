@@ -72,7 +72,6 @@
 #include <hal.h>
 #include <memstreams.h>
 #include <chprintf.h>
-#include <chrtclib.h>
 #include <time.h>
 #include <string.h>
 
@@ -98,79 +97,6 @@
 ////////#define LOGGER_BUFFER_SIZE		4
 #define LOGGER_FSYNC_INTERVAL			128
 
-#define KBB_MSG_SIZE					512
-
-// nBkB  backwards, since this architecture is little-endian, we
-// pre-swizzle the bytes
-#define KBB_PREAMBLE					0x426b426e
-#define KBB_CHECKSUM_START				6
-
-#define KBB_CLASS_HEADER				0x01
-#define KBB_CLASS_DATA					0x10
-
-#define KBB_SUBCLASS_HEADER_01			0x01
-#define KBB_SUBCLASS_DATA_01			0x01
-
-//-----------------------------------------------------------------------------
-//
-typedef struct kbb_header_t kbb_header_t;
-struct __PACKED__ kbb_header_t
-{
-	uint32_t preamble;					// 4
-	uint16_t checksum;					// 2
-	uint8_t msg_class;					// 1
-	uint8_t msg_subclass;				// 1
-	uint16_t msg_size;					// 2
-										// = 10 for HEADER block
-};
-
-//-----------------------------------------------------------------------------
-// this msg is written at the start of every file
-typedef struct kbb_01_01_t kbb_01_01_t; // the header packet
-struct __PACKED__ kbb_01_01_t
-{
-	kbb_header_t header;				// 10 bytes
-
-	uint8_t vnav_header[64];			// vnav stuff, dumped in here
-
-	uint8_t __pad[512 - (10 + 64)];		// 438 left
-};
-
-STATIC_ASSERT(sizeof(kbb_01_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
-
-//-----------------------------------------------------------------------------
-typedef struct kbb_02_01_t kbb_02_01_t;	// the data packet
-struct __PACKED__ kbb_02_01_t
-{
-	kbb_header_t header;				// 10 bytes
-
-	uint32_t msg_num;					// 4
-	uint32_t write_errors;				// 4
-										// = 18 for HEADER block
-
-	ltc_frame_t ltc_frame;				// 10
-	struct tm rtc;						// 9*4=36
-	uint32_t one_sec_pps;				// 4
-										// = 50 for TIME (LTC+RTC) block
-
-	uint32_t pps;						// 4
-	ubx_nav_sol_t nav_sol;				// 60
-										// = 64 for GPS block
-
-	vnav_data_t vnav;					// 4*3+4 = 16
-										// 16 for the VNAV block
-
-	float altitude;						// 4
-	float temperature;					// 4
-										// 8 for the altimeter block
-
-	uint32_t global_count;
-
-	uint8_t __pad[512 - (18 + 50 + 64 + 16 + 8 + 4)];
-};
-typedef kbb_02_01_t kbb_current_msg_t;
-STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
-STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
 // threads and states. 
@@ -782,7 +708,7 @@ thLogger(void *arg)
 				memcpy(lm, &current_msg, sizeof(current_msg));
 				chSysUnlock();
 
-				rtcGetTimeTm(&RTCD1, &lm->rtc);
+				kbt_getRTC(&lm->rtc);
 
 				uint8_t * buf = (uint8_t*) lm;
 				// NOTHING must get written after this, ok?

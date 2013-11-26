@@ -28,54 +28,7 @@
 #include <ch.h>
 #include <hal.h>
 #include "kb_util.h"
-
-//-----------------------------------------------------------------------------
-// this is the raw 80bit LTC frame as defined:
-// http://en.wikipedia.org/wiki/Linear_timecode
-#define LTC_FRAME_SIZE 10
-typedef struct ltc_frame_t ltc_frame_t;
-struct __PACKED__ ltc_frame_t
-{
-	uint8_t frame_units:4;
-	uint8_t user_bits_1:4;
-	uint8_t frame_tens:2;
-	uint8_t drop_frame_flag:1;
-	uint8_t color_frame_flag:1;
-	uint8_t user_bits_2:4;
-
-	uint8_t seconds_units:4;
-	uint8_t user_bits_3:4;
-	uint8_t seconds_tens:3;
-	uint8_t even_parity_bit:1;
-	uint8_t user_bits_4:4;
-
-	uint8_t minutes_units:4;
-	uint8_t user_bits_5:4;
-	uint8_t minutes_tens:3;
-	uint8_t binary_group_flag_1:1;
-	uint8_t user_bits_6:4;
-
-	uint8_t hours_units:4;
-	uint8_t user_bits_7:4;
-	uint8_t hours_tens:2;
-	uint8_t reserved:1;
-	uint8_t binary_group_flag_2:1;
-	uint8_t user_bits_8:4;
-
-	uint16_t sync_word:16;
-};
-STATIC_ASSERT(sizeof(ltc_frame_t)==LTC_FRAME_SIZE, LTC_FRAME_SIZE); // 80bits
-
-//-----------------------------------------------------------------------------
-// interpreted timecode with just HH:MM:SS:FF, none of the userbit intepreted
-typedef struct smpte_timecode_t smpte_timecode_t;
-struct __PACKED__ smpte_timecode_t
-{
-	uint8_t hours;
-	uint8_t minutes;
-	uint8_t seconds;
-	uint8_t frames;
-};
+#include "kbb_types.h"
 
 //-----------------------------------------------------------------------------
 const smpte_timecode_t * kbt_getLTC(void);
@@ -89,5 +42,6 @@ void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel);
 
 //-----------------------------------------------------------------------------
 void kbt_startOneSec(int32_t drift_factor);
+void kbt_getRTC(rtc_t * rtc);
 
 #endif // _naniBox_kuroBox_time
