@@ -174,7 +174,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>250</width>
+           <width>300</width>
            <height>16777215</height>
           </size>
          </property>
@@ -185,14 +185,6 @@
           <bool>true</bool>
          </property>
          <widget class="QWidget" name="infoArea_widget">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>231</width>
-            <height>2012</height>
-           </rect>
-          </property>
           <layout class="QVBoxLayout" name="_02_01_verticalLayout_15">
            <item>
             <widget class="QGroupBox" name="_02_01_groupBox">
@@ -309,9 +301,6 @@
                  <item>
                   <widget class="QWidget" name="_02_01_time_widget" native="true">
                    <layout class="QFormLayout" name="_02_01_formLayout_5">
-                    <property name="fieldGrowthPolicy">
-                     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                    </property>
                     <item row="0" column="0">
                      <widget class="QLabel" name="_02_01_time_ltc_lbl">
                       <property name="text">
@@ -1035,7 +1024,7 @@
      <x>0</x>
      <y>0</y>
      <width>925</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

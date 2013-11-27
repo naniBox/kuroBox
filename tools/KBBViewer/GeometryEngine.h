@@ -61,7 +61,7 @@ public:
 private:
 	void initGeometry();
 
-    GLuint vboIds[2];
+    GLuint vboIds[4];
 };
 
 #endif // GEOMETRYENGINE_H

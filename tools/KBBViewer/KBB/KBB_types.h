@@ -44,7 +44,7 @@
 
 //-----------------------------------------------------------------------------
 // http://stackoverflow.com/questions/174356/ways-to-assert-expressions-at-build-time-in-c
-#ifdef __GNUC__
+#ifdef __GNUC_OR_NOT__
 #define STATIC_ASSERT_HELPER(expr, msg) \
     (!!sizeof(struct { unsigned int STATIC_ASSERTION__##msg: (expr) ? 1 : -1; }))
 #define STATIC_ASSERT(expr, msg) \

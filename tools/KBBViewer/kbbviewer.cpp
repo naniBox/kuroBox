@@ -64,6 +64,12 @@ KBBViewer::KBBViewer(QWidget *parent) :
 		w->setContentsMargins(0, 6, 0, 0);
 		w->setSpacing(4);
 	}
+	QList<QFormLayout*> flayouts = ui->infoArea_widget->findChildren<QFormLayout *>();
+	for ( QList<QFormLayout*>::iterator it = flayouts.begin() ; it != flayouts.end() ; ++it )
+	{
+		QFormLayout * w = *it;
+		w->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+	}
 
 	QList<QGroupBox*> groupboxes = ui->infoArea_widget->findChildren<QGroupBox *>();
 	for ( QList<QGroupBox*>::iterator it = groupboxes.begin() ; it != groupboxes.end() ; ++it )
@@ -72,15 +78,10 @@ KBBViewer::KBBViewer(QWidget *parent) :
 		if ( !gb->isCheckable() )
 			continue;
 		QList<QWidget*> widgets = gb->findChildren<QWidget*>(QRegExp(".*_widget"));
-		ui->hexView_text->appendPlainText(QString("This groupBox (%1) has %2 widgets!\n")
-										  .arg(gb->objectName())
-										  .arg(widgets.end()-widgets.begin()));
 		for ( QList<QWidget*>::const_iterator wit = widgets.begin(); wit != widgets.end() ; ++wit)
 		{
 			QWidget * w = *wit;
 			connect(gb, SIGNAL(toggled(bool)), w, SLOT(setVisible(bool)));
-			ui->hexView_text->appendPlainText(QString("\t'%1'\n")
-												.arg(w->objectName()));
 		}
 	}
 	groupboxes = ui->infoArea_widget->findChildren<QGroupBox *>(QRegExp("_02_.*_groupBox"));
@@ -225,7 +226,7 @@ void KBBViewer::handle_02_01(const KBB_02_01 * data)
 	ui->_02_01_gps_lat_edit->setText(QString("%1")
 							  .arg((double)lat, 9, 'f', 9));
 	ui->_02_01_gps_alt_edit->setText(QString("%1m")
-							  .arg((double)alt, 9, 'f', 2));
+                              .arg((double)alt, 1, 'f', 2));
 	ui->_02_01_gps_pps_edit->setText(QString("%1")
 							  .arg(_02_01.pps));
 	ui->_02_01_gps_gpsfix_edit->setText(QString("%1")
@@ -307,7 +308,7 @@ void KBBViewer::handle_02_02(const KBB_02_02 * data)
 	ui->_02_02_gps_lat_edit->setText(QString("%1")
 							  .arg((double)lat, 9, 'f', 9));
 	ui->_02_02_gps_alt_edit->setText(QString("%1m")
-							  .arg((double)alt, 9, 'f', 2));
+                              .arg((double)alt, 1, 'f', 2));
 	ui->_02_02_gps_pps_edit->setText(QString("%1")
 							  .arg(_02_02.pps));
 	ui->_02_02_gps_gpsfix_edit->setText(QString("%1")
