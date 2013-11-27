@@ -20,15 +20,11 @@
 # build stuff
 /.dep
 
-# IAR droppings
-/iar/Debug
-/iar/Release
-/iar/settings
-/iar/kuroBoxCustomSfr.sfr
-/iar/kuroBox.dep
-/iar/kuroBox.ewd
-
-
-/JFlashARM.log
-
 *.pyc
+/tools/KBBViewer/KBB/Debug
+/tools/KBBViewer/KBB/Release
+/tools/KBBViewer/KBB/ipch
+/tools/build-KBBViewer-Qt_5_1_1_Static-Debug
+/tools/build-KBBViewer-Qt_5_1_1_Static-Release
+*.opensdf
+*.user

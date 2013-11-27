@@ -91,6 +91,6 @@ protected:
 //-----------------------------------------------------------------------------
 void ltc_frame_to_smpte_timecode(smpte_timecode_t * smpte_timecode, const ltc_frame_t * ltc_frame);
 uint32_t ltc_frame_count(const smpte_timecode_t * smpte_timecode, uint32_t fps, bool drop_frame_flag);
-void ecef_to_lla(int32_t x, int32_t y, int32_t z, float & lat, float & lon, float & alt);
+void ecef_to_lla(float x, float y, float z, float & olat, float & olon, float & oalt);
 
 #endif // KBB_H

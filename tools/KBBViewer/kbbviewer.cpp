@@ -209,6 +209,10 @@ void KBBViewer::handlePacket(const KBB_Packet * packet)
 					ui->gps_detail_ecefv_edit->setText(QString("%1, %2, %3").arg(_02_01.nav_sol.ecefVX).arg(_02_01.nav_sol.ecefVY).arg(_02_01.nav_sol.ecefVZ));
 					ui->gps_detail_pacc_edit->setText(QString("%1 / %2").arg(_02_01.nav_sol.pAcc).arg(_02_01.nav_sol.sAcc));
 					ui->gps_detail_pdop_edit->setText(QString("%1 / %2").arg(_02_01.nav_sol.pdop).arg(_02_01.nav_sol.numSV));
+					if ( _02_01.nav_sol.gpsfix == 3 )
+						ui->gps_detail_gpsfix_edit->setStyleSheet("QLineEdit { background-color: rgb(212, 255, 212); }");
+					else
+						ui->gps_detail_gpsfix_edit->setStyleSheet("QLineEdit { background-color: rgb(255, 212, 212); }");
 
 					// VectorNav
 					ui->vn_yaw_edit->setText(QString("%1").arg(_02_01.vnav.ypr[0], 0, 'f', 5));

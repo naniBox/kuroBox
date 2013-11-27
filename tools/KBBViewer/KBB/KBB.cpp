@@ -200,19 +200,36 @@ ltc_frame_count(const smpte_timecode_t * smpte_timecode, uint32_t fps, bool drop
 }
 
 //-----------------------------------------------------------------------------
-void ecef_to_lla(int32_t x, int32_t y, int32_t z, float & lat, float & lon, float & alt)
+// Implemented from
+// http://www.nalresearch.com/files/Standard%20Modems/A3LA-XG/A3LA-XG%20SW%20Version%201.0.0/GPS%20Technical%20Documents/GPS.G1-X-00006%20(Datum%20Transformations).pdf
+// input is in SI (meters)
+#define A		6378137.000f
+#define B		6356752.31424518f
+#define EE		0.0066943799901411239f
+#define E1E1	0.0067394967422762389f
+void ecef_to_lla(float xx, float yy, float zz, float & olat, float & olon, float & oalt)
 {
-	float a = 6378137.0f;
-	float e = 8.1819190842622e-2f;
-	float b = 6356752.3142451793f; // sqrtf(powf(a,2) * (1-powf(e,2)));
-	float ep = 0.082094437949695676f; // sqrtf((powf(a,2)-powf(b,2))/powf(b,2));
-	float p = sqrtf(powf(x,2)+powf(y,2));
-	float th = atan2f(a*z, b*p);
-	lon = atan2f(y, x);
-	lat = atan2f((z+ep*ep*b*powf(sinf(th),3)), (p-e*e*a*powf(cosf(th),3)));
-	float n = a/sqrt(1-e*e*powf(sinf(lat),2));
-	alt = p/cosf(lat)-n;
-	lat = (lat*180.0f)/M_PI;
-	lon = (lon*180.0f)/M_PI;
-}
+	float x = xx/100.0f;
+	float y = yy/100.0f;
+	float z = zz/100.0f;
 
+	// const float F = 1.0/298.257223563f;
+	// const float A = 6378137.000f;
+	// const float B = 6356752.31424518f;			// A*(1.0-F)
+
+	// const float E = 0.081819190842620321f;	// sqrt((A*A-B*B)/(A*A));
+	// const float EE = 0.0066943799901411239f;	// E*E
+	// const float E1 = 0.082094437949694496f;	// sqrt((A*A-B*B)/(B*B));
+	// const float E1E1 = 0.0067394967422762389f;	// E1*E1
+
+	float lambda = atan2f(y, x);
+	float p = sqrtf(x*x + y*y);
+	float theta = atan2f((z*A), (p*B));
+	float phi = atan2f(z + E1E1*B*powf(sinf(theta), 3), p - EE*A*powf(cosf(theta), 3));
+	float N = A / sqrtf(1.0f - EE*powf(sinf(phi), 2));
+	float h = p / cosf(phi) - N;
+
+	olat = phi*180.0f/(float)M_PI;
+	olon = lambda*180.0f/(float)M_PI;
+	oalt = h;
+}
