@@ -232,8 +232,8 @@ void GeometryEngine::drawGridGeometry(QGLShaderProgram *program)
 	glVertex3f( 0.0f, 0.0f,  3.0f);
 	glVertex3f( 3.0f, 0.0f,  0.0f);
 	glVertex3f( 1.0f, 0.0f,  0.0f);
-	glVertex3f( 1.0f, 0.0f, -3.0f);
-	glVertex3f(-1.0f, 0.0f, -3.0f);
+	glVertex3f( 1.0f, 0.0f, -2.9f);
+	glVertex3f(-1.0f, 0.0f, -2.9f);
 	glVertex3f(-1.0f, 0.0f,  0.0f);
 	glVertex3f(-3.0f, 0.0f,  0.0f);
 	glVertex3f( 0.0f, 0.0f,  3.0f);
@@ -303,13 +303,13 @@ void GeometryEngine::drawCameraGeometry(QGLShaderProgram *program)
 
 	program->setUniformValue("a_colour", QVector4D(0.3f, 0.3f, 0.85f, 1.0f));
 	glBegin(GL_LINE_STRIP);
-	glVertex3f( 0.0f,	h,		-l);
-	glVertex3f( w,		0.0f,	-l);
-	glVertex3f( w/2.0f, 0.0f,	-l);
-	glVertex3f( w/2.0f, -h,		-l);
-	glVertex3f(-w/2.0f, -h,		-l);
-	glVertex3f(-w/2.0f, 0.0f,	-l);
-	glVertex3f(-w,		0.0f,	-l);
-	glVertex3f( 0.0f,	h,		-l);
+		glVertex3f( 0.0f,	h,			-l);
+		glVertex3f( w,		0.0f,		-l);
+		glVertex3f( w/2.0f, 0.0f,		-l);
+		glVertex3f( w/2.0f, -h+0.1f,	-l);
+		glVertex3f(-w/2.0f, -h+0.1f,	-l);
+		glVertex3f(-w/2.0f, 0.0f,		-l);
+		glVertex3f(-w,		0.0f,		-l);
+		glVertex3f( 0.0f,	h,			-l);
 	glEnd();
 }

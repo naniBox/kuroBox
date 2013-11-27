@@ -43,6 +43,7 @@ public:
     ~KBBViewer();
 
 public slots:
+	void about();
 	void fileOpen();
 	void setFilePosition(int pos);
 	void stepForward();

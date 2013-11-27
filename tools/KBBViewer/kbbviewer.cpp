@@ -23,6 +23,7 @@
 #include "kbbviewer.h"
 #include "ui_kbbviewer.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 //-----------------------------------------------------------------------------
 KBBViewer::KBBViewer(QWidget *parent) :
@@ -41,6 +42,8 @@ KBBViewer::KBBViewer(QWidget *parent) :
 	connect(ui->action_Raw_View, SIGNAL(triggered()), this, SLOT(setTabRawView()));
 	connect(ui->action_3D_View, SIGNAL(triggered()), this, SLOT(setTabThreeDView()));
 
+	connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+
 	connect(this, SIGNAL(fileSizeChanged(int, int)), ui->frame_slider, SLOT(setRange(int, int)));
 	connect(this, SIGNAL(filePositionChanged(int)), ui->frame_slider, SLOT(setValue(int)));
 	connect(this, SIGNAL(filePositionChanged(int)), ui->frame_spin, SLOT(setValue(int)));
@@ -56,6 +59,16 @@ KBBViewer::KBBViewer(QWidget *parent) :
 KBBViewer::~KBBViewer()
 {
     delete ui;
+}
+
+//-----------------------------------------------------------------------------
+void KBBViewer::about()
+{
+	QMessageBox msgBox;
+	msgBox.setText("KBB Viewer\n"
+				   "Copyright (c) 2013 - naniBox.com\n"
+				   "Build Date: " __DATE__ " at " __TIME__);
+	msgBox.exec();
 }
 
 //-----------------------------------------------------------------------------
