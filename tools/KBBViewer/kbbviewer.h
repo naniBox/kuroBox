@@ -19,16 +19,21 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//-----------------------------------------------------------------------------
 #ifndef KBBVIEWER_H
 #define KBBVIEWER_H
 
+//-----------------------------------------------------------------------------
 #include <QMainWindow>
 #include "KBB/KBB.h"
+#include "ThreeDWidget.h"
 
+//-----------------------------------------------------------------------------
 namespace Ui {
 class KBBViewer;
 }
 
+//-----------------------------------------------------------------------------
 class KBBViewer : public QMainWindow
 {
     Q_OBJECT
@@ -42,6 +47,8 @@ public slots:
 	void setFilePosition(int pos);
 	void stepForward();
 	void stepBackwards();
+	void setTabRawView();
+	void setTabThreeDView();
 
 signals:
 	void fileOpened(const QString & fname);
@@ -52,6 +59,8 @@ private:
 	void handlePacket(const KBB_Packet * packet);
 
     Ui::KBBViewer *ui;
+
+	ThreeDWidget * m_threeD;
 
 	QString m_fname;
 	KBB * m_kbb;

@@ -44,7 +44,7 @@ protected:
 class KBB_01_01 : public KBB_Packet
 {
 public:
-	KBB_01_01(const kbb_01_01_t & packet) : m_packet(packet) {}
+	explicit KBB_01_01(const kbb_01_01_t & packet) : m_packet(packet) {}
 	const kbb_01_01_t & packet() const { return m_packet; }
 	virtual const std::string name() const { return "KBB_01_01"; }
 	virtual const kbb_header_t & header() const { return m_packet.header; }
@@ -56,7 +56,7 @@ protected:
 class KBB_02_01 : public KBB_Packet
 {
 public:
-	KBB_02_01(const kbb_02_01_t & packet) : m_packet(packet) {}
+	explicit KBB_02_01(const kbb_02_01_t & packet) : m_packet(packet) {}
 	const kbb_02_01_t & packet() const { return m_packet; }
 	virtual const std::string name() const { return "KBB_01_01"; }
 	virtual const kbb_header_t & header() const { return m_packet.header; }

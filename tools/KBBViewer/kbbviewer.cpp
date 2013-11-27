@@ -19,31 +19,46 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//-----------------------------------------------------------------------------
 #include "kbbviewer.h"
 #include "ui_kbbviewer.h"
 #include <QFileDialog>
 
+//-----------------------------------------------------------------------------
 KBBViewer::KBBViewer(QWidget *parent) :
     QMainWindow(parent),
 	ui(new Ui::KBBViewer),
 	m_kbb(NULL)
 {
     ui->setupUi(this);
+
+	m_threeD = new ThreeDWidget(ui->threeD_tab);
+	ui->threeD_frame_layout->addWidget(m_threeD);;
+
 	connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(fileOpen()));
+	connect(ui->actionStep_Forward, SIGNAL(triggered()), this, SLOT(stepForward()));
+	connect(ui->actionStep_Backwards, SIGNAL(triggered()), this, SLOT(stepBackwards()));
+	connect(ui->action_Raw_View, SIGNAL(triggered()), this, SLOT(setTabRawView()));
+	connect(ui->action_3D_View, SIGNAL(triggered()), this, SLOT(setTabThreeDView()));
+
 	connect(this, SIGNAL(fileSizeChanged(int, int)), ui->frame_slider, SLOT(setRange(int, int)));
 	connect(this, SIGNAL(filePositionChanged(int)), ui->frame_slider, SLOT(setValue(int)));
 	connect(this, SIGNAL(filePositionChanged(int)), ui->frame_spin, SLOT(setValue(int)));
-	connect(ui->actionStep_Forward, SIGNAL(triggered()), this, SLOT(stepForward()));
-	connect(ui->actionStep_Backwards, SIGNAL(triggered()), this, SLOT(stepBackwards()));
+
+
 	connect(ui->frame_slider, SIGNAL(valueChanged(int)), this, SLOT(setFilePosition(int)));
 	connect(ui->frame_spin, SIGNAL(valueChanged(int)), this, SLOT(setFilePosition(int)));
+
+	connect(ui->threeD_tool_reset_view_btn, SIGNAL(clicked()), m_threeD, SLOT(resetView()));
 }
 
+//-----------------------------------------------------------------------------
 KBBViewer::~KBBViewer()
 {
     delete ui;
 }
 
+//-----------------------------------------------------------------------------
 void KBBViewer::fileOpen()
 {
 	QString fname = QFileDialog::getOpenFileName(this, tr("Open KBB file"), "c:/Users/talsit/Code/naniBox/KBBViewer/KURO0015.KBB", tr("KBB Files (*.kbb)"));
@@ -65,6 +80,7 @@ void KBBViewer::fileOpen()
 	}
 }
 
+//-----------------------------------------------------------------------------
 void KBBViewer::setFilePosition(int pos)
 {
 	if ( !m_kbb )
@@ -87,6 +103,7 @@ void KBBViewer::setFilePosition(int pos)
 	}
 }
 
+//-----------------------------------------------------------------------------
 void KBBViewer::stepForward()
 {
 	if ( !m_kbb )
@@ -95,6 +112,7 @@ void KBBViewer::stepForward()
 	setFilePosition(m_position+1);
 }
 
+//-----------------------------------------------------------------------------
 void KBBViewer::stepBackwards()
 {
 	if ( !m_kbb )
@@ -103,6 +121,19 @@ void KBBViewer::stepBackwards()
 	setFilePosition(m_position-1);
 }
 
+//-----------------------------------------------------------------------------
+void KBBViewer::setTabRawView()
+{
+	ui->content->setCurrentIndex(0);
+}
+
+//-----------------------------------------------------------------------------
+void KBBViewer::setTabThreeDView()
+{
+	ui->content->setCurrentIndex(1);
+}
+
+//-----------------------------------------------------------------------------
 void KBBViewer::handlePacket(const KBB_Packet * packet)
 {
 
@@ -199,10 +230,11 @@ void KBBViewer::handlePacket(const KBB_Packet * packet)
 					}
 
 					ui->hexView_text->setPlainText(hex);
+
+					m_threeD->setYPR(_02_01.vnav.ypr[0], _02_01.vnav.ypr[1], _02_01.vnav.ypr[2]);
 				}
 			}
 		}
 		break;
 	}
-
 }
