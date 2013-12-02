@@ -58,6 +58,9 @@ signals:
 
 private:
 	void handlePacket(const KBB_Packet * packet);
+	void handle_02_01(const KBB_02_01 * data);
+	void handle_02_02(const KBB_02_02 * data);
+	void drawHexView(const uint8_t * data, uint32_t len);
 
     Ui::KBBViewer *ui;
 

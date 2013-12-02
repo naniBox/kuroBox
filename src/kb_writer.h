@@ -38,6 +38,7 @@ const kbb_current_msg_t * kbw_getCurrentMsg(void);
 //-----------------------------------------------------------------------------
 // the normal packets to send into the writer
 void kbw_setLTC(ltc_frame_t * ltc_frame);
+void kbw_setSMPTETime(smpte_timecode_t * smpte_time);
 void kbw_incPPS(void);
 void kbw_setGpsNavSol(ubx_nav_sol_t * nav_sol);
 void kbw_setVNav(vnav_data_t * vnav);

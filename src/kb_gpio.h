@@ -31,6 +31,7 @@
 //-----------------------------------------------------------------------------
 #define kbg_setGPIO(on,port,pin) 	palWritePad(port,pin,on)
 #define kbg_getGPIO(port,pin)		palReadPad(port,pin)
+#define kbg_toggleGPIO(port,pin)	palTogglePad(port,pin)
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -40,12 +41,15 @@
 //-----------------------------------------------------------------------------
 #define kbg_setLED1(on)				kbg_setGPIO(on, GPIOB, GPIOB_LED1)
 #define kbg_getLED1()				kbg_getGPIO(GPIOB, GPIOB_LED1)
+#define kbg_toggleLED1()			kbg_toggleGPIO(GPIOB, GPIOB_LED1)
 
 #define kbg_setLED2(on)				kbg_setGPIO(on, GPIOB, GPIOB_LED2)
 #define kbg_getLED2()				kbg_getGPIO(GPIOB, GPIOB_LED2)
+#define kbg_toggleLED2()			kbg_toggleGPIO(GPIOB, GPIOB_LED2)
 
 #define kbg_setLED3(on)				kbg_setGPIO(on, GPIOA, GPIOA_LED3)
 #define kbg_getLED3()				kbg_getGPIO(GPIOA, GPIOA_LED3)
+#define kbg_toggleLED3()			kbg_toggleGPIO(GPIOA, GPIOA_LED3)
 
 //-----------------------------------------------------------------------------
 #define kbg_setLCDBacklight(on)		kbg_setGPIO(!on, GPIOD, GPIOD_LCD_LED_DRIVE)

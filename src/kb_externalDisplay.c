@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 #include "kbb_types.h"
-KBB_TYPES_VERSION_CHECK(0x0001)
+KBB_TYPES_VERSION_CHECK(0x0002)
 
 //-----------------------------------------------------------------------------
 static int ed_interval;
@@ -67,6 +67,7 @@ thEDisplay(void *arg)
 
 		const kbb_current_msg_t * msg = kbw_getCurrentMsg();
 		memcpy(&kbb_display.ltc_frame, 		&msg->ltc_frame, 	sizeof(kbb_display.ltc_frame));
+		memcpy(&kbb_display.smpte_time, 	&msg->smpte_time, 	sizeof(kbb_display.smpte_time));
 		kbb_display.ecef[0] = msg->nav_sol.ecefX;
 		kbb_display.ecef[1] = msg->nav_sol.ecefY;
 		kbb_display.ecef[2] = msg->nav_sol.ecefZ;

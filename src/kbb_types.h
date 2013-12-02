@@ -29,7 +29,7 @@
 	of this file should check against it and increment accordingly using the 
 	macro below
  */
-#define KBB_TYPES_VERSION		0x0001
+#define KBB_TYPES_VERSION		0x0002
 #define KBB_TYPES_VERSION_CHECK(x) 										\
 	extern char KBB_TYPES_VERSION_CHECK_[1];							\
 	extern char KBB_TYPES_VERSION_CHECK_[(x)==KBB_TYPES_VERSION?1:2];
@@ -204,6 +204,7 @@ STATIC_ASSERT(sizeof(vnav_data_t)==VNAV_DATA_SIZE, VNAV_DATA_SIZE);
 
 #define KBB_SUBCLASS_HEADER_01			0x01
 #define KBB_SUBCLASS_DATA_01			0x01
+#define KBB_SUBCLASS_DATA_02			0x02
 #define KBB_SUBCLASS_EXTERNAL_01		0x01
 
 
@@ -267,8 +268,43 @@ struct __PACKED__ kbb_02_01_t
 
 	uint8_t __pad[512 - (18 + 50 + 64 + 16 + 8 + 4)];
 };
-typedef kbb_02_01_t kbb_current_msg_t;
+
+//-----------------------------------------------------------------------------
+typedef struct kbb_02_02_t kbb_02_02_t;	// the data packet
+struct __PACKED__ kbb_02_02_t
+{
+	kbb_header_t header;				// 10 bytes
+
+	uint32_t msg_num;					// 4
+	uint32_t write_errors;				// 4
+										// = 18 for HEADER block
+
+	ltc_frame_t ltc_frame;				// 10
+	rtc_t rtc;							// 36
+	uint32_t one_sec_pps;				// 4
+	smpte_timecode_t smpte_time;		// 4
+										// = 54 for TIME (LTC+RTC+FPS) block
+
+	uint32_t pps;						// 4
+	ubx_nav_sol_t nav_sol;				// 60
+										// = 64 for GPS block
+
+	vnav_data_t vnav;					// 4*3+4 = 16
+										// 16 for the VNAV block
+
+	float altitude;						// 4
+	float temperature;					// 4
+										// 8 for the altimeter block
+
+	uint32_t global_count;
+
+	uint8_t __pad[512 - (18 + 54 + 64 + 16 + 8 + 4)];
+};
+
+typedef kbb_02_02_t kbb_current_msg_t;
+#define KBB_SUBCLASS_DATA_CURRENT KBB_SUBCLASS_DATA_02
 STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
+STATIC_ASSERT(sizeof(kbb_02_02_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
@@ -278,11 +314,12 @@ struct __PACKED__ kbb_display_t
 {
 	kbb_header_t header;				// 10
 	ltc_frame_t ltc_frame;				// 10
+	smpte_timecode_t smpte_time;		// 4
 	int32_t ecef[3];					// 12
 	vnav_data_t vnav;					// 16
 	float temperature;					// 4
-										// = 52
-	uint8_t __pad[KBB_DISPLAY_SIZE - (10+10+12+16+4)]; // 76 left over
+										// = 56
+	uint8_t __pad[KBB_DISPLAY_SIZE - (10+10+4+12+16+4)]; // 72 left over
 };
 STATIC_ASSERT(sizeof(kbb_display_t)==KBB_DISPLAY_SIZE, KBB_DISPLAY_SIZE);
 

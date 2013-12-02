@@ -27,6 +27,7 @@
 #include <string>
 #include "utils.h"
 #include "KBB_types.h"
+KBB_TYPES_VERSION_CHECK(0x0002)
 
 //-----------------------------------------------------------------------------
 class KBB_Packet
@@ -58,10 +59,22 @@ class KBB_02_01 : public KBB_Packet
 public:
 	explicit KBB_02_01(const kbb_02_01_t & packet) : m_packet(packet) {}
 	const kbb_02_01_t & packet() const { return m_packet; }
-	virtual const std::string name() const { return "KBB_01_01"; }
+	virtual const std::string name() const { return "KBB_02_01"; }
 	virtual const kbb_header_t & header() const { return m_packet.header; }
 protected:
 	kbb_02_01_t m_packet;
+};
+
+//-----------------------------------------------------------------------------
+class KBB_02_02 : public KBB_Packet
+{
+public:
+	explicit KBB_02_02(const kbb_02_02_t & packet) : m_packet(packet) {}
+	const kbb_02_02_t & packet() const { return m_packet; }
+	virtual const std::string name() const { return "KBB_02_02"; }
+	virtual const kbb_header_t & header() const { return m_packet.header; }
+protected:
+	kbb_02_02_t m_packet;
 };
 
 //-----------------------------------------------------------------------------

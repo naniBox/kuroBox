@@ -33,21 +33,6 @@
     <item>
      <widget class="QWidget" name="top_widget" native="true">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QTabWidget" name="content">
          <property name="minimumSize">
@@ -57,7 +42,7 @@
           </size>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="rawData_tab">
           <attribute name="title">
@@ -180,622 +165,829 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="info_widget" native="true">
+        <widget class="QScrollArea" name="infoArea">
          <property name="minimumSize">
           <size>
-           <width>250</width>
+           <width>220</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>220</width>
+           <width>250</width>
            <height>16777215</height>
           </size>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="spacing">
-           <number>0</number>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="infoArea_widget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>231</width>
+            <height>2012</height>
+           </rect>
           </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QGroupBox" name="header_gb">
-            <property name="title">
-             <string>Header</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <property name="spacing">
-              <number>0</number>
+          <layout class="QVBoxLayout" name="_02_01_verticalLayout_15">
+           <item>
+            <widget class="QGroupBox" name="_02_01_groupBox">
+             <property name="title">
+              <string>_02_01</string>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
+             <property name="flat">
+              <bool>true</bool>
              </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="header_widget" native="true">
-               <layout class="QFormLayout" name="formLayout">
-                <property name="horizontalSpacing">
-                 <number>0</number>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QGroupBox" name="_02_01_header_gb">
+                <property name="title">
+                 <string>Header</string>
                 </property>
-                <property name="verticalSpacing">
-                 <number>0</number>
+                <property name="flat">
+                 <bool>true</bool>
                 </property>
-                <property name="leftMargin">
-                 <number>0</number>
+                <property name="checkable">
+                 <bool>true</bool>
                 </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="header_preamble_lbl">
-                  <property name="text">
-                   <string>Preamble</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="header_preamble_edit"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="header_checksum_lbl">
-                  <property name="text">
-                   <string>Checksum</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="header_checksum_edit"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="header_msg_class_lbl">
-                  <property name="text">
-                   <string>Msg Class</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="header_msg_class_edit"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="header_msg_subclass_lbl">
-                  <property name="text">
-                   <string>Msg Subclass</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="header_msg_size_lbl">
-                  <property name="text">
-                   <string>Msg Size</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="header_msg_subclass_edit"/>
-                </item>
-                <item row="4" column="1">
-                 <widget class="QLineEdit" name="header_msg_size_edit"/>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="header_msg_num_lbl">
-                  <property name="text">
-                   <string>Msg Number</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="header_write_errors_lbl">
-                  <property name="text">
-                   <string>Write Errors</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QLineEdit" name="header_msg_num_edit"/>
-                </item>
-                <item row="6" column="1">
-                 <widget class="QLineEdit" name="header_write_errors_edit"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="ltc_gb">
-            <property name="title">
-             <string>Linear Timecode</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="ltc_widget" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_11">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLineEdit" name="ltc_edit"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="rtc_gb">
-            <property name="title">
-             <string>Real Time Clock</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="rtc_widget" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_10">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLineEdit" name="rtc_edit"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="gps_gb">
-            <property name="title">
-             <string>GPS - NAV_SOL</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="gps_main_widget" native="true">
-               <layout class="QVBoxLayout" name="verticalLayout_12">
-                <item>
-                 <widget class="QWidget" name="gps_widget" native="true">
-                  <layout class="QFormLayout" name="formLayout_2">
-                   <property name="horizontalSpacing">
-                    <number>0</number>
-                   </property>
-                   <property name="verticalSpacing">
-                    <number>0</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item row="0" column="0">
-                    <widget class="QLabel" name="gps_lon_lbl">
-                     <property name="text">
-                      <string>Longitude</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="1">
-                    <widget class="QLineEdit" name="gps_lon_edit"/>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="gps_pps_lbl">
-                     <property name="text">
-                      <string>PPS</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QLineEdit" name="gps_pps_edit"/>
-                   </item>
-                   <item row="1" column="0">
-                    <widget class="QLabel" name="gps_lat_lbl">
-                     <property name="text">
-                      <string>Latitude</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="QLabel" name="gps_alt_lbl">
-                     <property name="text">
-                      <string>Altitude</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QLineEdit" name="gps_lat_edit"/>
-                   </item>
-                   <item row="2" column="1">
-                    <widget class="QLineEdit" name="gps_alt_edit"/>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="gps_details_gb">
-                  <property name="title">
-                   <string>GPS - NAV_SOL Details</string>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                  <property name="checkable">
-                   <bool>true</bool>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_9">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QWidget" name="gps_details_widget" native="true">
-                     <layout class="QFormLayout" name="formLayout_4">
-                      <property name="horizontalSpacing">
-                       <number>0</number>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_4">
+                 <item>
+                  <widget class="QWidget" name="_02_01_header_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_01_header_preamble_lbl">
+                      <property name="text">
+                       <string>Preamble</string>
                       </property>
-                      <property name="verticalSpacing">
-                       <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_preamble_edit"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="_02_01_header_checksum_lbl">
+                      <property name="text">
+                       <string>Checksum</string>
                       </property>
-                      <property name="leftMargin">
-                       <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_checksum_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_01_header_msg_class_lbl">
+                      <property name="text">
+                       <string>Msg Class</string>
                       </property>
-                      <property name="topMargin">
-                       <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_msg_class_edit"/>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="_02_01_header_msg_subclass_lbl">
+                      <property name="text">
+                       <string>Msg Subclass</string>
                       </property>
-                      <property name="rightMargin">
-                       <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="_02_01_header_msg_size_lbl">
+                      <property name="text">
+                       <string>Msg Size</string>
                       </property>
-                      <property name="bottomMargin">
-                       <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_msg_subclass_edit"/>
+                    </item>
+                    <item row="4" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_msg_size_edit"/>
+                    </item>
+                    <item row="5" column="0">
+                     <widget class="QLabel" name="_02_01_header_msg_num_lbl">
+                      <property name="text">
+                       <string>Msg Number</string>
                       </property>
-                      <item row="0" column="0">
-                       <widget class="QLabel" name="gps_detail_itow_lbl">
-                        <property name="text">
-                         <string>ITOW</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="0" column="1">
-                       <widget class="QLineEdit" name="gps_detail_itow_edit"/>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="gps_detail_ftow_lbl">
-                        <property name="text">
-                         <string>FTOW</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="2" column="0">
-                       <widget class="QLabel" name="gps_detail_week_lbl">
-                        <property name="text">
-                         <string>Week</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="3" column="0">
-                       <widget class="QLabel" name="gps_detail_gpsfix_lbl">
-                        <property name="text">
-                         <string>GPS Fix</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="4" column="0">
-                       <widget class="QLabel" name="gps_detail_flags_lbl">
-                        <property name="text">
-                         <string>Flags</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="5" column="0">
-                       <widget class="QLabel" name="gps_detail_ecef_lbl">
-                        <property name="text">
-                         <string>ECEF</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="6" column="0">
-                       <widget class="QLabel" name="gps_detail_ecefv_lbl">
-                        <property name="text">
-                         <string>ECEFV</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="7" column="0">
-                       <widget class="QLabel" name="gps_detail_pacc_lbl">
-                        <property name="text">
-                         <string>pAcc/sAcc</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="8" column="0">
-                       <widget class="QLabel" name="gps_detail_pdop_lbl">
-                        <property name="text">
-                         <string>pdop/numSv</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="1">
-                       <widget class="QLineEdit" name="gps_detail_ftow_edit"/>
-                      </item>
-                      <item row="2" column="1">
-                       <widget class="QLineEdit" name="gps_detail_week_edit"/>
-                      </item>
-                      <item row="3" column="1">
-                       <widget class="QLineEdit" name="gps_detail_gpsfix_edit"/>
-                      </item>
-                      <item row="4" column="1">
-                       <widget class="QLineEdit" name="gps_detail_flags_edit"/>
-                      </item>
-                      <item row="5" column="1">
-                       <widget class="QLineEdit" name="gps_detail_ecef_edit"/>
-                      </item>
-                      <item row="6" column="1">
-                       <widget class="QLineEdit" name="gps_detail_ecefv_edit"/>
-                      </item>
-                      <item row="7" column="1">
-                       <widget class="QLineEdit" name="gps_detail_pacc_edit"/>
-                      </item>
-                      <item row="8" column="1">
-                       <widget class="QLineEdit" name="gps_detail_pdop_edit"/>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="vn_gb">
-            <property name="title">
-             <string>Vector Nav - Attitude</string>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <property name="spacing">
-              <number>0</number>
+                     </widget>
+                    </item>
+                    <item row="6" column="0">
+                     <widget class="QLabel" name="_02_01_header_write_errors_lbl">
+                      <property name="text">
+                       <string>Write Errors</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="5" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_msg_num_edit"/>
+                    </item>
+                    <item row="6" column="1">
+                     <widget class="QLineEdit" name="_02_01_header_write_errors_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_01_time_gb">
+                <property name="title">
+                 <string>Time</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_6">
+                 <item>
+                  <widget class="QWidget" name="_02_01_time_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout_5">
+                    <property name="fieldGrowthPolicy">
+                     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                    </property>
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_01_time_ltc_lbl">
+                      <property name="text">
+                       <string>LTC</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_01_time_ltc_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_01_time_rtc_lbl">
+                      <property name="text">
+                       <string>RTC</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_01_time_rtc_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_01_vn_gb">
+                <property name="title">
+                 <string>Attitude - Roll Pitch Yaw</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_8">
+                 <item>
+                  <widget class="QWidget" name="_02_01_vn_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout_3">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_01_vn_yaw_lbl">
+                      <property name="text">
+                       <string>Yaw</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_01_vn_yaw_edit"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="_02_01_vn_pitch_lbl">
+                      <property name="text">
+                       <string>Pitch</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="_02_01_vn_pitch_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_01_vn_roll_lbl">
+                      <property name="text">
+                       <string>Roll</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_01_vn_roll_edit"/>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="_02_01_vn_timestamp_lbl">
+                      <property name="text">
+                       <string>Timestamp</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="_02_01_vn_timestamp_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_01_gps_gb">
+                <property name="title">
+                 <string>GPS - NAV_SOL</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_5">
+                 <item>
+                  <widget class="QWidget" name="_02_01_gps_main_widget" native="true">
+                   <layout class="QVBoxLayout" name="_02_01_verticalLayout_12">
+                    <item>
+                     <widget class="QWidget" name="_02_01_gps_widget" native="true">
+                      <layout class="QFormLayout" name="_02_01_formLayout_9">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="_02_01_gps_lon_lbl">
+                         <property name="text">
+                          <string>Longitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="_02_01_gps_lon_edit"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="_02_01_gps_pps_lbl">
+                         <property name="text">
+                          <string>PPS</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="1">
+                        <widget class="QLineEdit" name="_02_01_gps_pps_edit"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="_02_01_gps_lat_lbl">
+                         <property name="text">
+                          <string>Latitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="_02_01_gps_alt_lbl">
+                         <property name="text">
+                          <string>Altitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="_02_01_gps_lat_edit"/>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="_02_01_gps_alt_edit"/>
+                       </item>
+                       <item row="4" column="0">
+                        <widget class="QLabel" name="_02_01_gps_gpsfix_lbl">
+                         <property name="text">
+                          <string>GPS Fix</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="1">
+                        <widget class="QLineEdit" name="_02_01_gps_gpsfix_edit"/>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QGroupBox" name="_02_01_gps_details_gb">
+                      <property name="title">
+                       <string>GPS - NAV_SOL Details</string>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <layout class="QVBoxLayout" name="_02_01_verticalLayout_9">
+                       <item>
+                        <widget class="QWidget" name="_02_01_gps_details_widget" native="true">
+                         <layout class="QFormLayout" name="_02_01_formLayout_4">
+                          <item row="0" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_itow_lbl">
+                            <property name="text">
+                             <string>ITOW</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="0" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_itow_edit"/>
+                          </item>
+                          <item row="1" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_ftow_lbl">
+                            <property name="text">
+                             <string>FTOW</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="2" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_week_lbl">
+                            <property name="text">
+                             <string>Week</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="4" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_flags_lbl">
+                            <property name="text">
+                             <string>Flags</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="5" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_ecef_lbl">
+                            <property name="text">
+                             <string>ECEF</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="6" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_ecefv_lbl">
+                            <property name="text">
+                             <string>ECEFV</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="7" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_pacc_lbl">
+                            <property name="text">
+                             <string>pAcc/sAcc</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="8" column="0">
+                           <widget class="QLabel" name="_02_01_gps_detail_pdop_lbl">
+                            <property name="text">
+                             <string>pdop/numSv</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_ftow_edit"/>
+                          </item>
+                          <item row="2" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_week_edit"/>
+                          </item>
+                          <item row="4" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_flags_edit"/>
+                          </item>
+                          <item row="5" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_ecef_edit"/>
+                          </item>
+                          <item row="6" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_ecefv_edit"/>
+                          </item>
+                          <item row="7" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_pacc_edit"/>
+                          </item>
+                          <item row="8" column="1">
+                           <widget class="QLineEdit" name="_02_01_gps_detail_pdop_edit"/>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="_02_02_groupBox">
+             <property name="title">
+              <string>_02_02</string>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
+             <property name="flat">
+              <bool>true</bool>
              </property>
-             <property name="topMargin">
-              <number>0</number>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QGroupBox" name="_02_02_header_gb">
+                <property name="title">
+                 <string>Header</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_11">
+                 <item>
+                  <widget class="QWidget" name="_02_02_header_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout_8">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_02_header_preamble_lbl">
+                      <property name="text">
+                       <string>Preamble</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_preamble_edit"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="_02_02_header_checksum_lbl">
+                      <property name="text">
+                       <string>Checksum</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_checksum_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_02_header_msg_class_lbl">
+                      <property name="text">
+                       <string>Msg Class</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_msg_class_edit"/>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="_02_02_header_msg_subclass_lbl">
+                      <property name="text">
+                       <string>Msg Subclass</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QLabel" name="_02_02_header_msg_size_lbl">
+                      <property name="text">
+                       <string>Msg Size</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_msg_subclass_edit"/>
+                    </item>
+                    <item row="4" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_msg_size_edit"/>
+                    </item>
+                    <item row="5" column="0">
+                     <widget class="QLabel" name="_02_02_header_msg_num_lbl">
+                      <property name="text">
+                       <string>Msg Number</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="6" column="0">
+                     <widget class="QLabel" name="_02_02_header_write_errors_lbl">
+                      <property name="text">
+                       <string>Write Errors</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="5" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_msg_num_edit"/>
+                    </item>
+                    <item row="6" column="1">
+                     <widget class="QLineEdit" name="_02_02_header_write_errors_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_02_time_gb">
+                <property name="title">
+                 <string>Time</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_7">
+                 <item>
+                  <widget class="QWidget" name="_02_02_time_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout_7">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_02_time_ltc_lbl">
+                      <property name="text">
+                       <string>LTC</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_02_time_ltc_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_02_time_internal_lbl">
+                      <property name="text">
+                       <string>Internal</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="_02_02_time_rtc_lbl">
+                      <property name="text">
+                       <string>RTC</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="_02_02_time_rtc_edit"/>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_02_time_internal_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_02_vn_gb">
+                <property name="title">
+                 <string>Attitude - Roll Pitch Yaw</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_10">
+                 <item>
+                  <widget class="QWidget" name="_02_02_vn_widget" native="true">
+                   <layout class="QFormLayout" name="_02_01_formLayout_6">
+                    <item row="0" column="0">
+                     <widget class="QLabel" name="_02_02_vn_yaw_lbl">
+                      <property name="text">
+                       <string>Yaw</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QLineEdit" name="_02_02_vn_yaw_edit"/>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QLabel" name="_02_02_vn_pitch_lbl">
+                      <property name="text">
+                       <string>Pitch</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QLineEdit" name="_02_02_vn_pitch_edit"/>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QLabel" name="_02_02_vn_roll_lbl">
+                      <property name="text">
+                       <string>Roll</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="_02_02_vn_roll_edit"/>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="_02_02_vn_timestamp_lbl">
+                      <property name="text">
+                       <string>Timestamp</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="_02_02_vn_timestamp_edit"/>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="_02_02_gps_gb">
+                <property name="title">
+                 <string>GPS - NAV_SOL</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <layout class="QVBoxLayout" name="_02_01_verticalLayout_13">
+                 <item>
+                  <widget class="QWidget" name="_02_02_gps_main_widget" native="true">
+                   <layout class="QVBoxLayout" name="_02_01_verticalLayout_14">
+                    <item>
+                     <widget class="QWidget" name="_02_02_gps_widget" native="true">
+                      <layout class="QFormLayout" name="_02_02_formLayout">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="_02_02_gps_lon_lbl">
+                         <property name="text">
+                          <string>Longitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QLineEdit" name="_02_02_gps_lon_edit"/>
+                       </item>
+                       <item row="3" column="0">
+                        <widget class="QLabel" name="_02_02_gps_pps_lbl">
+                         <property name="text">
+                          <string>PPS</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="3" column="1">
+                        <widget class="QLineEdit" name="_02_02_gps_pps_edit"/>
+                       </item>
+                       <item row="1" column="0">
+                        <widget class="QLabel" name="_02_02_gps_lat_lbl">
+                         <property name="text">
+                          <string>Latitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="2" column="0">
+                        <widget class="QLabel" name="_02_02_gps_alt_lbl">
+                         <property name="text">
+                          <string>Altitude</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="1">
+                        <widget class="QLineEdit" name="_02_02_gps_lat_edit"/>
+                       </item>
+                       <item row="2" column="1">
+                        <widget class="QLineEdit" name="_02_02_gps_alt_edit"/>
+                       </item>
+                       <item row="4" column="0">
+                        <widget class="QLabel" name="_02_02_gps_gpsfix_lbl">
+                         <property name="text">
+                          <string>GPS Fix</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="4" column="1">
+                        <widget class="QLineEdit" name="_02_02_gps_gpsfix_edit"/>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QGroupBox" name="_02_02_gps_details_gb">
+                      <property name="title">
+                       <string>GPS - NAV_SOL Details</string>
+                      </property>
+                      <property name="flat">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <layout class="QVBoxLayout" name="_02_01_verticalLayout_16">
+                       <item>
+                        <widget class="QWidget" name="_02_02_gps_details_widget" native="true">
+                         <layout class="QFormLayout" name="_02_01_formLayout_10">
+                          <item row="0" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_itow_lbl">
+                            <property name="text">
+                             <string>ITOW</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="0" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_itow_edit"/>
+                          </item>
+                          <item row="1" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_ftow_lbl">
+                            <property name="text">
+                             <string>FTOW</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="2" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_week_lbl">
+                            <property name="text">
+                             <string>Week</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="4" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_flags_lbl">
+                            <property name="text">
+                             <string>Flags</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="5" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_ecef_lbl">
+                            <property name="text">
+                             <string>ECEF</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="6" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_ecefv_lbl">
+                            <property name="text">
+                             <string>ECEFV</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="7" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_pacc_lbl">
+                            <property name="text">
+                             <string>pAcc/sAcc</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="8" column="0">
+                           <widget class="QLabel" name="_02_02_gps_detail_pdop_lbl">
+                            <property name="text">
+                             <string>pdop/numSv</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item row="1" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_ftow_edit"/>
+                          </item>
+                          <item row="2" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_week_edit"/>
+                          </item>
+                          <item row="4" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_flags_edit"/>
+                          </item>
+                          <item row="5" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_ecef_edit"/>
+                          </item>
+                          <item row="6" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_ecefv_edit"/>
+                          </item>
+                          <item row="7" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_pacc_edit"/>
+                          </item>
+                          <item row="8" column="1">
+                           <widget class="QLineEdit" name="_02_02_gps_detail_pdop_edit"/>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="zz_verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <property name="rightMargin">
-              <number>0</number>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
              </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QWidget" name="vn_widget" native="true">
-               <layout class="QFormLayout" name="formLayout_3">
-                <property name="fieldGrowthPolicy">
-                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                </property>
-                <property name="horizontalSpacing">
-                 <number>0</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>0</number>
-                </property>
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="vn_yaw_lbl">
-                  <property name="text">
-                   <string>Yaw</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="vn_yaw_edit"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="vn_pitch_lbl">
-                  <property name="text">
-                   <string>Pitch</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="vn_pitch_edit"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="vn_roll_lbl">
-                  <property name="text">
-                   <string>Roll</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="vn_roll_edit"/>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="vn_timestamp_lbl">
-                  <property name="text">
-                   <string>Timestamp</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QLineEdit" name="vn_timestamp_edit"/>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -974,102 +1166,6 @@
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>header_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>header_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>669</x>
-     <y>35</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>718</x>
-     <y>61</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ltc_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>ltc_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>786</x>
-     <y>162</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>786</x>
-     <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rtc_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>rtc_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>786</x>
-     <y>195</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>786</x>
-     <y>201</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>gps_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>gps_main_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>786</x>
-     <y>305</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>786</x>
-     <y>312</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>vn_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>vn_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>786</x>
-     <y>416</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>786</x>
-     <y>422</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>gps_details_gb</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>gps_details_widget</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>786</x>
-     <y>374</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>786</x>
-     <y>380</y>
     </hint>
    </hints>
   </connection>

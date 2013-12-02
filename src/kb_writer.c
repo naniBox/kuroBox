@@ -626,15 +626,15 @@ thWriter(void *arg)
 	chRegSetThreadName("Writer");
 
 	// this data never changes, until we start added in new message types
-	current_msg.header.preamble = KBB_PREAMBLE;
-	current_msg.header.msg_class = KBB_CLASS_DATA;
-	current_msg.header.msg_subclass = KBB_SUBCLASS_DATA_01;
-	current_msg.header.msg_size = KBB_MSG_SIZE;
-
 	header_msg.header.preamble = KBB_PREAMBLE;
 	header_msg.header.msg_class = KBB_CLASS_HEADER;
 	header_msg.header.msg_subclass = KBB_SUBCLASS_HEADER_01;
 	header_msg.header.msg_size = KBB_MSG_SIZE;
+
+	current_msg.header.preamble = KBB_PREAMBLE;
+	current_msg.header.msg_class = KBB_CLASS_DATA;
+	current_msg.header.msg_subclass = KBB_SUBCLASS_DATA_CURRENT;
+	current_msg.header.msg_size = KBB_MSG_SIZE;
 
 	logger_state = LS_WAIT_FOR_SD;
 	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
@@ -816,6 +816,13 @@ void
 kbw_setLTC(ltc_frame_t * ltc_frame)
 {
 	memcpy(&current_msg.ltc_frame, ltc_frame, sizeof(current_msg.ltc_frame));
+}
+
+//-----------------------------------------------------------------------------
+void
+kbw_setSMPTETime(smpte_timecode_t * smpte_time)
+{
+	memcpy(&current_msg.smpte_time, smpte_time, sizeof(current_msg.smpte_time));
 }
 
 //-----------------------------------------------------------------------------

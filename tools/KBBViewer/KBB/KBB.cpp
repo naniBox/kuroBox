@@ -151,6 +151,11 @@ KBB::packetMaker(const uint8_t * data)
 				const kbb_02_01_t * kbb_02_01  = reinterpret_cast<const kbb_02_01_t *>(data);
 				packet = new KBB_02_01(*kbb_02_01);
 			} break;
+		case KBB_SUBCLASS_DATA_02:
+			{
+				const kbb_02_02_t * kbb_02_02  = reinterpret_cast<const kbb_02_02_t *>(data);
+				packet = new KBB_02_02(*kbb_02_02);
+			} break;
 		default:
 			break;
 		}

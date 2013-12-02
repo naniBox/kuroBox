@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 #include "kbb_types.h"
-KBB_TYPES_VERSION_CHECK(0x0001)
+KBB_TYPES_VERSION_CHECK(0x0002)
 
 //-----------------------------------------------------------------------------
 const smpte_timecode_t * kbt_getLTC(void);

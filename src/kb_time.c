@@ -31,6 +31,7 @@
 #include "kb_writer.h"
 #include "kb_util.h"
 #include "kb_externalDisplay.h"
+#include "kb_gpio.h"
 
 //-----------------------------------------------------------------------------
 /*
@@ -68,6 +69,43 @@ static uint32_t last_edge_time;
 static bool_t was_last_edge_short;
 static ltc_frame_t ltc_frame;
 static smpte_timecode_t ltc_timecode;
+static uint32_t max_frame_for_fps;
+static uint32_t fps_format;
+static smpte_timecode_t fps_timecode;
+
+//-----------------------------------------------------------------------------
+#define FPS_29_970_NDF			0
+#define FPS_29_970_DF			1
+#define FPS_30_000_NDF			2
+#define FPS_30_000_DF			3
+#define FPS_24_000				4
+#define FPS_25_000				5
+#define FPS_23_976				6
+
+// these correspond to the interval count based on a 1MHz clock and the FPS
+// above
+uint32_t fps_clock [] =
+{
+	33367,
+	33367,
+	33333,
+	33333,
+	41667,
+	40000,
+	41708,
+};
+
+// these are 0-based, hence the X-1
+uint32_t fps_count [] =
+{
+	29,
+	29,
+	29,
+	29,
+	23,
+	24,
+	23,
+};
 
 //-----------------------------------------------------------------------------
 static void frame_to_time(smpte_timecode_t * smpte_timecode, ltc_frame_t * ltc_frame)
@@ -105,11 +143,13 @@ static void ltc_store(uint8_t bit_set)
 	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
 	{
 		chSysLockFromIsr();
-		frame_to_time(&ltc_timecode, &ltc_frame);
-		kbs_setLTC(&ltc_timecode);
-		kbs_err_setLTC(1);
-		kbw_setLTC(&ltc_frame);
-		kbed_dataReady();
+			frame_to_time(&ltc_timecode, &ltc_frame);
+			if ( ltc_timecode.frames > max_frame_for_fps )
+				max_frame_for_fps = ltc_timecode.frames;
+			kbs_setLTC(&ltc_timecode);
+			kbs_err_setLTC(1);
+			kbw_setLTC(&ltc_frame);
+			kbed_dataReady();
 		chSysUnlockFromIsr();
 	}
 }
@@ -176,8 +216,52 @@ one_sec_cb(GPTDriver * gptp)
 	(void)gptp;
 
 	chSysLockFromIsr();
+
+		kbg_toggleLED2();
+		fps_timecode.frames = 0;
+		GPTD9.tim->CNT = 0;
+
+		fps_timecode.seconds++;
+
+		if ( fps_timecode.seconds > 59 )
+		{
+			fps_timecode.seconds = 0;
+			fps_timecode.minutes++;
+		}
+
+		if ( fps_timecode.minutes > 59 )
+		{
+			fps_timecode.minutes = 0;
+			fps_timecode.hours++;
+		}
+
+		if ( fps_timecode.hours > 23 )
+		{
+			fps_timecode.hours = 0;
+		}
+
 		kbw_incOneSecPPS();
+
 	chSysUnlockFromIsr();
+}
+
+//-----------------------------------------------------------------------------
+static void
+fps_cb(GPTDriver * gptp)
+{
+	(void)gptp;
+	kbw_setSMPTETime(&fps_timecode);
+	kbs_setSMPTETime(&fps_timecode);
+	fps_timecode.frames++;
+
+	kbg_toggleLED3();
+	/*
+	if ( fps_timecode.frames > fps_count[fps_format] )
+	{
+		// we should never reach this!!
+		fps_timecode.frames = 0;
+	}
+	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -185,6 +269,14 @@ static const GPTConfig one_sec_cfg =
 {
 	84000000,		// max clock!
 	one_sec_cb,
+	0
+};
+
+//-----------------------------------------------------------------------------
+static const GPTConfig fps_cfg =
+{
+	1000000,
+	fps_cb,
 	0
 };
 
@@ -210,6 +302,9 @@ kbt_startOneSec(int32_t drift_factor)
 {
 	gptStart(&GPTD2, &one_sec_cfg);
 	gptStartContinuous(&GPTD2, 84000000-drift_factor);
+
+	gptStart(&GPTD9, &fps_cfg);
+	gptStartContinuous(&GPTD9, fps_clock[fps_format]);
 }
 
 //-----------------------------------------------------------------------------

@@ -53,6 +53,7 @@ typedef struct kuroBoxScreen kuroBoxScreen;
 struct __PACKED__ kuroBoxScreen
 {
 	smpte_timecode_t ltc;
+	smpte_timecode_t smpte_time;
 	uint16_t voltage;
 	int16_t temperature;
 	int32_t sdc_free;
@@ -61,11 +62,12 @@ struct __PACKED__ kuroBoxScreen
 	uint32_t write_errors;
 	uint8_t btn0;
 	uint8_t btn1;
-	uint8_t pps;
+	uint8_t gps_pps;
 	int32_t ecef[3];
 	float ypr[3];
 	int32_t error;
 	int32_t metric_units;
+	uint32_t one_sec_pps;
 };
 
 //-----------------------------------------------------------------------------
@@ -112,18 +114,21 @@ draw(void)
 
 //----------------------------------------------------------------------------
 	// LTC
-
 	INIT_CBUF();
-	chprintf(bss,"%.2d:%.2d:%.2d.%.2d  %.2d%.2d%.2d",
+	chprintf(bss,"%.2d:%.2d:%.2d.%.2d%.2d%.2d%.2d%.2d",
 			screen.ltc.hours,
 			screen.ltc.minutes,
 			screen.ltc.seconds,
 			screen.ltc.frames,
-			rtc.tm_hour,rtc.tm_min,rtc.tm_sec);
+			screen.smpte_time.hours,
+			screen.smpte_time.minutes,
+			screen.smpte_time.seconds,
+			screen.smpte_time.frames);
 	st7565_drawstring(&ST7565D1, 0, 1, "T");
 	st7565_drawstring(&ST7565D1, C2P(1)+2, 1, charbuf);
 
 //----------------------------------------------------------------------------
+	// YPR
 	INIT_CBUF();
 	chprintf(bss,"%4i/%4i/%4i",
 			(int)screen.ypr[0], (int)screen.ypr[1], (int)screen.ypr[2]);
@@ -143,10 +148,14 @@ draw(void)
 	st7565_drawstring(&ST7565D1, C2P(-3), 2, charbuf);
 
 //----------------------------------------------------------------------------
+	// GPS
+
+
 	float lat,lon,alt;
 	lat=lon=alt=0.0f;
 	kbg_ecef2lla(screen.ecef[0], screen.ecef[1], screen.ecef[2],
 			&lat, &lon, &alt);
+
 
 	INIT_CBUF();
 	chprintf(bss,"%3f/%3f/%3f",
@@ -177,7 +186,8 @@ draw(void)
 	INIT_CBUF();
 	uint8_t idle_time = 100*chThdGetTicks(chSysGetIdleThread()) / chTimeNow();
 	chprintf(bss,"%d", idle_time);
-	st7565_drawstring(&ST7565D1, C2P(-6), 0, charbuf);
+	st7565_drawline(&ST7565D1, C2P(-6), 0, C2P(-6), CHAR_HEIGHT-1, COLOUR_BLACK);
+	st7565_drawstring(&ST7565D1, C2P(-6)+2, 0, charbuf);
 #endif
 	//
 	//
@@ -187,9 +197,9 @@ draw(void)
 
 	// we want to draw this over the top, so put it last.
 	st7565_drawline(&ST7565D1, C2P(1), 0, C2P(1), 31, COLOUR_BLACK);
-	if ( screen.pps )
+	if ( screen.gps_pps )
 	{
-		screen.pps--;
+		screen.gps_pps--;
 		st7565_fillrect(&ST7565D1, C2P(-1), CHAR_HEIGHT+1, CHAR_WIDTH-1, CHAR_HEIGHT, COLOUR_BLACK);
 	}
 
@@ -351,6 +361,12 @@ kbs_setLTC(smpte_timecode_t * ltc)
 }
 
 //-----------------------------------------------------------------------------
+void kbs_setSMPTETime(smpte_timecode_t * smpte_time)
+{
+	memcpy(&screen.smpte_time, smpte_time, sizeof(screen.smpte_time));
+}
+
+//-----------------------------------------------------------------------------
 void 
 kbs_setWriteCount(uint32_t write_count)
 {
@@ -396,7 +412,7 @@ kbs_btn1(uint8_t on)
 void 
 kbs_PPS(void)
 {
-	screen.pps = 1000 / (SCREEN_REFRESH_SLEEP*10);
+	screen.gps_pps = 1000 / (SCREEN_REFRESH_SLEEP*10);
 }
 
 //-----------------------------------------------------------------------------
@@ -433,6 +449,12 @@ void kbs_setMetricUnits(uint32_t metric)
 void kbs_changeMetricUnits(void)
 {
 	screen.metric_units = !screen.metric_units;
+}
+
+//-----------------------------------------------------------------------------
+void kbs_incOneSecPPS(void)
+{
+	screen.one_sec_pps++;
 }
 
 //-----------------------------------------------------------------------------

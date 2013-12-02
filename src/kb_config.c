@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 #include "kbb_types.h"
-KBB_TYPES_VERSION_CHECK(0x0001)
+KBB_TYPES_VERSION_CHECK(0x0002)
 
 //-----------------------------------------------------------------------------
 // runtime configuration - stored in Backup Domain
