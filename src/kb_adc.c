@@ -28,8 +28,8 @@
 #define ADC_NUM_CHANNELS	3
 
 //-----------------------------------------------------------------------------
-// Depth of the conversion buffer, channels are sampled four times each.
-#define ADC_BUF_DEPTH		2
+// Depth of the conversion buffer, channels are sampled X times each.
+#define ADC_BUF_DEPTH		4
 
 #define SAMPLE_PERIOD		500    // every X milliseconds
 
@@ -47,7 +47,7 @@ static ADCConfig adc_cfg = {
 static const ADCConversionGroup adc_grp_cfg =
 {
 	FALSE,						// circular
-	ADC_NUM_CHANNELS,		// num channels
+	ADC_NUM_CHANNELS,			// num channels
 	adc_cb,						// completetion callback
 	NULL,						// error callback
 	/* HW dependent part.*/
@@ -65,7 +65,7 @@ static const ADCConversionGroup adc_grp_cfg =
 };
 
 //-----------------------------------------------------------------------------
-adcsample_t adc_make_avg(int channel)
+int adc_make_avg(int channel)
 {
 	int avg = 0;
 	for ( int idx = 0 ; idx < ADC_BUF_DEPTH ; idx++ )
@@ -84,8 +84,8 @@ adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 	 intermediate callback when the buffer is half full.*/
 	if (adcp->state == ADC_COMPLETE)
 	{
-		adcsample_t voltage = adc_make_avg(0);
-		kbs_setVoltage((voltage-100)/10);
+		int voltage = adc_make_avg(0);
+		kbs_setVoltage(((voltage-40)*10)/103);
 		// don't care about these yet
 		// @TODO: remove them from actual ADC capture?
 		// adcsample_t temperature = adc_make_avg(1);

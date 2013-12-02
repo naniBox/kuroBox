@@ -20,25 +20,28 @@
 
 */
 
-//-----------------------------------------------------------------------------
-#ifndef _naniBox_kuroBox_gps
-#define _naniBox_kuroBox_gps
+#ifndef _naniBox_kuroBox_KB_EXTERNALDISPLAY_H_
+#define _naniBox_kuroBox_KB_EXTERNALDISPLAY_H_
 
 //-----------------------------------------------------------------------------
-#include <hal.h>
 #include "kb_util.h"
 
 //-----------------------------------------------------------------------------
-#include "kbb_types.h"
-KBB_TYPES_VERSION_CHECK(0x0001)
+int kuroBoxExternalDisplayInit(void);
+int kuroBoxExternalDisplayStop(void);
 
 //-----------------------------------------------------------------------------
-int kuroBoxGPSInit(SerialDriver * sd);
-int kuroBoxGPSStop(void);
+void kbed_dataReady(void);
 
 //-----------------------------------------------------------------------------
-void kbg_timepulseExtiCB(EXTDriver *extp, expchannel_t channel);
-void kbg_ecef2lla(int32_t x, int32_t y, int32_t z, float * lat, float * lon, float * alt);
-const ubx_nav_sol_t * kbg_getUbxNavSol(void);
+int kbed_getInterval(void);
+void kbfa_setInterval(int interval);
+int kbfa_changeInterval(void);
 
-#endif // _naniBox_kuroBox_gps
+//-----------------------------------------------------------------------------
+int kbed_getSerialPort(void);
+void kbfa_setSerialPort(int serialPort);
+int kbfa_changeSerialPort(void);
+
+
+#endif // _naniBox_kuroBox_KB_EXTERNALDISPLAY_H_

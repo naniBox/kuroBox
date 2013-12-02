@@ -23,7 +23,7 @@
 //-----------------------------------------------------------------------------
 #include "kb_menu_items.h"
 #include "kb_serial.h"
-#include "kb_featureA.h"
+#include "kb_externalDisplay.h"
 #include "kb_gpio.h"
 #include "kb_gps.h"
 #include "kb_time.h"
@@ -45,21 +45,36 @@ mi_exit(void * data)
 
 //-----------------------------------------------------------------------------
 void 
-mi_featureA_change(void * data)
+mi_eDisplay_changeInterval(void * data)
 {
 	(void)data;
-	kbfa_changeFeature();
+	kbfa_changeInterval();
 }
 
 //-----------------------------------------------------------------------------
 int 
-mi_featureA_getFeature(void)
+mi_eDisplay_getInterval(void)
 {
-	return kbfa_getFeature();
+	return kbed_getInterval();
 }
 
 //-----------------------------------------------------------------------------
 void 
+mi_eDisplay_changeSerialPort(void * data)
+{
+	(void)data;
+	kbfa_changeSerialPort();
+}
+
+//-----------------------------------------------------------------------------
+int
+mi_eDisplay_getSerialPort(void)
+{
+	return kbed_getSerialPort();
+}
+
+//-----------------------------------------------------------------------------
+void
 mi_serial1_pwr(void * data)
 {
 	(void)data;

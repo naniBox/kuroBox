@@ -32,7 +32,7 @@
 #include "kb_adc.h"
 #include "kb_buttons.h"
 #include "kb_config.h"
-#include "kb_featureA.h"
+#include "kb_externalDisplay.h"
 #include "kb_gpio.h"
 #include "kb_gps.h"
 #include "kb_menu.h"
@@ -304,7 +304,7 @@ kuroBoxInit(void)
 	kuroBoxConfigInit();
 
 	// Feature "A" - just a test feature that sends updates over serial
-	kuroBoxFeatureAInit();
+	kuroBoxExternalDisplayInit();
 
 	// indicate we're ready
 	chprintf(DEBG, "%s\n\r\n\r", BOARD_NAME);
@@ -327,7 +327,7 @@ kuroBoxStop(void)
 
 	extStop(&EXTD1);
 
-	kuroBoxFeatureAStop();
+	kuroBoxExternalDisplayStop();
 
 	kuroBoxConfigStop();
 	kuroBoxMenuStop();

@@ -30,6 +30,7 @@
 #include "kb_screen.h"
 #include "kb_writer.h"
 #include "kb_util.h"
+#include "kb_externalDisplay.h"
 
 //-----------------------------------------------------------------------------
 /*
@@ -108,6 +109,7 @@ static void ltc_store(uint8_t bit_set)
 		kbs_setLTC(&ltc_timecode);
 		kbs_err_setLTC(1);
 		kbw_setLTC(&ltc_frame);
+		kbed_dataReady();
 		chSysUnlockFromIsr();
 	}
 }

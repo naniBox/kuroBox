@@ -41,7 +41,8 @@ struct __PACKED__ ambient_status_t
 {
 	/*
 	 * 2 byte sequence to identify start of packet: 0x6E, 0x42
-	 * */
+	 *
+	 */
 	uint16_t preamble;
 
 	/*

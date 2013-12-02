@@ -28,3 +28,6 @@
 /tools/build-KBBViewer-Qt_5_1_1_Static-Release
 *.opensdf
 *.user
+*.sdf
+
+*.suo

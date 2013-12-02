@@ -27,13 +27,16 @@
 #include <chprintf.h>
 #include "spiEEPROM.h"
 #include "kb_time.h"
-#include "kbb_types.h"
 
 // config sources
 #include "kb_serial.h"
-#include "kb_featureA.h"
+#include "kb_externalDisplay.h"
 #include "kb_gpio.h"
 #include "kb_screen.h"
+
+//-----------------------------------------------------------------------------
+#include "kbb_types.h"
+KBB_TYPES_VERSION_CHECK(0x0001)
 
 //-----------------------------------------------------------------------------
 // runtime configuration - stored in Backup Domain
@@ -41,12 +44,10 @@
 #define BKPSRAM_END					0x40024FFF
 #define BKPSRAM_SIZE				(BKPSRAM_END-BKPSRAM_BASE)
 #define BKPREG_MAGIC				0x426b426e	// nBkB ;)
-#define BKPREG_VERSION				0x00000001
+#define BKPREG_VERSION				0x00000002
 
 //-----------------------------------------------------------------------------
 // factory configuration - stored in EEPROM
-#define FACTORY_CONFIG_MAGIC				0x426b426e	// nBkB ;)
-#define FACTORY_CONFIG_VERSION				0x00000001
 factory_config_t factory_config;
 
 bool_t factory_config_good;
@@ -60,8 +61,9 @@ struct config_t
 	uint8_t 		serial2_pwr;
 	int32_t 		serial2_baud;
 	uint8_t 		lcd_backlight;
-	int32_t			featureA;
 	int32_t			metric_units;
+	int32_t			eDisplayInterval;
+	int32_t			eDisplaySerialPort;
 };
 config_t config;
 
@@ -77,8 +79,9 @@ int kbc_save(void)
 	config.serial2_pwr = kbse_getPowerSerial2();
 	config.serial2_baud = kbse_getBaudSerial2();
 	config.lcd_backlight = kbg_getLCDBacklight();
-	config.featureA = kbfa_getFeature();
 	config.metric_units = kbs_getMetricUnits();
+	config.eDisplayInterval = kbed_getInterval();
+	config.eDisplaySerialPort = kbed_getSerialPort();
 
 	return kbc_write(0, &config, sizeof(config));
 }
@@ -95,8 +98,9 @@ int kbc_load(void)
 	kbse_setPowerSerial2(config.serial2_pwr);
 	kbse_setBaudSerial2(config.serial2_baud);
 	kbg_setLCDBacklight(config.lcd_backlight);
-	kbfa_setFeature(config.featureA);
 	kbs_setMetricUnits(config.metric_units);
+	kbfa_setInterval(config.eDisplayInterval);
+	kbfa_setSerialPort(config.eDisplaySerialPort);
 
 	return KB_OK;
 }
@@ -193,9 +197,16 @@ kbc_write(uint32_t offset, void * data, uint32_t length)
 int
 kuroBoxConfigInit(void)
 {
-	if ( ( RTC->BKP0R != BKPREG_MAGIC ) ||
-		 ( RTC->BKP1R != BKPREG_VERSION ) ||
-		 ( RTC->BKP2R != calc_cs() ) )
+	if ( ( RTC->BKP0R == BKPREG_MAGIC ) &&
+		 ( RTC->BKP1R == BKPREG_VERSION ) &&
+		 ( RTC->BKP2R == calc_cs() ) )
+	{
+		// if we wiped memory, don't load it, maybe do a save instead so
+		// it gets put in memory, right?
+		// @TODO: check up on this
+		kbc_load();
+	}
+	else
 	{
 		// clear it all
 		memset((uint8_t*)BKPSRAM_BASE, 0, BKPSRAM_SIZE);
@@ -203,21 +214,13 @@ kuroBoxConfigInit(void)
 		RTC->BKP1R = BKPREG_VERSION;
 		RTC->BKP2R = calc_cs();
 	}
-	else
-	{
-		// if we wiped memory, don't load it, maybe do a save instead so
-		// it gets put in memory, right?
-		// @TODO: check up on this
-		kbc_load();
-	}
 
 	factory_config_good = 0;
 	memset(&factory_config, 0, sizeof(factory_config));
 
 	uint8_t * eeprombuf = (uint8_t*) &factory_config;
-	while( spiEepromWIP(&spiEepromD1) )
-	{}
-	spiEepromReadPage(&spiEepromD1, 0, eeprombuf);
+	spiEepromReadBytes(&spiEepromD1, FACTORY_CONFIG_ADDRESS, eeprombuf, FACTORY_CONFIG_SIZE);
+
 	if ( factory_config.preamble == FACTORY_CONFIG_MAGIC &&
 		 factory_config.version == FACTORY_CONFIG_VERSION )
 	{

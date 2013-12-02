@@ -129,7 +129,7 @@ static kbb_01_01_t header_msg;
 // dedicated to this, so we have the least number of writes, increasing throughput
 // and write latencies and possible skips
 #define BUFFER_COUNT			2
-#define BUFFER_SIZE				96		// size in "log_msg_v01_t" units
+#define BUFFER_SIZE				90		// size in "log_msg_v01_t" units
 
 // 21845 * 48kB is *just* below the 1GB limit, which gives enough space for a
 // header too. Make sure that if you adjust the buffer size, this changes too
@@ -802,6 +802,13 @@ kuroBoxWriterStop(void)
 	chThdWait(writerThread);
 
 	return KB_OK;
+}
+
+//-----------------------------------------------------------------------------
+const kbb_current_msg_t *
+kbw_getCurrentMsg(void)
+{
+	return &current_msg;
 }
 
 //-----------------------------------------------------------------------------

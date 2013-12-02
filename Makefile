@@ -123,7 +123,7 @@ CSRC = $(PORTSRC) \
         ./src/kb_buttons.c \
         ./src/kb_config.c \
         ./src/kb_debug.c \
-        ./src/kb_featureA.c \
+        ./src/kb_externalDisplay.c \
         ./src/kb_gpio.c \
         ./src/kb_gps.c \
         ./src/kb_menu.c \
@@ -137,6 +137,8 @@ CSRC = $(PORTSRC) \
         ./src/main.c \
         ./src/spiEEPROM.c \
         ./src/ST7565.c
+
+        #./src/kb_featureA.c \
         
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

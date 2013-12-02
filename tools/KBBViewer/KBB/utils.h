@@ -31,13 +31,6 @@
 uint16_t calc_checksum_16(const uint8_t * buf, uint32_t buf_size);
 
 //-----------------------------------------------------------------------------
-#ifdef WIN32
-#define __PACKED__
-#else
-#define __PACKED__ __attribute__((packed))
-#endif
-
-//-----------------------------------------------------------------------------
 #ifdef KBB_QT
 #include <QtGlobal>
 #define ASSERT(x) Q_ASSERT(x)

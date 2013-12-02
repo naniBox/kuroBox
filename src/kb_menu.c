@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 #define REFRESH_SLEEP 				50
-#define MENU_ITEMS_COUNT 			9
+#define MENU_ITEMS_COUNT 			12
 
 //-----------------------------------------------------------------------------
 #define BTN_NUM_MSGS				10
@@ -77,10 +77,13 @@ int16_t current_menu_item = NO_MENU_ITEM;
 menu_item_t menu_items [MENU_ITEMS_COUNT] =
 {
 	// menu item callback functions are in kb_menu_items.c
-		{ "Feature", 			1,		1, 		mi_featureA_change, mi_featureA_getFeature, NULL },
+		{ "eDisplay Interval", 	1,		1, 		mi_eDisplay_changeInterval,   mi_eDisplay_getInterval,   NULL },
+		{ "eDisplay Port", 		1,		1, 		mi_eDisplay_changeSerialPort, mi_eDisplay_getSerialPort, NULL },
+
 		{ "Serial1 Pwr", 		1,		1, 		mi_serial1_pwr, 	NULL, NULL },
 		{ "Serial1 Baud", 		1,		1, 		mi_serial1_baud, 	mi_serial1_getbaud, NULL },
 
+#define KUROBOX_HAS_SERIAL2
 #ifdef KUROBOX_HAS_SERIAL2
 		{ "Serial2 Pwr", 		1,		1, 		mi_serial2_pwr, 	NULL, NULL },
 		{ "Serial2 Baud", 		1,		1, 		mi_serial2_baud, 	mi_serial2_getbaud, NULL },

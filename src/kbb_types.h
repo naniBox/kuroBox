@@ -1,7 +1,7 @@
 /*
 	kuroBox / naniBox
 	Copyright (c) 2013
-	david morris-oliveros // naniBox.com
+	david morris-oliveros // dmo@nanibox.com // naniBox.com
 
     This file is part of kuroBox / naniBox.
 
@@ -24,8 +24,36 @@
 #ifndef _naniBox_kuroBox_KBB_TYPES_H_
 #define _naniBox_kuroBox_KBB_TYPES_H_
 
+/*
+	This define should be incremented every time this file is modified. Users
+	of this file should check against it and increment accordingly using the 
+	macro below
+ */
+#define KBB_TYPES_VERSION		0x0001
+#define KBB_TYPES_VERSION_CHECK(x) 										\
+	extern char KBB_TYPES_VERSION_CHECK_[1];							\
+	extern char KBB_TYPES_VERSION_CHECK_[(x)==KBB_TYPES_VERSION?1:2];
+
 //-----------------------------------------------------------------------------
-#include "kb_util.h"
+#ifdef WIN32
+	#define __PACKED__
+	#pragma pack(push,1)
+#else
+	#define __PACKED__ __attribute__((packed))
+#endif
+
+//-----------------------------------------------------------------------------
+// http://stackoverflow.com/questions/174356/ways-to-assert-expressions-at-build-time-in-c
+#ifdef __GNUC__
+#define STATIC_ASSERT_HELPER(expr, msg) \
+    (!!sizeof(struct { unsigned int STATIC_ASSERTION__##msg: (expr) ? 1 : -1; }))
+#define STATIC_ASSERT(expr, msg) \
+    extern int (*assert_function__(void)) [STATIC_ASSERT_HELPER(expr, msg)]
+#else
+    #define STATIC_ASSERT(expr, msg)   						\
+		extern char STATIC_ASSERTION__##msg[1]; 			\
+		extern char STATIC_ASSERTION__##msg[(expr)?1:2]
+#endif /* #ifdef __GNUC__ */
 
 //-----------------------------------------------------------------------------
 #define UBX_NAV_SOL_SIZE						60
@@ -61,6 +89,9 @@ STATIC_ASSERT(sizeof(ubx_nav_sol_t)==UBX_NAV_SOL_SIZE, UBX_NAV_SOL_SIZE);
 //-----------------------------------------------------------------------------
 #define FACTORY_CONFIG_USER_MAX_LENGTH		32
 #define FACTORY_CONFIG_SIZE					128
+#define FACTORY_CONFIG_ADDRESS				0
+#define FACTORY_CONFIG_MAGIC				0x426b426e	// nBkB ;)
+#define FACTORY_CONFIG_VERSION				0x00000001
 typedef struct factory_config_t factory_config_t;
 struct __PACKED__ factory_config_t
 {
@@ -169,9 +200,11 @@ STATIC_ASSERT(sizeof(vnav_data_t)==VNAV_DATA_SIZE, VNAV_DATA_SIZE);
 
 #define KBB_CLASS_HEADER				0x01
 #define KBB_CLASS_DATA					0x10
+#define KBB_CLASS_EXTERNAL				0x80
 
 #define KBB_SUBCLASS_HEADER_01			0x01
 #define KBB_SUBCLASS_DATA_01			0x01
+#define KBB_SUBCLASS_EXTERNAL_01		0x01
 
 
 //-----------------------------------------------------------------------------
@@ -198,9 +231,10 @@ struct __PACKED__ kbb_01_01_t
 
 	uint8_t vnav_header[64];			// vnav stuff, dumped in here
 
-	uint8_t __pad[512 - (10 + 64)];		// 438 left
-};
+	factory_config_t factory_config;	// 128 bytes
 
+	uint8_t __pad[512 - (10 + 64 + 128)];// 310 left
+};
 STATIC_ASSERT(sizeof(kbb_01_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
@@ -236,5 +270,25 @@ struct __PACKED__ kbb_02_01_t
 typedef kbb_02_01_t kbb_current_msg_t;
 STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
+
+//-----------------------------------------------------------------------------
+#define KBB_DISPLAY_SIZE	128
+typedef struct kbb_display_t kbb_display_t;
+struct __PACKED__ kbb_display_t
+{
+	kbb_header_t header;				// 10
+	ltc_frame_t ltc_frame;				// 10
+	int32_t ecef[3];					// 12
+	vnav_data_t vnav;					// 16
+	float temperature;					// 4
+										// = 52
+	uint8_t __pad[KBB_DISPLAY_SIZE - (10+10+12+16+4)]; // 76 left over
+};
+STATIC_ASSERT(sizeof(kbb_display_t)==KBB_DISPLAY_SIZE, KBB_DISPLAY_SIZE);
+
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+	#pragma pack(pop)
+#endif
 
 #endif // _naniBox_kuroBox_KBB_TYPES_H_

@@ -33,6 +33,9 @@ int kuroBoxWriterInit(void);
 int kuroBoxWriterStop(void);
 
 //-----------------------------------------------------------------------------
+const kbb_current_msg_t * kbw_getCurrentMsg(void);
+
+//-----------------------------------------------------------------------------
 // the normal packets to send into the writer
 void kbw_setLTC(ltc_frame_t * ltc_frame);
 void kbw_incPPS(void);

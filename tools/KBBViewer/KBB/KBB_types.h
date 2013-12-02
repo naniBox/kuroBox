@@ -3,28 +3,57 @@
 	Copyright (c) 2013
 	david morris-oliveros // dmo@nanibox.com // naniBox.com
 
-	This file is part of kuroBox / naniBox.
+    This file is part of kuroBox / naniBox.
 
-	kuroBox / naniBox is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 3 of the License, or
-	(at your option) any later version.
+    kuroBox / naniBox is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
 
-	kuroBox / naniBox is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+    kuroBox / naniBox is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 */
 
-#ifndef KBB_types_H
-#define KBB_types_H
+//-----------------------------------------------------------------------------
+#ifndef _naniBox_kuroBox_KBB_TYPES_H_
+#define _naniBox_kuroBox_KBB_TYPES_H_
 
-#include <stdint.h>
+/*
+	This define should be incremented every time this file is modified. Users
+	of this file should check against it and increment accordingly using the 
+	macro below
+ */
+#define KBB_TYPES_VERSION		0x0001
+#define KBB_TYPES_VERSION_CHECK(x) 										\
+	extern char KBB_TYPES_VERSION_CHECK_[1];							\
+	extern char KBB_TYPES_VERSION_CHECK_[(x)==KBB_TYPES_VERSION?1:2];
 
-#pragma pack(push,1)
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+	#define __PACKED__
+	#pragma pack(push,1)
+#else
+	#define __PACKED__ __attribute__((packed))
+#endif
+
+//-----------------------------------------------------------------------------
+// http://stackoverflow.com/questions/174356/ways-to-assert-expressions-at-build-time-in-c
+#ifdef __GNUC__
+#define STATIC_ASSERT_HELPER(expr, msg) \
+    (!!sizeof(struct { unsigned int STATIC_ASSERTION__##msg: (expr) ? 1 : -1; }))
+#define STATIC_ASSERT(expr, msg) \
+    extern int (*assert_function__(void)) [STATIC_ASSERT_HELPER(expr, msg)]
+#else
+    #define STATIC_ASSERT(expr, msg)   						\
+		extern char STATIC_ASSERTION__##msg[1]; 			\
+		extern char STATIC_ASSERTION__##msg[(expr)?1:2]
+#endif /* #ifdef __GNUC__ */
 
 //-----------------------------------------------------------------------------
 #define UBX_NAV_SOL_SIZE						60
@@ -60,6 +89,9 @@ STATIC_ASSERT(sizeof(ubx_nav_sol_t)==UBX_NAV_SOL_SIZE, UBX_NAV_SOL_SIZE);
 //-----------------------------------------------------------------------------
 #define FACTORY_CONFIG_USER_MAX_LENGTH		32
 #define FACTORY_CONFIG_SIZE					128
+#define FACTORY_CONFIG_ADDRESS				0
+#define FACTORY_CONFIG_MAGIC				0x426b426e	// nBkB ;)
+#define FACTORY_CONFIG_VERSION				0x00000001
 typedef struct factory_config_t factory_config_t;
 struct __PACKED__ factory_config_t
 {
@@ -168,9 +200,11 @@ STATIC_ASSERT(sizeof(vnav_data_t)==VNAV_DATA_SIZE, VNAV_DATA_SIZE);
 
 #define KBB_CLASS_HEADER				0x01
 #define KBB_CLASS_DATA					0x10
+#define KBB_CLASS_EXTERNAL				0x80
 
 #define KBB_SUBCLASS_HEADER_01			0x01
 #define KBB_SUBCLASS_DATA_01			0x01
+#define KBB_SUBCLASS_EXTERNAL_01		0x01
 
 
 //-----------------------------------------------------------------------------
@@ -183,7 +217,7 @@ struct __PACKED__ kbb_header_t
 	uint8_t msg_class;					// 1
 	uint8_t msg_subclass;				// 1
 	uint16_t msg_size;					// 2
-	// = 10 for HEADER block
+										// = 10 for HEADER block
 };
 STATIC_ASSERT(sizeof(kbb_header_t)==KBB_HEADER_SIZE, KBB_HEADER_SIZE);
 
@@ -197,9 +231,10 @@ struct __PACKED__ kbb_01_01_t
 
 	uint8_t vnav_header[64];			// vnav stuff, dumped in here
 
-	uint8_t __pad[512 - (10 + 64)];		// 438 left
-};
+	factory_config_t factory_config;	// 128 bytes
 
+	uint8_t __pad[512 - (10 + 64 + 128)];// 310 left
+};
 STATIC_ASSERT(sizeof(kbb_01_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
 //-----------------------------------------------------------------------------
@@ -210,23 +245,23 @@ struct __PACKED__ kbb_02_01_t
 
 	uint32_t msg_num;					// 4
 	uint32_t write_errors;				// 4
-	// = 18 for HEADER block
+										// = 18 for HEADER block
 
 	ltc_frame_t ltc_frame;				// 10
 	rtc_t rtc;							// 36
 	uint32_t one_sec_pps;				// 4
-	// = 50 for TIME (LTC+RTC) block
+										// = 50 for TIME (LTC+RTC) block
 
 	uint32_t pps;						// 4
 	ubx_nav_sol_t nav_sol;				// 60
-	// = 64 for GPS block
+										// = 64 for GPS block
 
 	vnav_data_t vnav;					// 4*3+4 = 16
-	// 16 for the VNAV block
+										// 16 for the VNAV block
 
 	float altitude;						// 4
 	float temperature;					// 4
-	// 8 for the altimeter block
+										// 8 for the altimeter block
 
 	uint32_t global_count;
 
@@ -236,6 +271,24 @@ typedef kbb_02_01_t kbb_current_msg_t;
 STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 
-#pragma pack(pop)
+//-----------------------------------------------------------------------------
+#define KBB_DISPLAY_SIZE	128
+typedef struct kbb_display_t kbb_display_t;
+struct __PACKED__ kbb_display_t
+{
+	kbb_header_t header;				// 10
+	ltc_frame_t ltc_frame;				// 10
+	int32_t ecef[3];					// 12
+	vnav_data_t vnav;					// 16
+	float temperature;					// 4
+										// = 52
+	uint8_t __pad[KBB_DISPLAY_SIZE - (10+10+12+16+4)]; // 76 left over
+};
+STATIC_ASSERT(sizeof(kbb_display_t)==KBB_DISPLAY_SIZE, KBB_DISPLAY_SIZE);
 
-#endif // KBB_types_H
+//-----------------------------------------------------------------------------
+#ifdef WIN32
+	#pragma pack(pop)
+#endif
+
+#endif // _naniBox_kuroBox_KBB_TYPES_H_

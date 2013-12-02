@@ -37,8 +37,11 @@ typedef int (*menuextra_data_cb)(void);
 //-----------------------------------------------------------------------------
 void mi_exit(void * data);
 
-void mi_featureA_change(void * data);
-int mi_featureA_getFeature(void);
+void mi_eDisplay_changeInterval(void * data);
+int mi_eDisplay_getInterval(void);
+
+void mi_eDisplay_changeSerialPort(void * data);
+int mi_eDisplay_getSerialPort(void);
 
 void mi_serial1_pwr(void * data);
 void mi_serial1_baud(void * data);

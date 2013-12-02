@@ -29,17 +29,20 @@
 #include "hal.h"
 
 //----------------------------------------------------------------------------
-#define SPIEEPROM_24BIT_ADDRESS
+#define SPIEEPROM_16BIT_ADDRESS
+//#define SPIEEPROM_24BIT_ADDRESS
 
 //----------------------------------------------------------------------------
 #ifdef SPIEEPROM_16BIT_ADDRESS
 	#define SPIEEPROM_PAGE_SIZE			32
 	#define SPIEEPROM_PAGE_SIZE_SHIFT 	5
+	#define SPIEEPROM_PAGE_MASK			0x000001F
 	#define SPIEEPROM_NUMBER_PAGES		128
 #endif
 #ifdef SPIEEPROM_24BIT_ADDRESS
 	#define SPIEEPROM_PAGE_SIZE			256
 	#define SPIEEPROM_PAGE_SIZE_SHIFT 	8
+	#define SPIEEPROM_PAGE_MASK			0x00000FF
 	#define SPIEEPROM_NUMBER_PAGES		4096
 #endif
 #ifndef SPIEEPROM_PAGE_SIZE
