@@ -68,10 +68,16 @@
 static uint32_t last_edge_time;
 static bool_t was_last_edge_short;
 static ltc_frame_t ltc_frame;
-static smpte_timecode_t ltc_timecode;
+static smpte_timecode_t ltc_timecode_ext;
+static uint32_t ltc_timecode_count;
 static uint32_t max_frame_for_fps;
 static uint32_t fps_format;
-static smpte_timecode_t fps_timecode;
+static smpte_timecode_t ltc_timecode_int;
+
+//-----------------------------------------------------------------------------
+static uint32_t TIM2_factor;
+static uint32_t TIM5_factor;
+static uint32_t TIM9_factor;
 
 //-----------------------------------------------------------------------------
 #define FPS_29_970_NDF			0
@@ -84,27 +90,23 @@ static smpte_timecode_t fps_timecode;
 
 // these correspond to the interval count based on a 1MHz clock and the FPS
 // above
-uint32_t fps_clock [] =
+struct ltc_clock_stuff_t
 {
-	33367,
-	33367,
-	33333,
-	33333,
-	41667,
-	40000,
-	41708,
+	uint32_t clock;
+	uint8_t fps;
+	uint8_t real_clock;
+	uint8_t df;
 };
 
-// these are 0-based, hence the X-1
-uint32_t fps_count [] =
+struct ltc_clock_stuff_t ltc_clock_stuff [] =
 {
-	29,
-	29,
-	29,
-	29,
-	23,
-	24,
-	23,
+	{ 33367, 29, 0, 0 },	// 29.97 NDF
+	{ 33367, 29, 0, 1 },	// 29.97 DF
+	{ 33333, 29, 0, 0 },	// 30.00 NDF
+	{ 33333, 29, 0, 1 },	// 30.00 DF
+	{ 41667, 23, 0, 0 },	// 24
+	{ 40000, 24, 0, 0 },	// 25
+	{ 41667, 23, 0, 0 },	// 23.976
 };
 
 //-----------------------------------------------------------------------------
@@ -114,6 +116,45 @@ static void frame_to_time(smpte_timecode_t * smpte_timecode, ltc_frame_t * ltc_f
 	smpte_timecode->minutes  = ltc_frame->minutes_units  + ltc_frame->minutes_tens*10;
 	smpte_timecode->seconds  = ltc_frame->seconds_units  + ltc_frame->seconds_tens*10;
 	smpte_timecode->frames = ltc_frame->frame_units + ltc_frame->frame_tens*10;
+}
+
+//-----------------------------------------------------------------------------
+static void add_frame(smpte_timecode_t * out, smpte_timecode_t * in, struct ltc_clock_stuff_t * clock_stuff)
+{
+	out->frames  = in->frames+1;
+	out->seconds = in->seconds;
+	out->minutes = in->minutes;
+	out->hours   = in->hours;
+
+	if ( out->frames > clock_stuff->fps )
+	{
+		out->frames = 0;
+		out->seconds++;
+
+		if ( out->seconds > 59 )
+		{
+			if ( clock_stuff->df &&
+				 ((out->seconds%10)!=0) )
+			{
+				// drop the first 2 frames...
+				out->frames = 2;
+			}
+			out->seconds = 0;
+			out->minutes++;
+		}
+
+		if ( out->minutes > 59 )
+		{
+			out->minutes = 0;
+			out->hours++;
+		}
+
+		if ( out->hours > 23 )
+		{
+			out->hours = 0;
+		}
+	}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -143,13 +184,30 @@ static void ltc_store(uint8_t bit_set)
 	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
 	{
 		chSysLockFromIsr();
-			frame_to_time(&ltc_timecode, &ltc_frame);
-			if ( ltc_timecode.frames > max_frame_for_fps )
-				max_frame_for_fps = ltc_timecode.frames;
-			kbs_setLTC(&ltc_timecode);
+			kbg_setLED1(ltc_timecode_ext.frames&0x01);
+
+			frame_to_time(&ltc_timecode_ext, &ltc_frame);
+			if ( ltc_timecode_ext.frames == 0 )
+			{
+				if ( ltc_timecode_count++ == 5 )
+				{
+					// create sync point here
+					GPTD2.tim->CNT = 0;
+					GPTD5.tim->CNT = 0;
+					GPTD9.tim->CNT = 0;
+					// quicker than memcpy
+					ltc_timecode_int.hours   = ltc_timecode_ext.hours;
+					ltc_timecode_int.minutes = ltc_timecode_ext.minutes;
+					ltc_timecode_int.seconds = ltc_timecode_ext.seconds;
+					ltc_timecode_int.frames  = ltc_timecode_ext.frames;
+				}
+			}
+			if ( ltc_timecode_ext.frames > max_frame_for_fps )
+				max_frame_for_fps = ltc_timecode_ext.frames;
+			kbs_setLTC(&ltc_timecode_ext);
 			kbs_err_setLTC(1);
 			kbw_setLTC(&ltc_frame);
-			kbed_dataReady();
+			//kbed_dataReady();
 		chSysUnlockFromIsr();
 	}
 }
@@ -203,45 +261,69 @@ void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel)
 const smpte_timecode_t * 
 kbt_getLTC(void)
 {
-	return &ltc_timecode;
+	return &ltc_timecode_ext;
 }
 
 //-----------------------------------------------------------------------------
 // my 1 second precision clock
 
 //-----------------------------------------------------------------------------
+void
+inc_ltc_int(void)
+{
+	ltc_timecode_int.frames = 0;
+	gptChangeIntervalI(&GPTD9, TIM9_factor);
+	//GPTD9.tim->CNT = 0;
+
+	ltc_timecode_int.seconds++;
+
+	if ( ltc_timecode_int.seconds > 59 )
+	{
+		if ( ltc_clock_stuff[fps_format].df &&
+			 ((ltc_timecode_int.seconds%10)!=0) )
+		{
+			// drop the first 2 frames...
+			ltc_timecode_int.frames = 2;
+		}
+		ltc_timecode_int.seconds = 0;
+		ltc_timecode_int.minutes++;
+	}
+
+	if ( ltc_timecode_int.minutes > 59 )
+	{
+		ltc_timecode_int.minutes = 0;
+		ltc_timecode_int.hours++;
+	}
+
+	if ( ltc_timecode_int.hours > 23 )
+	{
+		ltc_timecode_int.hours = 0;
+	}
+
+	kbw_incOneSecPPS();
+}
+
+//-----------------------------------------------------------------------------
 static void
-one_sec_cb(GPTDriver * gptp)
+one_rsec_cb(GPTDriver * gptp)
 {
 	(void)gptp;
 
 	chSysLockFromIsr();
+	if( ltc_clock_stuff[fps_format].real_clock )
+		inc_ltc_int();
+	chSysUnlockFromIsr();
+}
 
-		kbg_toggleLED2();
-		fps_timecode.frames = 0;
-		GPTD9.tim->CNT = 0;
+//-----------------------------------------------------------------------------
+static void
+one_fsec_cb(GPTDriver * gptp)
+{
+	(void)gptp;
 
-		fps_timecode.seconds++;
-
-		if ( fps_timecode.seconds > 59 )
-		{
-			fps_timecode.seconds = 0;
-			fps_timecode.minutes++;
-		}
-
-		if ( fps_timecode.minutes > 59 )
-		{
-			fps_timecode.minutes = 0;
-			fps_timecode.hours++;
-		}
-
-		if ( fps_timecode.hours > 23 )
-		{
-			fps_timecode.hours = 0;
-		}
-
-		kbw_incOneSecPPS();
-
+	chSysLockFromIsr();
+	if( !ltc_clock_stuff[fps_format].real_clock )
+		inc_ltc_int();
 	chSysUnlockFromIsr();
 }
 
@@ -250,25 +332,28 @@ static void
 fps_cb(GPTDriver * gptp)
 {
 	(void)gptp;
-	kbw_setSMPTETime(&fps_timecode);
-	kbs_setSMPTETime(&fps_timecode);
-	fps_timecode.frames++;
 
-	kbg_toggleLED3();
-	/*
-	if ( fps_timecode.frames > fps_count[fps_format] )
-	{
-		// we should never reach this!!
-		fps_timecode.frames = 0;
-	}
-	*/
+	chSysLockFromIsr();
+	kbw_setSMPTETime(&ltc_timecode_int);
+	kbs_setSMPTETime(&ltc_timecode_int);
+	ltc_timecode_int.frames++;
+	kbg_setLED2(ltc_timecode_int.frames&0x01);
+	chSysUnlockFromIsr();
 }
 
 //-----------------------------------------------------------------------------
-static const GPTConfig one_sec_cfg =
+static const GPTConfig one_rsec_cfg =
 {
 	84000000,		// max clock!
-	one_sec_cb,
+	one_rsec_cb,
+	0
+};
+
+//-----------------------------------------------------------------------------
+static const GPTConfig one_fsec_cfg =
+{
+	84000000,		// max clock!
+	one_fsec_cb,
 	0
 };
 
@@ -300,11 +385,21 @@ kuroBoxTimeStop(void)
 void
 kbt_startOneSec(int32_t drift_factor)
 {
-	gptStart(&GPTD2, &one_sec_cfg);
-	gptStartContinuous(&GPTD2, 84000000-drift_factor);
+	TIM2_factor = 84000000-drift_factor;
+	uint64_t TIM5_factor_calc = (84000000-drift_factor);
+	TIM5_factor_calc *= 1000;
+	TIM5_factor_calc /= 999;
+	TIM5_factor = TIM5_factor_calc;
+	TIM9_factor = ltc_clock_stuff[fps_format].clock;
 
+	gptStart(&GPTD2, &one_rsec_cfg);
+	gptStart(&GPTD5, &one_fsec_cfg);
 	gptStart(&GPTD9, &fps_cfg);
-	gptStartContinuous(&GPTD9, fps_clock[fps_format]);
+
+	gptStartContinuous(&GPTD2, TIM2_factor);
+	gptStartContinuous(&GPTD5, TIM5_factor);
+	gptStartContinuous(&GPTD9, TIM9_factor);
+
 }
 
 //-----------------------------------------------------------------------------

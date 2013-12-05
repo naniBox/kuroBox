@@ -31,7 +31,7 @@ int kuroBoxExternalDisplayInit(void);
 int kuroBoxExternalDisplayStop(void);
 
 //-----------------------------------------------------------------------------
-void kbed_dataReady(void);
+void kbed_dataReadyI(void);
 
 //-----------------------------------------------------------------------------
 int kbed_getInterval(void);

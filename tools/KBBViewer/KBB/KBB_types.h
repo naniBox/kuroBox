@@ -302,6 +302,7 @@ struct __PACKED__ kbb_02_02_t
 };
 
 typedef kbb_02_02_t kbb_current_msg_t;
+#define KBB_SUBCLASS_DATA_CURRENT KBB_SUBCLASS_DATA_02
 STATIC_ASSERT(sizeof(kbb_02_01_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 STATIC_ASSERT(sizeof(kbb_02_02_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);
 STATIC_ASSERT(sizeof(kbb_current_msg_t)==KBB_MSG_SIZE, KBB_MSG_SIZE);

@@ -86,7 +86,7 @@ thEDisplay(void *arg)
 
 //-----------------------------------------------------------------------------
 void
-kbed_dataReady(void)
+kbed_dataReadyI(void)
 {
 	if (eDisplayThreadForSleep)
 	{
