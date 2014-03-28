@@ -355,12 +355,25 @@ kuroBoxStop(void)
 	return KB_OK;
 }
 
+extern uint32_t ltc_ext_ts;
+extern uint32_t ltc_int_ts;
+uint32_t ltc_ext_ts_prev;
+uint32_t ltc_int_ts_prev;
+extern uint32_t TIM5_period;
+extern int32_t ltc_diff;
+extern int32_t factor;
+
+int32_t AA,BB,CC;
+
+
 //-----------------------------------------------------------------------------
 int
 main(void)
 {
 	// do EVERYTHING here, ok?
 	kuroBoxInit();
+
+	chThdSleepMilliseconds(7000);
 
 	while( 1 )
 	{
@@ -371,6 +384,46 @@ main(void)
 			kuroBox_standby();
 			break;
 		}
+
+		if ( ltc_ext_ts > 0 && ltc_int_ts > 0 )
+		{
+			chSysLock();
+
+			uint32_t ext_ts_diff = ltc_ext_ts - ltc_ext_ts_prev;
+			uint32_t int_ts_diff = ltc_int_ts - ltc_int_ts_prev;
+
+			int64_t period_diffs = ext_ts_diff - int_ts_diff;
+			int64_t clock_diff = ltc_ext_ts - ltc_int_ts;
+
+			AA = period_diffs;
+			BB = clock_diff;
+			CC = ltc_ext_ts;
+			/*
+			if ( ltc_diff_64 > -168000000 && ltc_diff_64 < 168000000 )
+			{
+
+				ltc_diff = ltc_diff_64;
+				factor = ltc_diff_64/50;
+				TIM5_period += factor;
+				if ( TIM5_period > 85000000 )
+					TIM5_period = 85000000;
+				if ( TIM5_period < 83000000 )
+					TIM5_period = 83000000;
+				gptChangeIntervalI(&GPTD5, TIM5_period);
+
+				ltc_ext_ts = ltc_int_ts = 0;
+			}
+			*/
+
+			ltc_ext_ts_prev = ltc_ext_ts;
+			ltc_int_ts_prev = ltc_int_ts;
+			ltc_ext_ts = ltc_int_ts = 0;
+
+			chSysUnlock();
+		}
+
+
+
 	}
 	while( 1 )
 		;

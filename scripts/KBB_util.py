@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 """
 	kuroBox / naniBox
 	Copyright (c) 2013

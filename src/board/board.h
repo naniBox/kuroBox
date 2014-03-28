@@ -259,8 +259,8 @@
                                      PIN_MODE_ALTERNATE(GPIOA_USART2_RX) |  \
                                      PIN_MODE_INPUT(GPIOA__A04) |           \
                                      PIN_MODE_INPUT(GPIOA__A05) |           \
-                                     PIN_MODE_INPUT(GPIOA__A06) |           \
-                                     PIN_MODE_INPUT(GPIOA__A07) |           \
+                                     PIN_MODE_OUTPUT(GPIOA__A06) |          \
+                                     PIN_MODE_OUTPUT(GPIOA__A07) |          \
                                      PIN_MODE_INPUT(GPIOA__A08) |           \
                                      PIN_MODE_ALTERNATE(GPIOA_LTC_TTL) |    \
                                      PIN_MODE_ALTERNATE(GPIOA_USB_ID) |     \
@@ -291,8 +291,8 @@
                                      PIN_OSPEED_100M(GPIOA_USART2_RX) |     \
                                      PIN_OSPEED_2M(GPIOA__A04) |            \
                                      PIN_OSPEED_2M(GPIOA__A05) |            \
-                                     PIN_OSPEED_2M(GPIOA__A06) |            \
-                                     PIN_OSPEED_2M(GPIOA__A07) |            \
+                                     PIN_OSPEED_100M(GPIOA__A06) |          \
+                                     PIN_OSPEED_100M(GPIOA__A07) |          \
                                      PIN_OSPEED_2M(GPIOA__A08) |            \
                                      PIN_OSPEED_100M(GPIOA_LTC_TTL) |       \
                                      PIN_OSPEED_100M(GPIOA_USB_ID) |        \

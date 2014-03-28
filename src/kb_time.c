@@ -73,11 +73,21 @@ static uint32_t ltc_timecode_count;
 static uint32_t max_frame_for_fps;
 static uint32_t fps_format;
 static smpte_timecode_t ltc_timecode_int;
+static uint32_t this_edge_time;
 
 //-----------------------------------------------------------------------------
-static uint32_t TIM2_factor;
-static uint32_t TIM5_factor;
-static uint32_t TIM9_factor;
+// PLL stuff
+uint32_t ltc_ext_ts;
+uint32_t ltc_int_ts;
+
+//-----------------------------------------------------------------------------
+static uint32_t TIM2_period;
+static uint32_t TIM9_period;
+uint32_t TIM5_period;
+int32_t ltc_diff;
+int32_t factor;
+
+int32_t cb_time;
 
 //-----------------------------------------------------------------------------
 #define FPS_29_970_NDF			0
@@ -184,16 +194,18 @@ static void ltc_store(uint8_t bit_set)
 	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
 	{
 		chSysLockFromIsr();
-			kbg_setLED1(ltc_timecode_ext.frames&0x01);
-
 			frame_to_time(&ltc_timecode_ext, &ltc_frame);
+			/**/kbed_dataReadyI();
 			if ( ltc_timecode_ext.frames == 0 )
 			{
-				if ( ltc_timecode_count++ == 5 )
+				kbg_setGPIO(ltc_timecode_ext.seconds&0x01, GPIOA, GPIOA__A06);
+				ltc_ext_ts = this_edge_time;
+				ltc_timecode_count++;
+				if ( ltc_timecode_count == 5 )
 				{
 					// create sync point here
-					GPTD2.tim->CNT = 0;
-					GPTD5.tim->CNT = 0;
+					GPTD2.tim->CNT = 500;
+					GPTD5.tim->CNT = 500;
 					GPTD9.tim->CNT = 0;
 					// quicker than memcpy
 					ltc_timecode_int.hours   = ltc_timecode_ext.hours;
@@ -207,7 +219,6 @@ static void ltc_store(uint8_t bit_set)
 			kbs_setLTC(&ltc_timecode_ext);
 			kbs_err_setLTC(1);
 			kbw_setLTC(&ltc_frame);
-			//kbed_dataReady();
 		chSysUnlockFromIsr();
 	}
 }
@@ -217,7 +228,7 @@ void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel)
 {
 	(void)extp;
 	(void)channel;
-	uint32_t this_edge_time = halGetCounterValue();
+	this_edge_time = halGetCounterValue();
 	uint32_t tdiff = RTT2US(this_edge_time - last_edge_time);
 	last_edge_time = this_edge_time;
 
@@ -254,6 +265,8 @@ void kbt_pulseExtiCB(EXTDriver *extp, expchannel_t channel)
 		// 	implementing a clock-tracking algorithm
 		//other_count++;
 	}
+
+	cb_time = halGetCounterValue() - this_edge_time;
 }
 
 
@@ -271,11 +284,12 @@ kbt_getLTC(void)
 void
 inc_ltc_int(void)
 {
-	ltc_timecode_int.frames = 0;
-	gptChangeIntervalI(&GPTD9, TIM9_factor);
-	//GPTD9.tim->CNT = 0;
-
+	ltc_int_ts = halGetCounterValue();
 	ltc_timecode_int.seconds++;
+	kbg_setGPIO(ltc_timecode_int.seconds&0x01, GPIOA, GPIOA__A07);
+	ltc_timecode_int.frames = 0;
+	GPTD9.tim->CNT = 0;
+
 
 	if ( ltc_timecode_int.seconds > 59 )
 	{
@@ -337,7 +351,6 @@ fps_cb(GPTDriver * gptp)
 	kbw_setSMPTETime(&ltc_timecode_int);
 	kbs_setSMPTETime(&ltc_timecode_int);
 	ltc_timecode_int.frames++;
-	kbg_setLED2(ltc_timecode_int.frames&0x01);
 	chSysUnlockFromIsr();
 }
 
@@ -385,20 +398,20 @@ kuroBoxTimeStop(void)
 void
 kbt_startOneSec(int32_t drift_factor)
 {
-	TIM2_factor = 84000000-drift_factor;
-	uint64_t TIM5_factor_calc = (84000000-drift_factor);
-	TIM5_factor_calc *= 1000;
-	TIM5_factor_calc /= 999;
-	TIM5_factor = TIM5_factor_calc;
-	TIM9_factor = ltc_clock_stuff[fps_format].clock;
+	TIM2_period = 84000000-drift_factor/2;
+	uint64_t TIM5_period_calc = (84000000-drift_factor/2);
+	TIM5_period_calc *= 1000;
+	TIM5_period_calc /= 999;
+	TIM5_period = TIM5_period_calc;
+	TIM9_period = ltc_clock_stuff[fps_format].clock;
 
 	gptStart(&GPTD2, &one_rsec_cfg);
 	gptStart(&GPTD5, &one_fsec_cfg);
 	gptStart(&GPTD9, &fps_cfg);
 
-	gptStartContinuous(&GPTD2, TIM2_factor);
-	gptStartContinuous(&GPTD5, TIM5_factor);
-	gptStartContinuous(&GPTD9, TIM9_factor);
+	gptStartContinuous(&GPTD2, TIM2_period);
+	gptStartContinuous(&GPTD5, TIM5_period);
+	gptStartContinuous(&GPTD9, TIM9_period);
 
 }
 

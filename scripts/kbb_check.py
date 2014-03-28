@@ -33,6 +33,7 @@ def main():
         kbb = KBB.KBB_factory(fname)
         if kbb is None:
             print "\tCan't parse!"
+            continue
         while kbb.read_next():
             kbb.check_all()
         kbb.print_errors()

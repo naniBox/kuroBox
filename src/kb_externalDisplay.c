@@ -24,6 +24,7 @@
 #include "kb_externalDisplay.h"
 #include "kb_serial.h"
 #include "kb_writer.h"
+#include "kb_gpio.h"
 #include <chprintf.h>
 #include <string.h>
 
@@ -39,6 +40,8 @@ static int ed_interval;
 SerialDriver * ed_serialPort;
 
 static kbb_display_t kbb_display;
+
+extern int32_t AA,BB,CC;
 
 //-----------------------------------------------------------------------------
 static Thread * eDisplayThread;
@@ -65,6 +68,13 @@ thEDisplay(void *arg)
 		if ( !ed_serialPort )
 			continue;
 
+		if ( ed_serialPort == &Serial1 )
+			if ( kbse_getBaudSerial1() < 115200 )
+				continue;
+		if ( ed_serialPort == &Serial2 )
+			if ( kbse_getBaudSerial2() < 115200 )
+				continue;
+
 		const kbb_current_msg_t * msg = kbw_getCurrentMsg();
 		memcpy(&kbb_display.ltc_frame, 		&msg->ltc_frame, 	sizeof(kbb_display.ltc_frame));
 		memcpy(&kbb_display.smpte_time, 	&msg->smpte_time, 	sizeof(kbb_display.smpte_time));
@@ -73,13 +83,23 @@ thEDisplay(void *arg)
 		kbb_display.ecef[2] = msg->nav_sol.ecefZ;
 		memcpy(&kbb_display.vnav, 			&msg->vnav, 		sizeof(kbb_display.vnav));
 		kbb_display.temperature = msg->temperature;
+		int32_t * i32buf = (int32_t*)kbb_display.__pad;
+
+		i32buf[0] = AA;
+		i32buf[1] = BB;
+		i32buf[2] = CC;
 
 		uint8_t * buf = (uint8_t*) &kbb_display;
 		kbb_display.header.checksum = calc_checksum_16(buf+KBB_CHECKSUM_START,
 				KBB_DISPLAY_SIZE-KBB_CHECKSUM_START);
 
 		// display!!!
-		sdWrite(ed_serialPort, buf, KBB_DISPLAY_SIZE);
+		int size_written = sdWrite(ed_serialPort, buf, KBB_DISPLAY_SIZE);
+		if ( size_written != KBB_DISPLAY_SIZE )
+		{
+			kbg_toggleLED3();
+			ASSERT(size_written==KBB_DISPLAY_SIZE,"thEDisplay", "Wrong sent data!!");
+		}
 	}
 	return 0;
 }

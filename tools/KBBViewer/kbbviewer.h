@@ -57,6 +57,8 @@ signals:
 	void filePositionChanged(int pos);
 
 private:
+	void openFile(const QString & fname);
+
 	void handlePacket(const KBB_Packet * packet);
 	void handle_02_01(const KBB_02_01 * data);
 	void handle_02_02(const KBB_02_02 * data);

@@ -223,7 +223,7 @@ kbv_drIntExtiCB(EXTDriver *extp, expchannel_t channel)
 	async_vn_msg.state = VN_ASYNC_1ST_SPI_CB;
 	spiSelectI(VND1.spip);
 	spiStartSendI(VND1.spip, 4, async_vn_msg.buf);
-	kbed_dataReadyI();
+	///**/kbed_dataReadyI();
 	chSysUnlockFromIsr();
 }
 

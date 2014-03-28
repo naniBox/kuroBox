@@ -87,6 +87,17 @@ KBBViewer::KBBViewer(QWidget *parent) :
 	groupboxes = ui->infoArea_widget->findChildren<QGroupBox *>(QRegExp("_02_.*_groupBox"));
 	for ( QList<QGroupBox*>::iterator it = groupboxes.begin() ; it != groupboxes.end() ; ++it )
 		(*it)->hide();
+
+	QStringList args = QCoreApplication::arguments();
+	if ( args.size() > 0)
+	{
+
+		const QString & arg = args.back();
+		if ( arg.endsWith(".kbb", Qt::CaseInsensitive) )
+		{
+			openFile(arg);
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +119,16 @@ void KBBViewer::about()
 //-----------------------------------------------------------------------------
 void KBBViewer::fileOpen()
 {
-	QString fname = QFileDialog::getOpenFileName(this, tr("Open KBB file"), "c:/Users/talsit/Code/naniBox/KBBViewer/KURO0015.KBB", tr("KBB Files (*.kbb)"));
+	QString fname = QFileDialog::getOpenFileName(this, tr("Open KBB file"),
+												 //"c:/Users/talsit/Code/naniBox/KBBViewer/KURO0015.KBB",
+												 "",
+												 tr("KBB Files (*.kbb)"));
+	openFile(fname);
+}
+
+//-----------------------------------------------------------------------------
+void KBBViewer::openFile(const QString & fname)
+{
 	if ( !fname.isNull() && m_fname != fname )
 	{
 		m_fname = fname;
@@ -126,6 +146,7 @@ void KBBViewer::fileOpen()
 			emit fileOpened(m_fname);
 			// go to the first packet after the header
 			setFilePosition(1);
+			setWindowTitle(QString("KBBViewer :: ") + m_fname);
 		}
 	}
 }
@@ -139,7 +160,8 @@ void KBBViewer::setFilePosition(int pos)
 	if ( pos < 0 )
 		return;
 
-	if ( pos >= m_kbb->size() )
+	uint32_t ppos = pos;
+	if ( ppos >= m_kbb->size() )
 		return;
 
 	if ( pos == m_position )
@@ -344,6 +366,8 @@ void KBBViewer::handle_02_02(const KBB_02_02 * data)
 //-----------------------------------------------------------------------------
 void KBBViewer::drawHexView(const uint8_t * data, uint32_t len)
 {
+	(void)len;
+
 	QString hex;
 	uint32_t offset = m_position * KBB_MSG_SIZE;
 

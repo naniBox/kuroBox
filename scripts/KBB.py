@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 """
 	kuroBox / naniBox
 	Copyright (c) 2013
@@ -24,20 +23,7 @@
 import sys
 import os
 import struct
+import KBB_types
 
 def KBB_factory(fname):
-	fin = file(fname,"rb")
-	msg = fin.read(18)
-	fin.close()
-	if len(msg) != 18:
-		return None
-	preamble,checksum,version,msg_size,msg_num,write_errors = struct.unpack("<IBBHII",msg[0:16])
-	if version == 11:
-		import KBB_V11
-		return KBB_V11.KBB_V11(fname)
-	preamble,checksum,version,msg_type,msg_size,msg_num,write_errors = struct.unpack("<IHBBHII",msg[0:18])
-	if version == 12:
-		import KBB_V12
-		return KBB_V12.KBB_V12(fname)
-	return None
-
+	return KBB_types.KBB(fname)
