@@ -71,7 +71,7 @@ struct __PACKED__ kuroBoxScreen
 };
 
 //-----------------------------------------------------------------------------
-static Thread * screenThread;
+static thread_t * screenThread;
 static kuroBoxScreen screen;
 static char charbuf[128];
 static MemoryStream msb;
@@ -212,7 +212,7 @@ draw_error(void)
 {
 	if ( screen.error == SCREEN_OK )
 		return 0;
-	if ( ( chTimeNow() >> 11 ) & 0x01 ) // yeah, not chosen scientifically
+	if ( ( chVTGetSystemTimeX() >> 11 ) & 0x01 ) // yeah, not chosen scientifically
 		return 0;
 
 	st7565_clear(&ST7565D1);
@@ -231,9 +231,8 @@ draw_error(void)
 }
 
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waScreen, 512);
-static msg_t 
-thScreen(void *arg) 
+static THD_WORKING_AREA(waScreen, 512);
+static THD_FUNCTION(thScreen, arg)
 {
 	(void)arg;
 	chRegSetThreadName("Screen");
@@ -248,7 +247,7 @@ thScreen(void *arg)
 	st7565_clear(&ST7565D1);
 	st7565_display(&ST7565D1);
 	
-	while( !chThdShouldTerminate() )
+	while( !chThdShouldTerminateX() )
 	{
 		// are we displaying the menu?
 		if ( kbm_display() )
@@ -271,18 +270,17 @@ thScreen(void *arg)
 	st7565_clear(&ST7565D1);
 	st7565_display(&ST7565D1);
 
-	return 0;
+	return;
 }
 
 //-----------------------------------------------------------------------------
-static Thread * blinkerThread;
-static WORKING_AREA(waBlinker, 64);
-static msg_t
-thBlinker(void *arg)
+static thread_t * blinkerThread;
+static THD_WORKING_AREA(waBlinker, 64);
+static THD_FUNCTION(thBlinker, arg)
 {
 	(void)arg;
 	chRegSetThreadName("Blinker");
-	while( !chThdShouldTerminate() )
+	while( !chThdShouldTerminateX() )
 	{
 		if ( screen.error & SCREEN_ERR_NO_SD )
 		{
@@ -311,7 +309,7 @@ thBlinker(void *arg)
 		for ( int i = 0 ; i < 10 && !chThdShouldTerminate() ; i++ )
 			chThdSleepMilliseconds(100);
 	}
-	return 0;
+	return;
 }
 
 

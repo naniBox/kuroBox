@@ -44,11 +44,10 @@ static kbb_display_t kbb_display;
 extern int32_t AA,BB,CC;
 
 //-----------------------------------------------------------------------------
-static Thread * eDisplayThread;
-static Thread * eDisplayThreadForSleep;
-static WORKING_AREA(waEDisplay, 512);
-static msg_t
-thEDisplay(void *arg)
+static thread_t * eDisplayThread;
+static thread_t * eDisplayThreadForSleep;
+static THD_WORKING_AREA(waEDisplay, 512);
+static THD_FUNCTION(thEDisplay, arg)
 {
 	(void)arg;
 	chRegSetThreadName("eDisplay");
@@ -58,11 +57,11 @@ thEDisplay(void *arg)
 	kbb_display.header.msg_subclass = KBB_SUBCLASS_EXTERNAL_01;
 	kbb_display.header.msg_size = KBB_DISPLAY_SIZE;
 
-	while( !chThdShouldTerminate() )
+	while( !chThdShouldTerminateX() )
 	{
 		chSysLock();
-			eDisplayThreadForSleep = chThdSelf();
-		    chSchGoSleepS(THD_STATE_SUSPENDED);
+			eDisplayThreadForSleep = chThdGetSelfX();
+		    chSchGoSleepS(CH_STATE_SUSPENDED);
 		chSysUnlock();
 
 		if ( !ed_serialPort )
@@ -101,7 +100,7 @@ thEDisplay(void *arg)
 			ASSERT(size_written==KBB_DISPLAY_SIZE,"thEDisplay", "Wrong sent data!!");
 		}
 	}
-	return 0;
+	return;
 }
 
 //-----------------------------------------------------------------------------

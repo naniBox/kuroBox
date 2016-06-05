@@ -29,7 +29,6 @@
 #include "kb_time.h"
 #include "kb_screen.h"
 #include <time.h>
-#include <chrtclib.h>
 
 //-----------------------------------------------------------------------------
 extern int16_t current_menu_item;

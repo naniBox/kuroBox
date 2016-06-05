@@ -36,7 +36,7 @@
 //-----------------------------------------------------------------------------
 static void adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n);
 static adcsample_t adc_samples[ADC_NUM_CHANNELS * ADC_BUF_DEPTH];
-static VirtualTimer adc_trigger;
+static virtual_timer_t adc_trigger;
 
 //-----------------------------------------------------------------------------
 static ADCConfig adc_cfg = {
@@ -98,11 +98,11 @@ adc_cb(ADCDriver *adcp, adcsample_t *buffer, size_t n)
 void 
 adc_trigger_cb(void * p)
 {
-	VirtualTimer * vt = (VirtualTimer *)p;
-	chSysLockFromIsr();
+	virtual_timer_t * vt = (virtual_timer_t *)p;
+	chSysLockFromISR();
 	adcStartConversionI(&ADCD1, &adc_grp_cfg, adc_samples, ADC_BUF_DEPTH);
 	chVTSetI(vt, MS2ST(SAMPLE_PERIOD), adc_trigger_cb, vt);
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 

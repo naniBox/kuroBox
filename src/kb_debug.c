@@ -22,7 +22,7 @@
 
 #include <ch.h>
 #include <hal.h>
-#include <chprintf.h>
+#include "chprintf.h"
 #include "kb_serial.h"
 
 /*

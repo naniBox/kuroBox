@@ -56,7 +56,7 @@ void __early_init(void) {
  * @brief   SDC card detection.
  */
 
-bool_t sdc_lld_is_card_inserted(SDCDriver *sdcp) {
+bool sdc_lld_is_card_inserted(SDCDriver *sdcp) {
 
   (void)sdcp;
   return palReadPad(GPIOD, GPIOD_SD_DET) == PAL_LOW;
@@ -67,7 +67,7 @@ bool_t sdc_lld_is_card_inserted(SDCDriver *sdcp) {
  * @brief   SDC card write protection detection.
  */
 
-bool_t sdc_lld_is_write_protected(SDCDriver *sdcp) {
+bool sdc_lld_is_write_protected(SDCDriver *sdcp) {
 
   (void)sdcp;
   return palReadPad(GPIOD, GPIOD_SD_WP) == PAL_HIGH;
@@ -79,7 +79,7 @@ bool_t sdc_lld_is_write_protected(SDCDriver *sdcp) {
 /**
  * @brief   MMC_SPI card detection.
  */
-bool_t mmc_lld_is_card_inserted(MMCDriver *mmcp) {
+bool mmc_lld_is_card_inserted(MMCDriver *mmcp) {
 
   (void)mmcp;
   /* TODO: Fill the implementation.*/
@@ -89,7 +89,7 @@ bool_t mmc_lld_is_card_inserted(MMCDriver *mmcp) {
 /**
  * @brief   MMC_SPI card write protection detection.
  */
-bool_t mmc_lld_is_write_protected(MMCDriver *mmcp) {
+bool mmc_lld_is_write_protected(MMCDriver *mmcp) {
 
   (void)mmcp;
   /* TODO: Fill the implementation.*/

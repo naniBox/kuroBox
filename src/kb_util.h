@@ -46,8 +46,11 @@ typedef enum
 } panic_msg_t;
 
 //----------------------------------------------------------------------------
+typedef bool bool_t;
+
+//----------------------------------------------------------------------------
 #define swap_u8(a,b) {uint8_t x=a;a=b;b=x;}
-#define ASSERT(expr,where,msg) chDbgAssert(expr, where, msg)
+#define ASSERT(expr,where,msg) chDbgAssert(expr, where  msg)
 
 //----------------------------------------------------------------------------
 #define KB_OK				0

@@ -126,11 +126,10 @@ parse_and_store_nav_sol(void)
 }
 
 //-----------------------------------------------------------------------------
-static Thread * gpsThread;
+static thread_t * gpsThread;
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waGps, 128);
-static msg_t
-thGps(void *arg)
+static THD_WORKING_AREA(waGps, 128);
+static THD_FUNCTION(thGps, arg)
 {
 	SerialDriver * sd = (SerialDriver *)arg;
 	chRegSetThreadName("Gps");
@@ -171,7 +170,8 @@ thGps(void *arg)
 		if ( ubx_nav_sol_idx == UBX_NAV_SOL_SIZE )
 			parse_and_store_nav_sol();
 	}
-	return 0;
+
+	return;
 }
 
 //-----------------------------------------------------------------------------

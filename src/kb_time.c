@@ -25,7 +25,6 @@
 #include <hal.h>
 #include <string.h>
 #include <chprintf.h>
-#include <chrtclib.h>
 #include "kb_time.h"
 #include "kb_screen.h"
 #include "kb_writer.h"
@@ -193,7 +192,7 @@ static void ltc_store(uint8_t bit_set)
 	// happens at the end of the frame.
 	if ( ltc_frame.sync_word == LTC_SYNC_WORD )
 	{
-		chSysLockFromIsr();
+		chSysLockFromISR();
 			frame_to_time(&ltc_timecode_ext, &ltc_frame);
 			/**/kbed_dataReadyI();
 			if ( ltc_timecode_ext.frames == 0 )
@@ -219,7 +218,7 @@ static void ltc_store(uint8_t bit_set)
 			kbs_setLTC(&ltc_timecode_ext);
 			kbs_err_setLTC(1);
 			kbw_setLTC(&ltc_frame);
-		chSysUnlockFromIsr();
+		chSysUnlockFromISR();
 	}
 }
 
@@ -323,10 +322,10 @@ one_rsec_cb(GPTDriver * gptp)
 {
 	(void)gptp;
 
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	if( ltc_clock_stuff[fps_format].real_clock )
 		inc_ltc_int();
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------
@@ -335,10 +334,10 @@ one_fsec_cb(GPTDriver * gptp)
 {
 	(void)gptp;
 
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	if( !ltc_clock_stuff[fps_format].real_clock )
 		inc_ltc_int();
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------
@@ -347,11 +346,11 @@ fps_cb(GPTDriver * gptp)
 {
 	(void)gptp;
 
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	kbw_setSMPTETime(&ltc_timecode_int);
 	kbs_setSMPTETime(&ltc_timecode_int);
 	ltc_timecode_int.frames++;
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------
@@ -359,6 +358,7 @@ static const GPTConfig one_rsec_cfg =
 {
 	84000000,		// max clock!
 	one_rsec_cb,
+	0,
 	0
 };
 
@@ -367,6 +367,7 @@ static const GPTConfig one_fsec_cfg =
 {
 	84000000,		// max clock!
 	one_fsec_cb,
+	0,
 	0
 };
 
@@ -375,6 +376,7 @@ static const GPTConfig fps_cfg =
 {
 	1000000,
 	fps_cb,
+	0,
 	0
 };
 
@@ -419,8 +421,10 @@ kbt_startOneSec(int32_t drift_factor)
 void
 kbt_getRTC(rtc_t * rtc)
 {
-	struct tm t;
-	rtcGetTimeTm(&RTCD1, &t);
+    RTCDateTime timespec;
+    struct tm t;
+    rtcGetTime(&RTCD1, &timespec);
+    rtcConvertDateTimeToStructTm(&timespec, &t, 0);
 	rtc->tm_sec 	= t.tm_sec;
 	rtc->tm_min 	= t.tm_min;
 	rtc->tm_hour 	= t.tm_hour;

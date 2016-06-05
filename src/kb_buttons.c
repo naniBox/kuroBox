@@ -66,9 +66,9 @@ void kbbtn_0ExtiCB(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 	btn_0_pressed=palReadPad(GPIOA, GPIOA_BTN0) == BUTTON_DOWN;
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	on_btn0(btn_0_pressed);
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------
@@ -77,9 +77,9 @@ void kbbtn_1ExtiCB(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 	btn_1_pressed=palReadPad(GPIOA, GPIOA_BTN1) == BUTTON_DOWN;
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	on_btn1(btn_1_pressed);
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------

@@ -103,9 +103,9 @@
 // Threads should only be woken if they're asleep, so we use the thread pointer
 // for that. We also need to clean up on shutdown, and that's what the other 
 // pointers are for
-static Thread * loggerThread;
-static Thread * writerThread;
-static Thread * writerThreadForSleep;
+static thread_t * loggerThread;
+static thread_t * writerThread;
+static thread_t * writerThreadForSleep;
 static uint8_t logger_state;
 
 //-----------------------------------------------------------------------------
@@ -147,7 +147,7 @@ struct write_buffer_t
 	// instead of byte-by-byte copying
 	int32_t current_idx;
 };
-static Semaphore 				write_buffer_semaphore;
+static semaphore_t 				write_buffer_semaphore;
 static write_buffer_t 			write_buffers[BUFFER_COUNT];
 
 #define NANIBOX_DNAME "/nanibox"
@@ -370,13 +370,13 @@ on_insert(void)
 	FRESULT stat;
 
 	kbs_setFName(KUROBOX_LOADING_NAME);
-	if (sdcConnect(&SDCD1) != CH_SUCCESS)
+	if (!sdcConnect(&SDCD1))
 	{
 		kbs_setFName(KUROBOX_ERR1);
 		return KB_NOT_OK;
 	}
 
-	stat = f_mount(0, &SDC_FS);
+	stat = f_mount(&SDC_FS, "/", 1);
 	if (stat != FR_OK)
 	{
 		kbs_setFName(KUROBOX_ERR2);
@@ -456,7 +456,7 @@ wait_for_sd(void)
 	uint8_t sd_det_count = POLLING_COUNT;
 	while(1)
 	{
-		if (chThdShouldTerminate())
+		if (chThdShouldTerminateX())
 		{
 			logger_state = LS_EXITING;
 			break;
@@ -517,7 +517,7 @@ writing_run(void)
 	uint32_t writer_buffers_written = 0;
 	while(LS_RUNNING == logger_state)
 	{
-		if (chThdShouldTerminate())
+		if (chThdShouldTerminateX())
 		{
 			logger_state = LS_EXITING;
 			f_sync(&kbfile);
@@ -531,8 +531,8 @@ writing_run(void)
 		{
 			// no more buffers to write, go to sleep, wait to be notified
 			chSysLock();
-				writerThreadForSleep = chThdSelf();
-			    chSchGoSleepS(THD_STATE_SUSPENDED);
+				writerThreadForSleep = chThdGetSelfX();
+			    chSchGoSleepS(CH_STATE_SUSPENDED);
 			chSysUnlock();
 
 			// we can get woken up by either a buffer ready to be written
@@ -616,9 +616,8 @@ writing_run(void)
 // The writer thread run function, only returns on shutdown. It gets the SD card
 // ready, and then just goes to sleep until there's something to write
 // @TODO: reduce the working area size to its reasonable limit
-static WORKING_AREA(waWriter, 1024);
-static msg_t 
-thWriter(void *arg)
+static THD_WORKING_AREA(waWriter, 1024);
+static THD_FUNCTION(thWriter,arg)
 {
 	ASSERT(LS_INIT == logger_state, "thWriter, 1", "logger_state is not LS_INIT");
 	(void)arg;
@@ -637,12 +636,12 @@ thWriter(void *arg)
 	current_msg.header.msg_size = KBB_MSG_SIZE;
 
 	logger_state = LS_WAIT_FOR_SD;
-	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
+	while( !chThdShouldTerminateX() && LS_EXITING != logger_state)
 	{
 		switch ( logger_state )
 		{
 		case LS_INIT:
-			chDbgAssert(0, "thLogger, 2", "logger_state is should not be LS_INIT");
+			chDbgAssert(0, "thLogger, 2"  "logger_state is should not be LS_INIT");
 			break;
 		case LS_WAIT_FOR_SD:
 			wait_for_sd();
@@ -655,16 +654,15 @@ thWriter(void *arg)
 		}
 	}
 
-	return KB_OK;
+	return;
 }
 
 //-----------------------------------------------------------------------------
 // The logger thread run function. 
 // This thread copies the "current_msg" to the write buffer every 5ms. If a
 // time slot is missed, it is noted and will try again next slot.
-static WORKING_AREA(waLogger, 256);
-static msg_t
-thLogger(void *arg)
+static THD_WORKING_AREA(waLogger, 256);
+static THD_FUNCTION(thLogger, arg)
 {
 	(void)arg;
 
@@ -679,13 +677,13 @@ thLogger(void *arg)
 	uint32_t logger_buffers_written = 0;
 	current_msg.global_count = 0;
 
-	while( !chThdShouldTerminate() && LS_EXITING != logger_state)
+	while( !chThdShouldTerminateX() && LS_EXITING != logger_state)
 	{
 		flush_write_buffers();
 		int8_t current_idx = -1;
-		systime_t sleep_until = chTimeNow() + MS2ST(5);
+		systime_t sleep_until = chVTGetSystemTimeX() + MS2ST(5);
 
-		while( !chThdShouldTerminate() && LS_RUNNING == logger_state )
+		while( !chThdShouldTerminateX() && LS_RUNNING == logger_state )
 		{
 			if ( current_idx == -1 )
 			{
@@ -718,7 +716,7 @@ thLogger(void *arg)
 
 			// chTimeNow() will roll over every ~49 days
 			// @TODO: make this code handle that (or not, 49 days is a lot!!)
-			while ( sleep_until < chTimeNow() )
+			while ( sleep_until < chVTGetSystemTimeX() )
 			{
 				// this code handles for when we skipped a writing-slot
 				// i'm counting a skipped msg as a write error
@@ -760,7 +758,7 @@ thLogger(void *arg)
 		}
 		chThdSleepMilliseconds(1);
 	}
-	return KB_OK;
+	return;
 }
 
 //-----------------------------------------------------------------------------
@@ -769,7 +767,7 @@ kuroBoxWriterInit(void)
 {
 	ASSERT(LS_INIT == logger_state, "kuroBoxLogger, 1", "logger_state is not LS_INIT");
 
-	chSemInit(&write_buffer_semaphore, 1);
+	chSemObjectInit(&write_buffer_semaphore, 1);
 	kbs_setFName(KUROBOX_BLANK_FNAME);
 	// start with the status set to no SD, just to make sure, on_insert() will
 	// change it

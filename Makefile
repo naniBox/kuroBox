@@ -37,7 +37,7 @@ endif
 
 # Enable this if you want to see the full log while compiling.
 ifeq ($(USE_VERBOSE_COMPILE),)
-  USE_VERBOSE_COMPILE = no
+  USE_VERBOSE_COMPILE = yes
 endif
 
 #
@@ -61,7 +61,7 @@ endif
 
 # we want FPU, please
 ifeq ($(USE_FPU),)
-  USE_FPU = yes
+  USE_FPU = no
 endif
 
 #
@@ -88,12 +88,26 @@ endif
 
 
 # Imported source files and paths
-CHIBIOS = ../../chibios
+CHIBIOS = ../../chibios30
 KUROBOX = .
-include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
+# Startup files.
+include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk
+# HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
-include $(CHIBIOS)/os/kernel/kernel.mk
+include $(CHIBIOS)/os/hal/ports/STM32/STM32F4xx/platform.mk
+#include $(CHIBIOS)/os/hal/boards/ST_STM32F4_DISCOVERY/board.mk
+include $(CHIBIOS)/os/hal/osal/rt/osal.mk
+# RTOS files (optional).
+include $(CHIBIOS)/os/rt/rt.mk
+include $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
+# Other files (optional).
+
+
+#include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
+#include $(CHIBIOS)/os/hal/hal.mk
+#include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
+#include $(CHIBIOS)/os/kernel/kernel.mk
+
 include $(KUROBOX)/src/fatfs/fatfs.mk
 include $(KUROBOX)/src/board/board.mk
 
@@ -107,15 +121,15 @@ endif
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = $(PORTSRC) \
+CSRC = $(STARTUPSRC) \
         $(KERNSRC) \
-        $(TESTSRC) \
+        $(PORTSRC) \
+        $(OSALSRC) \
         $(HALSRC) \
         $(PLATFORMSRC) \
         $(BOARDSRC) \
-        $(CHIBIOS)/os/various/chprintf.c \
-        $(CHIBIOS)/os/various/chrtclib.c \
-        $(CHIBIOS)/os/various/memstreams.c \
+        $(CHIBIOS)/os/hal/lib/streams/chprintf.c \
+        $(CHIBIOS)/os/hal/lib/streams/memstreams.c \
         $(FATFSSRC) \
         ./src/glcdfont.c \
         ./src/kb_adc.c \
@@ -139,6 +153,8 @@ CSRC = $(PORTSRC) \
         ./src/ST7565.c
 
         #./src/kb_featureA.c \
+        $(CHIBIOS)/os/various/chrtclib.c \
+
         
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -168,12 +184,15 @@ TCPPSRC =
 ASMSRC = $(PORTASM) \
 		./src/kb_debug_asm.s
 
-INCDIR = $(PORTINC) \
+INCDIR = $(STARTUPINC) \
+		$(PORTINC) \
 		$(KERNINC) \
 		$(HALINC) \
+		$(OSALINC) \
 		$(PLATFORMINC) \
 		$(BOARDINC) \
 		$(CHIBIOS)/os/various \
+		$(CHIBIOS)/os/hal/lib/streams \
 		$(FATFSINC) \
 		$(LIBLTCINC) \
 		src
@@ -287,4 +306,7 @@ ifeq ($(USE_FWLIB),yes)
   USE_OPT += -DUSE_STDPERIPH_DRIVER
 endif
 
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
+RULESPATH = $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC
+include $(RULESPATH)/rules.mk
+
+#include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk

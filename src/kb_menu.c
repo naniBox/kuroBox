@@ -35,9 +35,9 @@
 
 //-----------------------------------------------------------------------------
 #define BTN_NUM_MSGS				10
-static Semaphore btn_semaphore;
+static semaphore_t btn_semaphore;
 static msg_t btn_msgs[BTN_NUM_MSGS];
-static Mailbox btn_mailbox;
+static mailbox_t btn_mailbox;
 
 #define BTN_ENCODE(b,p)				((b<<1)|p)
 #define BTN_DECODE_BUTTON(s)		((s>>1)&0x01)
@@ -116,7 +116,7 @@ int kbm_display(void)
 	{
 		msg_t btn_state = 0;
 		msg_t mbox_stat = chMBFetch(&btn_mailbox, &btn_state, TIME_IMMEDIATE);
-		if ( mbox_stat == RDY_OK )
+		if ( mbox_stat == MSG_OK )
 		{
 			// in the message of the mailbox, which is just an int, we encode
 			// which button it is, and whether it's a press or release
@@ -222,8 +222,8 @@ kbm_btn1_dispatch(bool_t pressed)
 //-----------------------------------------------------------------------------
 int kuroBoxMenuInit(void)
 {
-	chSemInit(&btn_semaphore, 1);
-	chMBInit(&btn_mailbox, btn_msgs, BTN_NUM_MSGS);
+    chSemObjectInit(&btn_semaphore, 1);
+    chMBObjectInit(&btn_mailbox, btn_msgs, BTN_NUM_MSGS);
 	return KB_OK;
 }
 

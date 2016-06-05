@@ -42,7 +42,7 @@ write_reg(uint8_t reg, uint8_t dat)
 	i2cAcquireBus(&I2CD2);
 	msg_t status = i2cMasterTransmitTimeout(&I2CD2, BAROMETER_I2C_ADDRESS, txbuf, 2, rxbuf, 0, timeout);
 	i2cReleaseBus(&I2CD2);
-	if (status != RDY_OK)
+	if (status != MSG_OK)
 	{
 		errors = i2cGetErrors(&I2CD2);
 	}
@@ -58,7 +58,7 @@ read_reg(uint8_t reg, uint8_t * dat, uint8_t dat_len)
 	i2cAcquireBus(&I2CD2);
 	msg_t status = i2cMasterTransmitTimeout(&I2CD2, BAROMETER_I2C_ADDRESS, txbuf, 1, dat, dat_len, timeout);
 	i2cReleaseBus(&I2CD2);
-	if (status != RDY_OK)
+	if (status != MSG_OK)
 	{
 		errors = i2cGetErrors(&I2CD2);
 	}
@@ -66,25 +66,24 @@ read_reg(uint8_t reg, uint8_t * dat, uint8_t dat_len)
 }
 
 //-----------------------------------------------------------------------------
-static Thread * altimeterThread;
+static thread_t * altimeterThread;
 //-----------------------------------------------------------------------------
-static WORKING_AREA(waAltimeter, 256);
-static msg_t
-thAltimeter(void *arg)
+static THD_WORKING_AREA(waAltimeter, 256);
+static THD_FUNCTION(thAltimeter, arg)
 {
 	(void)arg;
 	chRegSetThreadName("Altimeter");
 
-	msg_t status = RDY_OK;
+	msg_t status = MSG_OK;
 
 	status = write_reg(0x26, 0xb8);
 	status = write_reg(0x13, 0x07);
 	status = write_reg(0x26, 0xb9);
 
-	while( !chThdShouldTerminate() )
+	while( !chThdShouldTerminateX() )
 	{
 		status = read_reg(0x01, rxbuf, 5);
-		if ( status == RDY_OK )
+		if ( status == MSG_OK )
 		{
 			int m_a,m_t,c_a;
 			float l_a,l_t;
@@ -102,7 +101,7 @@ thAltimeter(void *arg)
 		}
 		chThdSleepMilliseconds(200);
 	}
-	return 0;
+	return;
 }
 
 //-----------------------------------------------------------------------------

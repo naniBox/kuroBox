@@ -80,7 +80,8 @@ static const VectorNavConfig default_vectornav_config =
 	{	// GPT config
 		1000000, // 1MHz should be fine enough to get a 50us timeout
 		vectornav_gpt_end_cb,
-		0 // DIER register
+		0, // CR2 register
+		0  // DIER register
 	}
 };
 
@@ -142,21 +143,21 @@ vectornav_spi_end_cb(SPIDriver * spip)
 	switch( async_vn_msg.state )
 	{
 	case VN_ASYNC_1ST_SPI_CB:
-		chSysLockFromIsr();
+		chSysLockFromISR();
 		spiUnselectI(VND1.spip);
 		async_vn_msg.state = VN_ASYNC_1ST_SLEEP;
 		gptStartOneShotI(VND1.gpdp, VN_SLEEPTIME);
-		chSysUnlockFromIsr();
+		chSysUnlockFromISR();
 		break;
 
 	case VN_ASYNC_2ND_SPI_CB:
-		chSysLockFromIsr();
+		chSysLockFromISR();
 		spiUnselectI(VND1.spip);
 		// here we have the register
 		vectornav_dispatch_register(async_vn_msg.reg, async_vn_msg.buf_size, async_vn_msg.buf);
 		async_vn_msg.state = VN_ASYNC_2ND_SLEEP;
 		gptStartOneShotI(VND1.gpdp, VN_SLEEPTIME);
-		chSysUnlockFromIsr();
+		chSysUnlockFromISR();
 		break;
 
 	case VN_ASYNC_INACTIVE:
@@ -177,12 +178,12 @@ vectornav_gpt_end_cb(GPTDriver * gptp)
 	switch( async_vn_msg.state )
 	{
 	case VN_ASYNC_1ST_SLEEP:
-		chSysLockFromIsr();
+		chSysLockFromISR();
 		async_vn_msg.state = VN_ASYNC_2ND_SPI_CB;
 		memset(&async_vn_msg.buf, 0, sizeof(async_vn_msg.buf));
 		spiSelectI(VND1.spip);
 		spiStartReceiveI(VND1.spip, async_vn_msg.buf_size, async_vn_msg.buf);
-		chSysUnlockFromIsr();
+		chSysUnlockFromISR();
 		break;
 
 	case VN_ASYNC_2ND_SLEEP:
@@ -213,7 +214,7 @@ kbv_drIntExtiCB(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 
-	chSysLockFromIsr();
+	chSysLockFromISR();
 	memset(&async_vn_msg, 0, sizeof(async_vn_msg));
 	async_vn_msg.reg = VN100_REG_YPR;
 	// ReadReg: [0x01, REG, 0x00, 0x00]
@@ -224,7 +225,7 @@ kbv_drIntExtiCB(EXTDriver *extp, expchannel_t channel)
 	spiSelectI(VND1.spip);
 	spiStartSendI(VND1.spip, 4, async_vn_msg.buf);
 	///**/kbed_dataReadyI();
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------
