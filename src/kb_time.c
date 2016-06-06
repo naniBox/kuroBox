@@ -421,10 +421,10 @@ kbt_startOneSec(int32_t drift_factor)
 void
 kbt_getRTC(rtc_t * rtc)
 {
-    RTCDateTime timespec;
-    struct tm t;
-    rtcGetTime(&RTCD1, &timespec);
-    rtcConvertDateTimeToStructTm(&timespec, &t, 0);
+	RTCDateTime timespec;
+	struct tm t;
+	rtcGetTime(&RTCD1, &timespec);
+	rtcConvertDateTimeToStructTm(&timespec, &t, 0);
 	rtc->tm_sec 	= t.tm_sec;
 	rtc->tm_min 	= t.tm_min;
 	rtc->tm_hour 	= t.tm_hour;

@@ -306,7 +306,7 @@ static THD_FUNCTION(thBlinker, arg)
 			chThdSleepMilliseconds(500);
 		}
 		// 10 short sleeps so that shutting down is quicker
-		for ( int i = 0 ; i < 10 && !chThdShouldTerminate() ; i++ )
+		for ( int i = 0 ; i < 10 && !chThdShouldTerminateX() ; i++ )
 			chThdSleepMilliseconds(100);
 	}
 	return;

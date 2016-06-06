@@ -130,7 +130,7 @@ Discarded input sections
  .text.chSysIntegrityCheckI
                 0x00000000       0xc0 build/obj/chsys.o
  .text.chSysTimerHandlerI
-                0x00000000       0xac build/obj/chsys.o
+                0x00000000       0x64 build/obj/chsys.o
  .text.chSysGetStatusAndLockX
                 0x00000000       0x38 build/obj/chsys.o
  .text.chSysRestoreStatusX
@@ -139,11 +139,9 @@ Discarded input sections
                 0x00000000       0x10 build/obj/chsys.o
  .text.chSysPolledDelayX
                 0x00000000       0x14 build/obj/chsys.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chsys.o
  .rodata.str1.4
                 0x00000000        0x5 build/obj/chsys.o
- .rodata.__func__.5963
+ .rodata.__func__.5810
                 0x00000000        0xc build/obj/chsys.o
  .comment       0x00000000       0x71 build/obj/chsys.o
  .ARM.attributes
@@ -176,7 +174,7 @@ Discarded input sections
  .text._dbg_trace_init
                 0x00000000       0x10 build/obj/chdebug.o
  .text._dbg_trace
-                0x00000000       0x38 build/obj/chdebug.o
+                0x00000000       0x34 build/obj/chdebug.o
  .rodata.str1.4
                 0x00000000       0x56 build/obj/chdebug.o
  .comment       0x00000000       0x71 build/obj/chdebug.o
@@ -188,12 +186,12 @@ Discarded input sections
  .text._vt_init
                 0x00000000       0x1c build/obj/chvt.o
  .text.chVTDoSetI
-                0x00000000       0x9c build/obj/chvt.o
+                0x00000000       0x58 build/obj/chvt.o
  .text.chVTDoResetI
-                0x00000000       0x94 build/obj/chvt.o
- .rodata.__func__.6580
+                0x00000000       0x48 build/obj/chvt.o
+ .rodata.__func__.6510
                 0x00000000        0xb build/obj/chvt.o
- .rodata.__func__.6588
+ .rodata.__func__.6517
                 0x00000000        0xd build/obj/chvt.o
  .comment       0x00000000       0x71 build/obj/chvt.o
  .ARM.attributes
@@ -223,10 +221,10 @@ Discarded input sections
  .text.chSchDoReschedule
                 0x00000000        0x4 build/obj/chschd.o
  .bss.ch        0x00000000      0x5d8 build/obj/chschd.o
+ .rodata.__func__.6507
+                0x00000000        0xc build/obj/chschd.o
  .rodata.str1.4
                 0x00000000        0xf build/obj/chschd.o
- .rodata.__func__.6577
-                0x00000000        0xc build/obj/chschd.o
  .comment       0x00000000       0x71 build/obj/chschd.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chschd.o
@@ -250,7 +248,7 @@ Discarded input sections
  .text.chThdSleep
                 0x00000000       0x58 build/obj/chthreads.o
  .text.chThdSleepUntil
-                0x00000000       0x54 build/obj/chthreads.o
+                0x00000000       0x50 build/obj/chthreads.o
  .text.chThdSleepUntilWindowed
                 0x00000000       0x6c build/obj/chthreads.o
  .text.chThdYield
@@ -277,30 +275,30 @@ Discarded input sections
                 0x00000000       0x30 build/obj/chthreads.o
  .text.chThdDequeueAllI
                 0x00000000       0x34 build/obj/chthreads.o
- .rodata.__func__.5877
+ .rodata.__func__.5974
                 0x00000000        0xc build/obj/chthreads.o
- .rodata.__func__.6655
-                0x00000000        0xd build/obj/chthreads.o
- .rodata.__func__.6661
-                0x00000000        0xd build/obj/chthreads.o
- .rodata.__func__.6060
-                0x00000000       0x14 build/obj/chthreads.o
- .rodata.__func__.6048
-                0x00000000        0xc build/obj/chthreads.o
- .rodata.__func__.6643
+ .rodata.__func__.6573
                 0x00000000        0xe build/obj/chthreads.o
- .rodata.__func__.6605
-                0x00000000       0x11 build/obj/chthreads.o
- .rodata.__func__.6649
-                0x00000000       0x15 build/obj/chthreads.o
- .rodata.__func__.6044
-                0x00000000        0xc build/obj/chthreads.o
- .rodata.__func__.6633
+ .rodata.__func__.6563
                 0x00000000        0xb build/obj/chthreads.o
- .rodata.__func__.6638
-                0x00000000        0xa build/obj/chthreads.o
- .rodata.__func__.6589
+ .rodata.__func__.6585
                 0x00000000        0xd build/obj/chthreads.o
+ .rodata.__func__.6568
+                0x00000000        0xa build/obj/chthreads.o
+ .rodata.__func__.5990
+                0x00000000       0x14 build/obj/chthreads.o
+ .rodata.__func__.6579
+                0x00000000       0x15 build/obj/chthreads.o
+ .rodata.__func__.6519
+                0x00000000        0xd build/obj/chthreads.o
+ .rodata.__func__.6591
+                0x00000000        0xd build/obj/chthreads.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chthreads.o
+ .rodata.__func__.5978
+                0x00000000        0xc build/obj/chthreads.o
+ .rodata.__func__.6535
+                0x00000000       0x11 build/obj/chthreads.o
  .comment       0x00000000       0x71 build/obj/chthreads.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chthreads.o
@@ -351,14 +349,14 @@ Discarded input sections
                 0x00000000       0x8c build/obj/chdynamic.o
  .text.chThdCreateFromMemoryPool
                 0x00000000       0xa4 build/obj/chdynamic.o
- .rodata.__func__.5877
+ .rodata.__func__.6502
                 0x00000000        0xc build/obj/chdynamic.o
- .rodata.__func__.6599
-                0x00000000       0x1a build/obj/chdynamic.o
- .rodata.__func__.6572
-                0x00000000        0xc build/obj/chdynamic.o
- .rodata.__func__.6577
+ .rodata.__func__.6507
                 0x00000000        0xd build/obj/chdynamic.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chdynamic.o
+ .rodata.__func__.6529
+                0x00000000       0x1a build/obj/chdynamic.o
  .comment       0x00000000       0x71 build/obj/chdynamic.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chdynamic.o
@@ -371,10 +369,10 @@ Discarded input sections
                 0x00000000       0x74 build/obj/chregistry.o
  .rodata.ch_debug
                 0x00000000       0x16 build/obj/chregistry.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chregistry.o
- .rodata.__func__.6578
+ .rodata.__func__.6508
                 0x00000000       0x10 build/obj/chregistry.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chregistry.o
  .comment       0x00000000       0x71 build/obj/chregistry.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chregistry.o
@@ -403,24 +401,24 @@ Discarded input sections
                 0x00000000       0x60 build/obj/chsem.o
  .text.chSemSignalWait
                 0x00000000       0xd4 build/obj/chsem.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chsem.o
- .rodata.__func__.6604
-                0x00000000       0x12 build/obj/chsem.o
- .rodata.__func__.6612
+ .rodata.__func__.6542
                 0x00000000        0xd build/obj/chsem.o
- .rodata.__func__.6608
+ .rodata.__func__.6538
                 0x00000000        0xc build/obj/chsem.o
- .rodata.__func__.6573
-                0x00000000       0x10 build/obj/chsem.o
- .rodata.__func__.6627
-                0x00000000       0x10 build/obj/chsem.o
- .rodata.__func__.6583
-                0x00000000        0xc build/obj/chsem.o
- .rodata.__func__.6594
-                0x00000000        0xb build/obj/chsem.o
- .rodata.__func__.6618
+ .rodata.__func__.6548
                 0x00000000       0x11 build/obj/chsem.o
+ .rodata.__func__.6557
+                0x00000000       0x10 build/obj/chsem.o
+ .rodata.__func__.6503
+                0x00000000       0x10 build/obj/chsem.o
+ .rodata.__func__.6513
+                0x00000000        0xc build/obj/chsem.o
+ .rodata.__func__.6524
+                0x00000000        0xb build/obj/chsem.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chsem.o
+ .rodata.__func__.6534
+                0x00000000       0x12 build/obj/chsem.o
  .comment       0x00000000       0x71 build/obj/chsem.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chsem.o
@@ -443,18 +441,18 @@ Discarded input sections
                 0x00000000       0x98 build/obj/chmtx.o
  .text.chMtxUnlockAll
                 0x00000000       0x84 build/obj/chmtx.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chmtx.o
- .rodata.__func__.6603
-                0x00000000        0xc build/obj/chmtx.o
- .rodata.__func__.6614
+ .rodata.__func__.6544
                 0x00000000        0xd build/obj/chmtx.o
- .rodata.__func__.6572
+ .rodata.__func__.6502
                 0x00000000       0x10 build/obj/chmtx.o
- .rodata.__func__.6580
+ .rodata.__func__.6510
                 0x00000000        0xb build/obj/chmtx.o
- .rodata.__func__.6597
+ .rodata.__func__.6527
                 0x00000000        0xe build/obj/chmtx.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chmtx.o
+ .rodata.__func__.6533
+                0x00000000        0xc build/obj/chmtx.o
  .comment       0x00000000       0x71 build/obj/chmtx.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chmtx.o
@@ -479,20 +477,20 @@ Discarded input sections
                 0x00000000       0x70 build/obj/chcond.o
  .text.chCondWaitTimeout
                 0x00000000       0x50 build/obj/chcond.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chcond.o
- .rodata.__func__.6602
-                0x00000000        0xc build/obj/chcond.o
- .rodata.__func__.6614
+ .rodata.__func__.6544
                 0x00000000       0x13 build/obj/chcond.o
- .rodata.__func__.6572
+ .rodata.__func__.6502
                 0x00000000       0x11 build/obj/chcond.o
- .rodata.__func__.6580
+ .rodata.__func__.6510
                 0x00000000        0xe build/obj/chcond.o
- .rodata.__func__.6576
+ .rodata.__func__.6506
                 0x00000000        0xd build/obj/chcond.o
- .rodata.__func__.6588
+ .rodata.__func__.6518
                 0x00000000       0x11 build/obj/chcond.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chcond.o
+ .rodata.__func__.6532
+                0x00000000        0xc build/obj/chcond.o
  .comment       0x00000000       0x71 build/obj/chcond.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chcond.o
@@ -533,20 +531,20 @@ Discarded input sections
                 0x00000000       0xb4 build/obj/chevents.o
  .text.chEvtWaitAllTimeout
                 0x00000000       0x9c build/obj/chevents.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chevents.o
- .rodata.__func__.6614
+ .rodata.__func__.6544
                 0x00000000        0xd build/obj/chevents.o
- .rodata.__func__.6609
-                0x00000000        0xc build/obj/chevents.o
- .rodata.__func__.6575
-                0x00000000       0x1b build/obj/chevents.o
- .rodata.__func__.6581
-                0x00000000       0x10 build/obj/chevents.o
- .rodata.__func__.6628
+ .rodata.__func__.6558
                 0x00000000        0xe build/obj/chevents.o
- .rodata.__func__.6597
+ .rodata.__func__.6539
+                0x00000000        0xc build/obj/chevents.o
+ .rodata.__func__.6505
+                0x00000000       0x1b build/obj/chevents.o
+ .rodata.__func__.6511
+                0x00000000       0x10 build/obj/chevents.o
+ .rodata.__func__.6527
                 0x00000000       0x15 build/obj/chevents.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chevents.o
  .comment       0x00000000       0x71 build/obj/chevents.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chevents.o
@@ -559,12 +557,12 @@ Discarded input sections
                 0x00000000       0x6c build/obj/chmsg.o
  .text.chMsgRelease
                 0x00000000       0x64 build/obj/chmsg.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chmsg.o
- .rodata.__func__.6574
+ .rodata.__func__.6504
                 0x00000000        0xa build/obj/chmsg.o
- .rodata.__func__.6583
+ .rodata.__func__.6513
                 0x00000000        0xd build/obj/chmsg.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chmsg.o
  .comment       0x00000000       0x71 build/obj/chmsg.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chmsg.o
@@ -595,23 +593,23 @@ Discarded input sections
                 0x00000000       0x54 build/obj/chmboxes.o
  .text.chMBFetchI
                 0x00000000       0x58 build/obj/chmboxes.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chmboxes.o
- .rodata.__func__.6599
+ .rodata.__func__.6542
+                0x00000000        0xf build/obj/chmboxes.o
+ .rodata.__func__.6547
+                0x00000000        0xf build/obj/chmboxes.o
+ .rodata.__func__.6560
+                0x00000000        0xb build/obj/chmboxes.o
+ .rodata.__func__.6504
+                0x00000000        0xf build/obj/chmboxes.o
+ .rodata.__func__.6511
+                0x00000000        0xb build/obj/chmboxes.o
+ .rodata.__func__.6565
+                0x00000000        0xb build/obj/chmboxes.o
+ .rodata.__func__.6524
                 0x00000000        0xa build/obj/chmboxes.o
- .rodata.__func__.6612
-                0x00000000        0xf build/obj/chmboxes.o
- .rodata.__func__.6617
-                0x00000000        0xf build/obj/chmboxes.o
- .rodata.__func__.6574
-                0x00000000        0xf build/obj/chmboxes.o
- .rodata.__func__.6630
-                0x00000000        0xb build/obj/chmboxes.o
- .rodata.__func__.6581
-                0x00000000        0xb build/obj/chmboxes.o
- .rodata.__func__.6635
-                0x00000000        0xb build/obj/chmboxes.o
- .rodata.__func__.6594
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chmboxes.o
+ .rodata.__func__.6529
                 0x00000000        0xa build/obj/chmboxes.o
  .comment       0x00000000       0x71 build/obj/chmboxes.o
  .ARM.attributes
@@ -639,12 +637,12 @@ Discarded input sections
                 0x00000000       0x44 build/obj/chqueues.o
  .text.chOQWriteTimeout
                 0x00000000      0x10c build/obj/chqueues.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chqueues.o
- .rodata.__func__.6600
-                0x00000000       0x10 build/obj/chqueues.o
- .rodata.__func__.6636
+ .rodata.__func__.6566
                 0x00000000       0x11 build/obj/chqueues.o
+ .rodata.__func__.6530
+                0x00000000       0x10 build/obj/chqueues.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chqueues.o
  .comment       0x00000000       0x71 build/obj/chqueues.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chqueues.o
@@ -660,9 +658,9 @@ Discarded input sections
  .text.chCoreGetStatusX
                 0x00000000       0x14 build/obj/chmemcore.o
  .bss.endmem    0x00000000        0x4 build/obj/chmemcore.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chmemcore.o
  .bss.nextmem   0x00000000        0x4 build/obj/chmemcore.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chmemcore.o
  .comment       0x00000000       0x71 build/obj/chmemcore.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chmemcore.o
@@ -679,11 +677,11 @@ Discarded input sections
                 0x00000000       0xc8 build/obj/chheap.o
  .text.chHeapStatus
                 0x00000000       0x44 build/obj/chheap.o
- .rodata.__func__.6579
+ .rodata.__func__.6509
                 0x00000000       0x11 build/obj/chheap.o
  .bss.default_heap
                 0x00000000       0x20 build/obj/chheap.o
- .rodata.__func__.6596
+ .rodata.__func__.6526
                 0x00000000        0xb build/obj/chheap.o
  .comment       0x00000000       0x71 build/obj/chheap.o
  .ARM.attributes
@@ -703,16 +701,16 @@ Discarded input sections
                 0x00000000       0x4c build/obj/chmempools.o
  .text.chPoolLoadArray
                 0x00000000       0x38 build/obj/chmempools.o
- .rodata.__func__.6598
-                0x00000000        0xc build/obj/chmempools.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/chmempools.o
- .rodata.__func__.6574
+ .rodata.__func__.6504
                 0x00000000       0x11 build/obj/chmempools.o
- .rodata.__func__.6580
+ .rodata.__func__.6510
                 0x00000000       0x10 build/obj/chmempools.o
- .rodata.__func__.6588
+ .rodata.__func__.6518
                 0x00000000        0xd build/obj/chmempools.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/chmempools.o
+ .rodata.__func__.6528
+                0x00000000        0xc build/obj/chmempools.o
  .comment       0x00000000       0x71 build/obj/chmempools.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/chmempools.o
@@ -770,22 +768,22 @@ Discarded input sections
                 0x00000000      0x148 build/obj/hal_mmcsd.o
  .text._mmcsd_unpack_csd_v20
                 0x00000000      0x13c build/obj/hal_mmcsd.o
- .rodata.__func__.8152
-                0x00000000       0x14 build/obj/hal_mmcsd.o
+ .rodata.__func__.8148
+                0x00000000       0x16 build/obj/hal_mmcsd.o
+ .rodata.__func__.8154
+                0x00000000       0x16 build/obj/hal_mmcsd.o
  .rodata.__func__.8160
-                0x00000000       0x18 build/obj/hal_mmcsd.o
+                0x00000000       0x16 build/obj/hal_mmcsd.o
  .rodata.__func__.8166
                 0x00000000       0x16 build/obj/hal_mmcsd.o
  .rodata.__func__.8172
                 0x00000000       0x16 build/obj/hal_mmcsd.o
- .rodata.__func__.8178
-                0x00000000       0x16 build/obj/hal_mmcsd.o
- .rodata.__func__.8184
-                0x00000000       0x16 build/obj/hal_mmcsd.o
- .rodata.__func__.8190
-                0x00000000       0x16 build/obj/hal_mmcsd.o
- .rodata.__func__.8145
+ .rodata.__func__.8127
                 0x00000000       0x11 build/obj/hal_mmcsd.o
+ .rodata.__func__.8134
+                0x00000000       0x14 build/obj/hal_mmcsd.o
+ .rodata.__func__.8142
+                0x00000000       0x18 build/obj/hal_mmcsd.o
  .comment       0x00000000       0x71 build/obj/hal_mmcsd.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/hal_mmcsd.o
@@ -812,24 +810,24 @@ Discarded input sections
                 0x00000000       0x28 build/obj/adc.o
  .text.adcReleaseBus
                 0x00000000       0x28 build/obj/adc.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/adc.o
- .rodata.__func__.8163
-                0x00000000       0x14 build/obj/adc.o
- .rodata.__func__.8171
+ .rodata.__func__.8153
                 0x00000000       0x13 build/obj/adc.o
- .rodata.__func__.8167
+ .rodata.__func__.8149
                 0x00000000       0x12 build/obj/adc.o
- .rodata.__func__.8183
-                0x00000000        0xe build/obj/adc.o
- .rodata.__func__.8179
+ .rodata.__func__.8161
                 0x00000000        0xb build/obj/adc.o
- .rodata.__func__.8187
+ .rodata.__func__.8165
                 0x00000000        0xe build/obj/adc.o
- .rodata.__func__.8150
+ .rodata.__func__.8169
+                0x00000000        0xe build/obj/adc.o
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/adc.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/adc.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/adc.o
+ .rodata.__func__.8145
+                0x00000000       0x14 build/obj/adc.o
  .comment       0x00000000       0x71 build/obj/adc.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/adc.o
@@ -860,18 +858,18 @@ Discarded input sections
                 0x00000000       0x78 build/obj/ext.o
  .text.extSetChannelModeI
                 0x00000000       0x44 build/obj/ext.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/ext.o
- .rodata.__func__.8155
-                0x00000000       0x11 build/obj/ext.o
- .rodata.__func__.8160
-                0x00000000       0x12 build/obj/ext.o
- .rodata.__func__.8167
+ .rodata.__func__.8149
                 0x00000000       0x13 build/obj/ext.o
- .rodata.__func__.8150
+ .rodata.__func__.8137
+                0x00000000       0x11 build/obj/ext.o
+ .rodata.__func__.8142
+                0x00000000       0x12 build/obj/ext.o
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/ext.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/ext.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/ext.o
  .comment       0x00000000       0x71 build/obj/ext.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/ext.o
@@ -900,22 +898,22 @@ Discarded input sections
                 0x00000000       0x48 build/obj/gpt.o
  .text.gptPolledDelay
                 0x00000000       0x28 build/obj/gpt.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/gpt.o
  .rodata.__func__.8155
-                0x00000000       0x12 build/obj/gpt.o
- .rodata.__func__.8164
-                0x00000000       0x14 build/obj/gpt.o
- .rodata.__func__.8173
                 0x00000000       0x11 build/obj/gpt.o
- .rodata.__func__.8180
+ .rodata.__func__.8137
+                0x00000000       0x12 build/obj/gpt.o
+ .rodata.__func__.8162
                 0x00000000        0xe build/obj/gpt.o
- .rodata.__func__.8185
+ .rodata.__func__.8167
                 0x00000000        0xf build/obj/gpt.o
- .rodata.__func__.8150
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/gpt.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/gpt.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/gpt.o
+ .rodata.__func__.8146
+                0x00000000       0x14 build/obj/gpt.o
  .comment       0x00000000       0x71 build/obj/gpt.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/gpt.o
@@ -938,22 +936,22 @@ Discarded input sections
                 0x00000000       0x28 build/obj/i2c.o
  .text.i2cReleaseBus
                 0x00000000       0x28 build/obj/i2c.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/i2c.o
- .rodata.__func__.8154
-                0x00000000        0xd build/obj/i2c.o
- .rodata.__func__.8165
+ .rodata.__func__.8147
                 0x00000000       0x19 build/obj/i2c.o
- .rodata.__func__.8174
+ .rodata.__func__.8160
+                0x00000000        0xe build/obj/i2c.o
+ .rodata.__func__.8156
                 0x00000000       0x18 build/obj/i2c.o
- .rodata.__func__.8182
+ .rodata.__func__.8164
                 0x00000000        0xe build/obj/i2c.o
- .rodata.__func__.8178
-                0x00000000        0xe build/obj/i2c.o
- .rodata.__func__.8150
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/i2c.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/i2c.o
+ .rodata.__func__.8136
+                0x00000000        0xd build/obj/i2c.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/i2c.o
  .comment       0x00000000       0x71 build/obj/i2c.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/i2c.o
@@ -982,22 +980,22 @@ Discarded input sections
                 0x00000000       0x64 build/obj/icu.o
  .text.icuDisableNotifications
                 0x00000000       0x64 build/obj/icu.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/icu.o
- .rodata.__func__.8154
-                0x00000000       0x10 build/obj/icu.o
- .rodata.__func__.8163
-                0x00000000        0xf build/obj/icu.o
- .rodata.__func__.8159
-                0x00000000        0xf build/obj/icu.o
- .rodata.__func__.8171
+ .rodata.__func__.8153
                 0x00000000       0x18 build/obj/icu.o
- .rodata.__func__.8167
+ .rodata.__func__.8149
                 0x00000000       0x17 build/obj/icu.o
- .rodata.__func__.8150
+ .rodata.__func__.8141
+                0x00000000        0xf build/obj/icu.o
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/icu.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/icu.o
+ .rodata.__func__.8136
+                0x00000000       0x10 build/obj/icu.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/icu.o
+ .rodata.__func__.8145
+                0x00000000        0xf build/obj/icu.o
  .comment       0x00000000       0x71 build/obj/icu.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/icu.o
@@ -1022,12 +1020,12 @@ Discarded input sections
                 0x00000000       0x38 build/obj/pal.o
  .text.palSetBusMode
                 0x00000000       0x2c build/obj/pal.o
- .rodata.__func__.8149
-                0x00000000        0xe build/obj/pal.o
- .rodata.__func__.8144
-                0x00000000        0xc build/obj/pal.o
- .rodata.__func__.8139
+ .rodata.__func__.8121
                 0x00000000        0xb build/obj/pal.o
+ .rodata.__func__.8126
+                0x00000000        0xc build/obj/pal.o
+ .rodata.__func__.8131
+                0x00000000        0xe build/obj/pal.o
  .comment       0x00000000       0x71 build/obj/pal.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/pal.o
@@ -1057,15 +1055,15 @@ Discarded input sections
                 0x00000000       0x64 build/obj/rtc.o
  .text.rtcConvertDateTimeToFAT
                 0x00000000       0x90 build/obj/rtc.o
- .rodata.__func__.8147
-                0x00000000        0xb build/obj/rtc.o
- .rodata.__func__.8158
-                0x00000000        0xc build/obj/rtc.o
- .rodata.__func__.8164
-                0x00000000        0xc build/obj/rtc.o
  .rodata.month_len
                 0x00000000        0xc build/obj/rtc.o
- .rodata.__func__.8152
+ .rodata.__func__.8146
+                0x00000000        0xc build/obj/rtc.o
+ .rodata.__func__.8129
+                0x00000000        0xb build/obj/rtc.o
+ .rodata.__func__.8140
+                0x00000000        0xc build/obj/rtc.o
+ .rodata.__func__.8134
                 0x00000000        0xb build/obj/rtc.o
  .comment       0x00000000       0x71 build/obj/rtc.o
  .ARM.attributes
@@ -1095,32 +1093,32 @@ Discarded input sections
                 0x00000000       0x64 build/obj/sdc.o
  .text.sdcErase
                 0x00000000       0xa8 build/obj/sdc.o
- .rodata.__func__.8486
-                0x00000000        0x9 build/obj/sdc.o
- .rodata.__func__.8431
+ .rodata.__func__.8419
+                0x00000000        0xb build/obj/sdc.o
+ .rodata.__func__.8430
+                0x00000000        0xe build/obj/sdc.o
+ .rodata.__func__.8387
+                0x00000000       0x12 build/obj/sdc.o
+ .rodata.__func__.8438
                 0x00000000        0x8 build/obj/sdc.o
- .rodata.__func__.8427
+ .rodata.__func__.8446
+                0x00000000        0x9 build/obj/sdc.o
+ .rodata.__func__.8468
                 0x00000000        0x9 build/obj/sdc.o
  .rodata.sdc_vmt
                 0x00000000       0x20 build/obj/sdc.o
- .rodata.__func__.6191
+ .rodata.__func__.6124
                 0x00000000        0xc build/obj/sdc.o
- .rodata.__func__.8437
+ .rodata.__func__.8461
                 0x00000000        0xb build/obj/sdc.o
- .rodata.__func__.8448
-                0x00000000        0xe build/obj/sdc.o
- .rodata.__func__.8469
+ .rodata.__func__.8409
+                0x00000000        0x9 build/obj/sdc.o
+ .rodata.__func__.8451
                 0x00000000       0x15 build/obj/sdc.o
+ .rodata.__func__.8413
+                0x00000000        0x8 build/obj/sdc.o
  .rodata.__func__.8456
                 0x00000000        0x8 build/obj/sdc.o
- .rodata.__func__.8464
-                0x00000000        0x9 build/obj/sdc.o
- .rodata.__func__.8405
-                0x00000000       0x12 build/obj/sdc.o
- .rodata.__func__.8474
-                0x00000000        0x8 build/obj/sdc.o
- .rodata.__func__.8479
-                0x00000000        0xb build/obj/sdc.o
  .comment       0x00000000       0x71 build/obj/sdc.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/sdc.o
@@ -1148,17 +1146,17 @@ Discarded input sections
                 0x00000000       0x54 build/obj/serial.o
  .text.sdGetWouldBlock
                 0x00000000       0x54 build/obj/serial.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/serial.o
- .rodata.__func__.8191
-                0x00000000        0x7 build/obj/serial.o
- .rodata.__func__.8187
-                0x00000000        0x8 build/obj/serial.o
- .rodata.vmt    0x00000000       0x20 build/obj/serial.o
- .rodata.__func__.8196
-                0x00000000       0x10 build/obj/serial.o
- .rodata.__func__.8201
+ .rodata.__func__.8183
                 0x00000000        0xf build/obj/serial.o
+ .rodata.__func__.8173
+                0x00000000        0x7 build/obj/serial.o
+ .rodata.__func__.8169
+                0x00000000        0x8 build/obj/serial.o
+ .rodata.__func__.8178
+                0x00000000       0x10 build/obj/serial.o
+ .rodata.vmt    0x00000000       0x20 build/obj/serial.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/serial.o
  .comment       0x00000000       0x71 build/obj/serial.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/serial.o
@@ -1200,36 +1198,36 @@ Discarded input sections
                 0x00000000       0x28 build/obj/spi.o
  .text.spiReleaseBus
                 0x00000000       0x28 build/obj/spi.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/spi.o
- .rodata.__func__.8154
-                0x00000000        0xa build/obj/spi.o
- .rodata.__func__.8210
-                0x00000000        0xe build/obj/spi.o
- .rodata.__func__.8206
-                0x00000000        0xb build/obj/spi.o
- .rodata.__func__.8158
-                0x00000000        0xc build/obj/spi.o
- .rodata.__func__.8214
-                0x00000000        0xe build/obj/spi.o
- .rodata.__func__.8170
+ .rodata.__func__.8152
                 0x00000000       0x11 build/obj/spi.o
- .rodata.__func__.8163
-                0x00000000        0xf build/obj/spi.o
- .rodata.__func__.8176
+ .rodata.__func__.8196
+                0x00000000        0xe build/obj/spi.o
+ .rodata.__func__.8158
                 0x00000000        0xd build/obj/spi.o
- .rodata.__func__.8182
+ .rodata.__func__.8164
                 0x00000000       0x10 build/obj/spi.o
- .rodata.__func__.8187
+ .rodata.__func__.8169
                 0x00000000        0xa build/obj/spi.o
- .rodata.__func__.8194
+ .rodata.__func__.8176
                 0x00000000        0xc build/obj/spi.o
- .rodata.__func__.8200
+ .rodata.__func__.8182
                 0x00000000        0x8 build/obj/spi.o
- .rodata.__func__.8150
+ .rodata.__func__.8188
+                0x00000000        0xb build/obj/spi.o
+ .rodata.__func__.8192
+                0x00000000        0xe build/obj/spi.o
+ .rodata.__func__.8132
                 0x00000000        0x8 build/obj/spi.o
- .rodata.__func__.8146
+ .rodata.__func__.8128
                 0x00000000        0x9 build/obj/spi.o
+ .rodata.__func__.8140
+                0x00000000        0xc build/obj/spi.o
+ .rodata.__func__.8136
+                0x00000000        0xa build/obj/spi.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/spi.o
+ .rodata.__func__.8145
+                0x00000000        0xf build/obj/spi.o
  .comment       0x00000000       0x71 build/obj/spi.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/spi.o
@@ -1245,12 +1243,12 @@ Discarded input sections
                 0x00000000       0x20 build/obj/st.o
  .text.stGetAlarm
                 0x00000000       0x20 build/obj/st.o
- .rodata.__func__.8153
-                0x00000000        0xb build/obj/st.o
- .rodata.__func__.8149
-                0x00000000        0xb build/obj/st.o
- .rodata.__func__.8142
+ .rodata.__func__.8124
                 0x00000000        0xd build/obj/st.o
+ .rodata.__func__.8131
+                0x00000000        0xb build/obj/st.o
+ .rodata.__func__.8135
+                0x00000000        0xb build/obj/st.o
  .comment       0x00000000       0x71 build/obj/st.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/st.o
@@ -1277,7 +1275,7 @@ Discarded input sections
                 0x00000000       0x24 build/obj/nvic.o
  .text.nvicClearPending
                 0x00000000       0x18 build/obj/nvic.o
- .rodata.__func__.8147
+ .rodata.__func__.8129
                 0x00000000       0x1d build/obj/nvic.o
  .comment       0x00000000       0x71 build/obj/nvic.o
  .ARM.attributes
@@ -1322,9 +1320,9 @@ Discarded input sections
                 0x00000000       0xac build/obj/stm32_dma.o
  .text.dmaStreamRelease
                 0x00000000       0x68 build/obj/stm32_dma.o
- .rodata.__func__.8220
+ .rodata.__func__.8202
                 0x00000000       0x12 build/obj/stm32_dma.o
- .rodata.__func__.8227
+ .rodata.__func__.8209
                 0x00000000       0x11 build/obj/stm32_dma.o
  .bss.dma_isr_redir
                 0x00000000       0x80 build/obj/stm32_dma.o
@@ -1372,11 +1370,11 @@ Discarded input sections
                 0x00000000       0x10 build/obj/adc_lld.o
  .text.adcSTM32DisableVBATE
                 0x00000000       0x10 build/obj/adc_lld.o
- .rodata.__func__.8156
-                0x00000000        0xe build/obj/adc_lld.o
  .bss.ADCD1     0x00000000       0x34 build/obj/adc_lld.o
  .bss.ADCD2     0x00000000       0x34 build/obj/adc_lld.o
  .bss.ADCD3     0x00000000       0x34 build/obj/adc_lld.o
+ .rodata.__func__.8138
+                0x00000000        0xe build/obj/adc_lld.o
  .comment       0x00000000       0x71 build/obj/adc_lld.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/adc_lld.o
@@ -1493,19 +1491,19 @@ Discarded input sections
  .text.sdc_lld_sync
                 0x00000000        0x4 build/obj/sdc_lld.o
  .bss.SDCD1     0x00000000       0x4c build/obj/sdc_lld.o
- .rodata.__func__.8429
-                0x00000000       0x15 build/obj/sdc_lld.o
  .rodata.sdc_default_cfg
                 0x00000000        0x8 build/obj/sdc_lld.o
- .rodata.__func__.8438
-                0x00000000       0x16 build/obj/sdc_lld.o
- .bss.u         0x00000000      0x200 build/obj/sdc_lld.o
- .rodata.__func__.6191
-                0x00000000        0xc build/obj/sdc_lld.o
- .rodata.__func__.8352
-                0x00000000        0xe build/obj/sdc_lld.o
- .rodata.__func__.8307
+ .rodata.__func__.8289
                 0x00000000       0x1b build/obj/sdc_lld.o
+ .rodata.__func__.8334
+                0x00000000        0xe build/obj/sdc_lld.o
+ .bss.u         0x00000000      0x200 build/obj/sdc_lld.o
+ .rodata.__func__.6124
+                0x00000000        0xc build/obj/sdc_lld.o
+ .rodata.__func__.8411
+                0x00000000       0x15 build/obj/sdc_lld.o
+ .rodata.__func__.8420
+                0x00000000       0x16 build/obj/sdc_lld.o
  .comment       0x00000000       0x71 build/obj/sdc_lld.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/sdc_lld.o
@@ -1543,17 +1541,17 @@ Discarded input sections
  .text.i2c_lld_stop
                 0x00000000       0x88 build/obj/i2c_lld.o
  .text.i2c_lld_master_receive_timeout
-                0x00000000       0xe0 build/obj/i2c_lld.o
+                0x00000000       0xd8 build/obj/i2c_lld.o
  .text.i2c_lld_master_transmit_timeout
-                0x00000000       0xf4 build/obj/i2c_lld.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/i2c_lld.o
- .rodata.__func__.8155
-                0x00000000       0x12 build/obj/i2c_lld.o
- .rodata.__func__.8220
+                0x00000000       0xec build/obj/i2c_lld.o
+ .rodata.__func__.8202
                 0x00000000        0xe build/obj/i2c_lld.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/i2c_lld.o
  .rodata.str1.4
                 0x00000000        0xc build/obj/i2c_lld.o
+ .rodata.__func__.8137
+                0x00000000       0x12 build/obj/i2c_lld.o
  .bss.I2CD2     0x00000000       0x38 build/obj/i2c_lld.o
  .comment       0x00000000       0x71 build/obj/i2c_lld.o
  .ARM.attributes
@@ -1581,9 +1579,9 @@ Discarded input sections
                 0x00000000       0x78 build/obj/rtc_lld.o
  .text.rtcSTM32GetPeriodicWakeup
                 0x00000000       0x24 build/obj/rtc_lld.o
- .rodata.__func__.8209
-                0x00000000       0x1a build/obj/rtc_lld.o
  .bss.RTCD1     0x00000000        0x4 build/obj/rtc_lld.o
+ .rodata.__func__.8191
+                0x00000000       0x1a build/obj/rtc_lld.o
  .comment       0x00000000       0x71 build/obj/rtc_lld.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/rtc_lld.o
@@ -1620,13 +1618,13 @@ Discarded input sections
                 0x00000000       0x38 build/obj/spi_lld.o
  .text.spi_lld_polled_exchange
                 0x00000000       0x10 build/obj/spi_lld.o
- .rodata.__func__.8161
-                0x00000000        0xe build/obj/spi_lld.o
  .bss.dummytx   0x00000000        0x2 build/obj/spi_lld.o
  .bss.SPID1     0x00000000       0x30 build/obj/spi_lld.o
  .bss.SPID2     0x00000000       0x30 build/obj/spi_lld.o
  .rodata.str1.4
                 0x00000000        0xc build/obj/spi_lld.o
+ .rodata.__func__.8143
+                0x00000000        0xe build/obj/spi_lld.o
  .bss.dummyrx   0x00000000        0x2 build/obj/spi_lld.o
  .comment       0x00000000       0x71 build/obj/spi_lld.o
  .ARM.attributes
@@ -1656,12 +1654,12 @@ Discarded input sections
                 0x00000000       0x14 build/obj/gpt_lld.o
  .text.gpt_lld_polled_delay
                 0x00000000       0x1c build/obj/gpt_lld.o
- .rodata.__func__.8162
-                0x00000000        0xe build/obj/gpt_lld.o
  .bss.GPTD2     0x00000000       0x10 build/obj/gpt_lld.o
  .bss.GPTD14    0x00000000       0x10 build/obj/gpt_lld.o
  .bss.GPTD5     0x00000000       0x10 build/obj/gpt_lld.o
  .bss.GPTD9     0x00000000       0x10 build/obj/gpt_lld.o
+ .rodata.__func__.8144
+                0x00000000        0xe build/obj/gpt_lld.o
  .comment       0x00000000       0x71 build/obj/gpt_lld.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/gpt_lld.o
@@ -1692,10 +1690,10 @@ Discarded input sections
                 0x00000000       0x40 build/obj/icu_lld.o
  .text.icu_lld_disable_notifications
                 0x00000000        0xc build/obj/icu_lld.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/icu_lld.o
- .rodata.__func__.8165
+ .rodata.__func__.8147
                 0x00000000        0xe build/obj/icu_lld.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/icu_lld.o
  .bss.ICUD1     0x00000000       0x18 build/obj/icu_lld.o
  .comment       0x00000000       0x71 build/obj/icu_lld.o
  .ARM.attributes
@@ -1709,10 +1707,10 @@ Discarded input sections
  .text          0x00000000        0x0 build/obj/st_lld.o
  .data          0x00000000        0x0 build/obj/st_lld.o
  .bss           0x00000000        0x0 build/obj/st_lld.o
- .text.VectorB0
-                0x00000000       0x44 build/obj/st_lld.o
+ .text.SysTick_Handler
+                0x00000000       0x38 build/obj/st_lld.o
  .text.st_lld_init
-                0x00000000       0x48 build/obj/st_lld.o
+                0x00000000       0x20 build/obj/st_lld.o
  .comment       0x00000000       0x71 build/obj/st_lld.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/st_lld.o
@@ -1884,14 +1882,14 @@ Discarded input sections
  .text.f_setlabel
                 0x00000000      0x190 build/obj/ff.o
  .text.f_mkfs   0x00000000      0x610 build/obj/ff.o
- .rodata.vst.7239
-                0x00000000       0x16 build/obj/ff.o
- .rodata.cst.7240
+ .rodata.cst.7174
                 0x00000000       0x16 build/obj/ff.o
  .bss.Fsid      0x00000000        0x2 build/obj/ff.o
  .rodata.str1.4
                 0x00000000       0x54 build/obj/ff.o
  .rodata.ExCvt  0x00000000       0x80 build/obj/ff.o
+ .rodata.vst.7173
+                0x00000000       0x16 build/obj/ff.o
  .bss.FatFs     0x00000000        0x4 build/obj/ff.o
  .comment       0x00000000       0x71 build/obj/ff.o
  .ARM.attributes
@@ -1916,12 +1914,12 @@ Discarded input sections
                 0x00000000       0x7c build/obj/kb_adc.o
  .text.kuroBoxADCStop
                 0x00000000       0x64 build/obj/kb_adc.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/kb_adc.o
  .rodata.adc_grp_cfg
                 0x00000000       0x28 build/obj/kb_adc.o
  .bss.adc_trigger
                 0x00000000       0x14 build/obj/kb_adc.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/kb_adc.o
  .bss.adc_cfg   0x00000000        0x4 build/obj/kb_adc.o
  .bss.adc_samples
                 0x00000000       0x18 build/obj/kb_adc.o
@@ -1934,7 +1932,7 @@ Discarded input sections
  .text.write_reg
                 0x00000000       0x54 build/obj/kb_altimeter.o
  .text.thAltimeter
-                0x00000000      0x100 build/obj/kb_altimeter.o
+                0x00000000       0xfc build/obj/kb_altimeter.o
  .text.kuroBoxAltimeterInit
                 0x00000000       0x2c build/obj/kb_altimeter.o
  .text.kuroBoxAltimeterStop
@@ -2041,10 +2039,10 @@ Discarded input sections
                 0x00000000       0x38 build/obj/kb_externalDisplay.o
  .bss.kbb_display
                 0x00000000       0x80 build/obj/kb_externalDisplay.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/kb_externalDisplay.o
  .bss.waEDisplay
                 0x00000000      0x2e8 build/obj/kb_externalDisplay.o
+ .rodata.__func__.8607
+                0x00000000        0xb build/obj/kb_externalDisplay.o
  .bss.eDisplayThreadForSleep
                 0x00000000        0x4 build/obj/kb_externalDisplay.o
  .bss.ed_serialPort
@@ -2053,8 +2051,8 @@ Discarded input sections
                 0x00000000        0x9 build/obj/kb_externalDisplay.o
  .bss.eDisplayThread
                 0x00000000        0x4 build/obj/kb_externalDisplay.o
- .rodata.__func__.8625
-                0x00000000        0xb build/obj/kb_externalDisplay.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/kb_externalDisplay.o
  .bss.ed_interval
                 0x00000000        0x4 build/obj/kb_externalDisplay.o
  .comment       0x00000000       0x71 build/obj/kb_externalDisplay.o
@@ -2069,22 +2067,20 @@ Discarded input sections
  .text          0x00000000        0x0 build/obj/kb_gps.o
  .data          0x00000000        0x0 build/obj/kb_gps.o
  .bss           0x00000000        0x0 build/obj/kb_gps.o
- .text.thGps    0x00000000      0x14c build/obj/kb_gps.o
+ .text.thGps    0x00000000      0x160 build/obj/kb_gps.o
  .text.kbg_ecef2lla
                 0x00000000      0x154 build/obj/kb_gps.o
  .text.kbg_timepulseExtiCB
-                0x00000000       0x18 build/obj/kb_gps.o
+                0x00000000       0x28 build/obj/kb_gps.o
  .text.kuroBoxGPSInit
                 0x00000000       0x4c build/obj/kb_gps.o
  .text.kuroBoxGPSStop
                 0x00000000       0x1c build/obj/kb_gps.o
  .text.kbg_getUbxNavSol
                 0x00000000        0x8 build/obj/kb_gps.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/kb_gps.o
- .bss.waGps     0x00000000      0x168 build/obj/kb_gps.o
- .rodata.__func__.9170
+ .rodata.__func__.9146
                 0x00000000        0xf build/obj/kb_gps.o
+ .bss.waGps     0x00000000      0x168 build/obj/kb_gps.o
  .bss.ubx_nav_sol_idx
                 0x00000000        0x1 build/obj/kb_gps.o
  .rodata.str1.4
@@ -2094,6 +2090,8 @@ Discarded input sections
  .bss.gpsThread
                 0x00000000        0x4 build/obj/kb_gps.o
  .data.gps_cfg  0x00000000        0xc build/obj/kb_gps.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/kb_gps.o
  .bss.ubx_nav_sol_valid
                 0x00000000       0x3c build/obj/kb_gps.o
  .comment       0x00000000       0x71 build/obj/kb_gps.o
@@ -2162,9 +2160,9 @@ Discarded input sections
  .text.mi_lcd_backlight
                 0x00000000       0x28 build/obj/kb_menu_items.o
  .text.mi_time_from_gps
-                0x00000000       0x8c build/obj/kb_menu_items.o
+                0x00000000       0x64 build/obj/kb_menu_items.o
  .text.mi_time_from_ltc
-                0x00000000       0x3c build/obj/kb_menu_items.o
+                0x00000000       0x58 build/obj/kb_menu_items.o
  .text.mi_standby
                 0x00000000       0x18 build/obj/kb_menu_items.o
  .bss.kuroBox_request_standby
@@ -2176,11 +2174,11 @@ Discarded input sections
  .data          0x00000000        0x0 build/obj/kb_screen.o
  .bss           0x00000000        0x0 build/obj/kb_screen.o
  .text.thBlinker
-                0x00000000       0xc8 build/obj/kb_screen.o
+                0x00000000       0xcc build/obj/kb_screen.o
  .text.chprintf.constprop.0
                 0x00000000       0x24 build/obj/kb_screen.o
  .text.thScreen
-                0x00000000      0x3f0 build/obj/kb_screen.o
+                0x00000000      0x3e0 build/obj/kb_screen.o
  .text.kuroBoxScreenInit
                 0x00000000       0x68 build/obj/kb_screen.o
  .text.kuroBoxScreenStop
@@ -2358,13 +2356,13 @@ Discarded input sections
                 0x00000000       0x6c build/obj/kb_vectornav.o
  .rodata.default_vectornav_config
                 0x00000000       0x1c build/obj/kb_vectornav.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/kb_vectornav.o
  .bss.async_vn_msg
                 0x00000000      0x406 build/obj/kb_vectornav.o
  .bss.vnav_data
                 0x00000000       0x10 build/obj/kb_vectornav.o
  .bss.VND1      0x00000000        0xc build/obj/kb_vectornav.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/kb_vectornav.o
  .comment       0x00000000       0x71 build/obj/kb_vectornav.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/kb_vectornav.o
@@ -2376,9 +2374,9 @@ Discarded input sections
  .text.new_file
                 0x00000000       0xf4 build/obj/kb_writer.o
  .text.thLogger
-                0x00000000      0x2b4 build/obj/kb_writer.o
+                0x00000000      0x2b0 build/obj/kb_writer.o
  .text.thWriter
-                0x00000000      0x3e8 build/obj/kb_writer.o
+                0x00000000      0x3e4 build/obj/kb_writer.o
  .text.kuroBoxWriterInit
                 0x00000000       0x7c build/obj/kb_writer.o
  .text.kuroBoxWriterStop
@@ -2401,29 +2399,29 @@ Discarded input sections
                 0x00000000       0x10 build/obj/kb_writer.o
  .text.kbwh_setVNav
                 0x00000000       0x3c build/obj/kb_writer.o
- .rodata.__func__.5877
-                0x00000000        0xc build/obj/kb_writer.o
  .bss.header_msg
                 0x00000000      0x200 build/obj/kb_writer.o
  .bss.write_buffer_semaphore
                 0x00000000        0xc build/obj/kb_writer.o
  .bss.writerThread
                 0x00000000        0x4 build/obj/kb_writer.o
+ .rodata.__func__.8994
+                0x00000000        0xd build/obj/kb_writer.o
  .bss.cardsize_MB
                 0x00000000        0x4 build/obj/kb_writer.o
  .bss.writerThreadForSleep
                 0x00000000        0x4 build/obj/kb_writer.o
- .bss.loggerThread
-                0x00000000        0x4 build/obj/kb_writer.o
+ .bss.fs_write_protected
+                0x00000000        0x1 build/obj/kb_writer.o
  .bss.SDC_FS    0x00000000      0x230 build/obj/kb_writer.o
- .rodata.__func__.8944
-                0x00000000        0x9 build/obj/kb_writer.o
  .bss.kbfile    0x00000000      0x224 build/obj/kb_writer.o
  .bss.waWriter  0x00000000      0x4e8 build/obj/kb_writer.o
+ .rodata.__func__.8930
+                0x00000000        0x9 build/obj/kb_writer.o
  .rodata.str1.4
                 0x00000000       0x85 build/obj/kb_writer.o
- .rodata.__func__.9008
-                0x00000000        0xd build/obj/kb_writer.o
+ .rodata.__func__.8961
+                0x00000000       0x12 build/obj/kb_writer.o
  .bss.fs_ready  0x00000000        0x1 build/obj/kb_writer.o
  .bss.current_msg
                 0x00000000      0x200 build/obj/kb_writer.o
@@ -2432,10 +2430,10 @@ Discarded input sections
  .bss.logger_state
                 0x00000000        0x1 build/obj/kb_writer.o
  .bss.waLogger  0x00000000      0x1e8 build/obj/kb_writer.o
- .bss.fs_write_protected
-                0x00000000        0x1 build/obj/kb_writer.o
- .rodata.__func__.8975
-                0x00000000       0x12 build/obj/kb_writer.o
+ .rodata.__func__.5810
+                0x00000000        0xc build/obj/kb_writer.o
+ .bss.loggerThread
+                0x00000000        0x4 build/obj/kb_writer.o
  .comment       0x00000000       0x71 build/obj/kb_writer.o
  .ARM.attributes
                 0x00000000       0x33 build/obj/kb_writer.o
@@ -2451,10 +2449,10 @@ Discarded input sections
  .text.kuroBoxStop
                 0x00000000       0x80 build/obj/main.o
  .text.startup.main
-                0x00000000      0x118 build/obj/main.o
+                0x00000000      0x114 build/obj/main.o
  .rodata.i2cfg2
                 0x00000000        0xc build/obj/main.o
- .rodata.__func__.6191
+ .rodata.__func__.6124
                 0x00000000        0xc build/obj/main.o
  .bss.CC        0x00000000        0x4 build/obj/main.o
  .bss.ltc_int_ts_prev
@@ -2510,7 +2508,7 @@ Discarded input sections
  .text.st7565_display
                 0x00000000       0xfc build/obj/ST7565.o
  .text.st7565Start
-                0x00000000      0x10c build/obj/ST7565.o
+                0x00000000      0x108 build/obj/ST7565.o
  .text.st7565_clear
                 0x00000000       0x4c build/obj/ST7565.o
  .text.st7565_clear_display
@@ -3140,7 +3138,8 @@ ST7565font                                        build/obj/glcdfont.o
                                                   build/obj/ST7565.o
 SVC_Handler                                       build/obj/chcore_v7m.o
                                                   build/obj/vectors.o
-SysTick_Handler                                   build/obj/vectors.o
+SysTick_Handler                                   build/obj/st_lld.o
+                                                  build/obj/vectors.o
 SystemCoreClock                                   build/obj/hal_lld.o
 TIM5_period                                       build/obj/kb_time.o
 UsageFault_Handler                                build/obj/vectors.o
@@ -3260,8 +3259,7 @@ VectorA4                                          build/obj/icu_lld.o
 VectorA8                                          build/obj/vectors.o
 VectorAC                                          build/obj/icu_lld.o
                                                   build/obj/vectors.o
-VectorB0                                          build/obj/st_lld.o
-                                                  build/obj/gpt_lld.o
+VectorB0                                          build/obj/gpt_lld.o
                                                   build/obj/vectors.o
 VectorB4                                          build/obj/vectors.o
 VectorB8                                          build/obj/vectors.o
@@ -3544,6 +3542,7 @@ _dbg_check_lock                                   build/obj/chdebug.o
 _dbg_check_lock_from_isr                          build/obj/chdebug.o
                                                   build/obj/kb_vectornav.o
                                                   build/obj/kb_time.o
+                                                  build/obj/kb_gps.o
                                                   build/obj/kb_buttons.o
                                                   build/obj/kb_adc.o
                                                   build/obj/serial_lld.o
@@ -3590,6 +3589,7 @@ _dbg_check_unlock                                 build/obj/chdebug.o
 _dbg_check_unlock_from_isr                        build/obj/chdebug.o
                                                   build/obj/kb_vectornav.o
                                                   build/obj/kb_time.o
+                                                  build/obj/kb_gps.o
                                                   build/obj/kb_buttons.o
                                                   build/obj/kb_adc.o
                                                   build/obj/serial_lld.o
@@ -3663,6 +3663,7 @@ _stats_init                                       build/obj/chstats.o
 _stats_start_measure_crit_isr                     build/obj/chstats.o
                                                   build/obj/kb_vectornav.o
                                                   build/obj/kb_time.o
+                                                  build/obj/kb_gps.o
                                                   build/obj/kb_buttons.o
                                                   build/obj/kb_adc.o
                                                   build/obj/serial_lld.o
@@ -3708,6 +3709,7 @@ _stats_start_measure_crit_thd                     build/obj/chstats.o
 _stats_stop_measure_crit_isr                      build/obj/chstats.o
                                                   build/obj/kb_vectornav.o
                                                   build/obj/kb_time.o
+                                                  build/obj/kb_gps.o
                                                   build/obj/kb_buttons.o
                                                   build/obj/kb_adc.o
                                                   build/obj/serial_lld.o
@@ -4103,13 +4105,11 @@ chSysInit                                         build/obj/chsys.o
                                                   build/obj/main.o
 chSysIntegrityCheckI                              build/obj/chsys.o
 chSysIsCounterWithinX                             build/obj/chsys.o
-chSysLockFromIsr                                  build/obj/kb_gps.o
 chSysPolledDelayX                                 build/obj/chsys.o
 chSysRestoreStatusX                               build/obj/chsys.o
                                                   build/obj/rtc_lld.o
 chSysTimerHandlerI                                build/obj/chsys.o
                                                   build/obj/st_lld.o
-chSysUnlockFromIsr                                build/obj/kb_gps.o
 chTMChainMeasurementToX                           build/obj/chtm.o
                                                   build/obj/chstats.o
 chTMObjectInit                                    build/obj/chtm.o
@@ -4154,8 +4154,6 @@ chThdResumeI                                      build/obj/chthreads.o
 chThdResumeS                                      build/obj/chthreads.o
                                                   build/obj/adc.o
 chThdSetPriority                                  build/obj/chthreads.o
-chThdShouldTerminate                              build/obj/kb_screen.o
-                                                  build/obj/kb_gps.o
 chThdSleep                                        build/obj/chthreads.o
                                                   build/obj/ST7565.o
                                                   build/obj/main.o
@@ -4654,7 +4652,6 @@ nvicDisableVector                                 build/obj/nvic.o
                                                   build/obj/stm32_dma.o
 nvicEnableVector                                  build/obj/nvic.o
                                                   build/obj/serial_lld.o
-                                                  build/obj/st_lld.o
                                                   build/obj/icu_lld.o
                                                   build/obj/gpt_lld.o
                                                   build/obj/i2c_lld.o
@@ -4663,6 +4660,7 @@ nvicEnableVector                                  build/obj/nvic.o
                                                   build/obj/adc_lld.o
                                                   build/obj/stm32_dma.o
 nvicSetSystemHandlerPriority                      build/obj/nvic.o
+                                                  build/obj/st_lld.o
 palReadBus                                        build/obj/pal.o
 palSetBusMode                                     build/obj/pal.o
 palWriteBus                                       build/obj/pal.o
@@ -4681,8 +4679,8 @@ rtcConvertStructTmToDateTime                      build/obj/rtc.o
 rtcGetAlarm                                       build/obj/rtc.o
 rtcGetTime                                        build/obj/rtc.o
                                                   build/obj/kb_time.o
+                                                  build/obj/kb_menu_items.o
                                                   build/obj/fatfs_diskio.o
-rtcGetTimeTm                                      build/obj/kb_menu_items.o
 rtcInit                                           build/obj/rtc.o
                                                   build/obj/hal.o
 rtcObjectInit                                     build/obj/rtc.o
@@ -4691,7 +4689,7 @@ rtcSTM32GetPeriodicWakeup                         build/obj/rtc_lld.o
 rtcSTM32SetPeriodicWakeup                         build/obj/rtc_lld.o
 rtcSetAlarm                                       build/obj/rtc.o
 rtcSetTime                                        build/obj/rtc.o
-rtcSetTimeTm                                      build/obj/kb_menu_items.o
+                                                  build/obj/kb_menu_items.o
 rtc_lld_get_alarm                                 build/obj/rtc_lld.o
                                                   build/obj/rtc.o
 rtc_lld_get_time                                  build/obj/rtc_lld.o
@@ -4879,13 +4877,8 @@ stGetAlarm                                        build/obj/st.o
 stInit                                            build/obj/st.o
                                                   build/obj/hal.o
 stSetAlarm                                        build/obj/st.o
-                                                  build/obj/chvt.o
-                                                  build/obj/chsys.o
 stStartAlarm                                      build/obj/st.o
-                                                  build/obj/chvt.o
 stStopAlarm                                       build/obj/st.o
-                                                  build/obj/chvt.o
-                                                  build/obj/chsys.o
 st_lld_init                                       build/obj/st_lld.o
                                                   build/obj/st.o
 stm32_clock_init                                  build/obj/hal_lld.o

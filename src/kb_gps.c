@@ -135,7 +135,7 @@ static THD_FUNCTION(thGps, arg)
 	chRegSetThreadName("Gps");
 
 	memset(ubx_nav_sol_buffer, 0, sizeof(ubx_nav_sol_buffer));
-	while( !chThdShouldTerminate() )
+	while( !chThdShouldTerminateX() )
 	{
 		uint8_t c = 0;
 		// read one byte at a time, this function blocks until there's
@@ -181,11 +181,11 @@ kbg_timepulseExtiCB(EXTDriver *extp, expchannel_t channel)
 	(void)extp;
 	(void)channel;
 
-	chSysLockFromIsr();
+	chSysLockFromISR();
 		// @TODO: inform VectorNav that this happened
 		kbw_incPPS();
 		kbs_PPS();
-	chSysUnlockFromIsr();
+	chSysUnlockFromISR();
 }
 
 //-----------------------------------------------------------------------------

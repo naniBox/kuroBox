@@ -153,13 +153,11 @@ mi_time_from_gps(void * data)
 {
 	(void)data;
 	const struct ubx_nav_sol_t * nav_sol = kbg_getUbxNavSol();
-	struct tm timp;
-	rtcGetTimeTm(&RTCD1, &timp);
+    RTCDateTime timespec;
+    rtcGetTime(&RTCD1, &timespec);
 	uint32_t secs_today = (nav_sol->itow/1000) % (60*60*24);
-	timp.tm_hour = secs_today/3600;
-	timp.tm_min = (secs_today%3600)/60;
-	timp.tm_sec = secs_today%60;
-	rtcSetTimeTm(&RTCD1, &timp);
+	timespec.millisecond = secs_today / 1000;
+	rtcSetTime(&RTCD1, &timespec);
 	mi_exit(NULL);
 }
 
@@ -169,12 +167,11 @@ mi_time_from_ltc(void * data)
 {
 	(void)data;
 	const struct smpte_timecode_t * ltc = kbt_getLTC();
-	struct tm timp;
-	rtcGetTimeTm(&RTCD1, &timp);
-	timp.tm_hour = ltc->hours;
-	timp.tm_min = ltc->minutes;
-	timp.tm_sec = ltc->seconds;
-	rtcSetTimeTm(&RTCD1, &timp);
+    RTCDateTime timespec;
+    rtcGetTime(&RTCD1, &timespec);
+    uint32_t seconds = ltc->hours * 60 * 60 + ltc->minutes * 60 + ltc->seconds;
+    timespec.millisecond = seconds * 1000;
+	rtcSetTime(&RTCD1, &timespec);
 	mi_exit(NULL);
 }
 
